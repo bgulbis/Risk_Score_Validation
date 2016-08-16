@@ -45,7 +45,24 @@ unique.pts <- demograph %>%
     group_by(person.id) %>%
     inner_join(screen, by = "pie.id") %>%
     arrange(person.id, discharge.datetime) %>%
-    summarize(pie.id = first(pie.id))
+    summarize(pie.id = first(pie.id)) %>%
+    arrange(pie.id)
+
+pie2 <- concat_encounters(unique.pts$pie.id)
+
+# Run EDW Query: Diagnosis Codes (ICD-9/10-CM) - All
+#   * PowerInsight Encounter Id: all values from object pie2
+icd.codes <- read_data(data.raw, "diagnosis") %>%
+    as.diagnosis()
+
+female <- demograph %>%
+    semi_join(unique.pts, by = "pie.id") %>%
+    filter(sex == "Female")
+
+pie3 <- concat_encounters(female$pie.id)
+
+# Run EDW Query: Labs - Pregnancy
+#   * PowerInsight Encounter Id: all values from object pie3
 
 
 # queries to run: demographics; diagnosis codes; labs - abg, cbc, chemistry,
