@@ -57,7 +57,8 @@ icd.codes <- read_data(data.raw, "diagnosis") %>%
 
 female <- demograph %>%
     semi_join(unique.pts, by = "pie.id") %>%
-    filter(sex == "Female")
+    filter(sex == "Female") %>%
+    arrange(pie.id)
 
 pie3 <- concat_encounters(female$pie.id)
 
