@@ -65,6 +65,15 @@ pie3 <- concat_encounters(female$pie.id)
 # Run EDW Query: Labs - Pregnancy
 #   * PowerInsight Encounter Id: all values from object pie3
 
+tmp.preg <- read_data(data.raw, "preg") %>%
+    as.labs() %>%
+    check_pregnant()
+
+excl.preg <- icd.codes %>%
+    semi_join(female, by = "pie.id") %>%
+    check_pregnant()
+
+
 
 # queries to run: demographics; diagnosis codes; labs - abg, cbc, chemistry,
 # lfts, pregnancy; location history; measures; urine output; ventilator data -
