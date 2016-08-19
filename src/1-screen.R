@@ -77,6 +77,13 @@ excl.preg <- icd.codes %>%
 
 include <- anti_join(include, excl.preg, by = "pie.id")
 
+exclude <- list(screen = nrow(screen),
+                prisoners = nrow(excl.prison),
+                pregnant = nrow(excl.preg))
+
+saveRDS(include, "data/tidy/include.Rds")
+saveRDS(exclude, "data/tidy/exclude.Rds")
+
 # queries to run: demographics; diagnosis codes; labs - abg, cbc, chemistry,
 # lfts, pregnancy; location history; measures; urine output; ventilator data -
 # settings, start and stop; vitals; icu assessments; surgeries?
