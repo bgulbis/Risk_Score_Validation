@@ -84,11 +84,11 @@ exclude <- list(screen = nrow(screen),
 saveRDS(include, "data/tidy/include.Rds")
 saveRDS(exclude, "data/tidy/exclude.Rds")
 
-# queries to run: demographics; diagnosis codes; labs - abg, cbc, chemistry,
-# lfts, pregnancy; location history; measures; urine output; ventilator data -
-# settings, start and stop; vitals; icu assessments; surgeries?
+# queries to run: labs - abg, cbc, chemistry, lfts; location history; measures;
+# urine output; ventilator data - settings, start and stop; vitals; icu
+# assessments; surgeries?
 
-# need to add: VBGs; components of GCS
+# need to add: VBGs; components of GCS; DRG codes
 
 # apply exclusion criteria; randomly select 100 each before and after Oct 1, 2015
 # (ICD-10 implementation)
