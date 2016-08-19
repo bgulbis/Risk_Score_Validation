@@ -33,3 +33,7 @@ print(pie)
 # Run EDW Query: Identifiers - by PowerInsight Encounter Id
 #   * PowerInsight Encounter Id: all values from object pie
 
+fins <- read_data("data/external", "edw") %>%
+    as.id()
+
+readr::write_csv(fins["fin"], "data/external/validation_sample.csv")
