@@ -41,14 +41,14 @@ excl.prison <- demograph %>%
 demograph <- anti_join(demograph, excl.prison, by = "pie.id")
 
 # keep only the first admission for any individual patient
-unique.pts <- demograph %>%
+include <- demograph %>%
     group_by(person.id) %>%
     inner_join(screen, by = "pie.id") %>%
     arrange(person.id, discharge.datetime) %>%
     summarize(pie.id = first(pie.id)) %>%
     arrange(pie.id)
 
-pie2 <- concat_encounters(unique.pts$pie.id)
+pie2 <- concat_encounters(include$pie.id)
 
 # Run EDW Query: Diagnosis Codes (ICD-9/10-CM) - All
 #   * PowerInsight Encounter Id: all values from object pie2
@@ -56,7 +56,7 @@ icd.codes <- read_data(data.raw, "diagnosis") %>%
     as.diagnosis()
 
 female <- demograph %>%
-    semi_join(unique.pts, by = "pie.id") %>%
+    semi_join(include, by = "pie.id") %>%
     filter(sex == "Female") %>%
     arrange(pie.id)
 
@@ -65,15 +65,17 @@ pie3 <- concat_encounters(female$pie.id)
 # Run EDW Query: Labs - Pregnancy
 #   * PowerInsight Encounter Id: all values from object pie3
 
-tmp.preg <- read_data(data.raw, "preg") %>%
+preg.lab <- read_data(data.raw, "preg") %>%
     as.labs() %>%
     check_pregnant()
 
 excl.preg <- icd.codes %>%
     semi_join(female, by = "pie.id") %>%
-    check_pregnant()
+    check_pregnant() %>%
+    full_join(preg.lab, by = "pie.id") %>%
+    distinct
 
-
+include <- anti_join(include, excl.preg, by = "pie.id")
 
 # queries to run: demographics; diagnosis codes; labs - abg, cbc, chemistry,
 # lfts, pregnancy; location history; measures; urine output; ventilator data -
