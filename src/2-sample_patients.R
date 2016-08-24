@@ -35,7 +35,6 @@ pie <- concat_encounters(pts.sample$pie.id)
 # Run EDW Queries:
 #   - DRG Codes - All
 #   - ICU Assessments (CAM-ICU, GCS, RASS)
-#   - Identifiers - by PowerInsight Encounter Id
 #   - Labs - ABG
 #   - Labs - CBC
 #   - Labs - Chemistry
