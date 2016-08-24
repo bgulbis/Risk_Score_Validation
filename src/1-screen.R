@@ -53,7 +53,8 @@ pie2 <- concat_encounters(include$pie.id)
 # Run EDW Query: Diagnosis Codes (ICD-9/10-CM) - All
 #   * PowerInsight Encounter Id: all values from object pie2
 icd.codes <- read_data(data.raw, "diagnosis") %>%
-    as.diagnosis()
+    as.diagnosis() %>%
+    tidy_data()
 
 female <- demograph %>%
     semi_join(include, by = "pie.id") %>%
