@@ -56,6 +56,15 @@ icd_codes <- read_data(data_raw, "diagnosis") %>%
     as.diagnosis() %>%
     tidy_data()
 
+# remove patients with both ICD9 and ICD10 codes
+excl_icd <- icd_codes %>%
+    distinct(pie.id, icd9) %>%
+    group_by(pie.id) %>%
+    summarize(n = n()) %>%
+    filter(n > 1)
+
+eligible <- anti_join(eligible, excl_icd, by = "pie.id")
+
 female <- demograph %>%
     semi_join(eligible, by = "pie.id") %>%
     filter(sex == "Female") %>%
@@ -80,7 +89,8 @@ eligible <- anti_join(eligible, excl_preg, by = "pie.id")
 
 exclude <- list(screen = nrow(screen),
                 prisoners = nrow(excl_prison),
-                pregnant = nrow(excl_preg))
+                pregnant = nrow(excl_preg)
+                mult_icd_types = nrow(excl_icd))
 
 saveRDS(eligible, "data/tidy/eligible.Rds")
 saveRDS(exclude, "data/tidy/exclude.Rds")

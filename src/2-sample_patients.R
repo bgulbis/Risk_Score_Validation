@@ -10,15 +10,7 @@ eligible <- readRDS("data/tidy/eligible.Rds")
 icd_codes <- read_data(data_raw, "diagnosis") %>%
     as.diagnosis() %>%
     tidy_data() %>%
-    semi_join(eligible, by = "pie.id") %>%
-    distinct(pie.id, icd9)
-
-excl_icd <- icd_codes %>%
-    group_by(pie.id) %>%
-    summarize(n = n()) %>%
-    filter(n > 1)
-
-icd_codes <- anti_join(icd_codes, excl_icd, by = "pie.id")
+    semi_join(eligible, by = "pie.id")
 
 # separate patients with ICD-9 and ICD-10 codes and sample evenly from both
 num <- 900
