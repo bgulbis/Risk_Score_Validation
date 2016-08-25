@@ -28,7 +28,8 @@ icd10 <- icd.codes %>%
     sample_n(num)
 
 pts.sample <- bind_rows(icd9, icd10) %>%
-    arrange(pie.id)
+    arrange(pie.id) %>%
+    distinct()
 
 pie <- concat_encounters(pts.sample$pie.id)
 
