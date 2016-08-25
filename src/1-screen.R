@@ -38,7 +38,7 @@ demograph <- read_data(data_raw, "demographics") %>%
 excl_prison <- demograph %>%
     filter(disposition %in% c("DC/TF TO COURT/LAW", "Court/Law Enforcement"))
 
-demograph <- anti_join(demograph, excl.prison, by = "pie.id")
+demograph <- anti_join(demograph, excl_prison, by = "pie.id")
 
 # keep only the first admission for any individual patient
 eligible <- demograph %>%
