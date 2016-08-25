@@ -17,6 +17,10 @@ tidy_codes_icd <- read_data(data.raw, "diagnosis") %>%
     tidy_data() %>%
     semi_join(patients, by = "pie.id")
 
+tidy_icu_scores <- read_data(data.raw, "icu-scores") %>%
+    as.icu_assess() %>%
+    semi_join(patients, by = "pie.id")
+
 tidy_labs <- read_data(data.raw, "labs") %>%
     as.labs() %>%
     tidy_data() %>%
@@ -43,6 +47,10 @@ tidy_uop <- read_data(data.raw, "uop") %>%
     as.uop() %>%
     semi_join(patients, by = "pie.id")
 
+tidy_vent_settings <- read_data(data.raw, "vent-settings") %>%
+    as.vent_settings() %>%
+    semi_join(patients, by = "pie.id")
+
 tidy_visits <- read_data(data.raw, "visit") %>%
     as.visits() %>%
     semi_join(patients, by = "pie.id")
@@ -50,6 +58,10 @@ tidy_visits <- read_data(data.raw, "visit") %>%
 tidy_vent_times <- read_data(data.raw, "vent-times") %>%
     as.vent_times() %>%
     tidy_data(dc = tidy_visits) %>%
+    semi_join(patients, by = "pie.id")
+
+tidy_vitals <- read_data(data.raw, "vitals") %>%
+    as.vitals() %>%
     semi_join(patients, by = "pie.id")
 
 dirr::save_rds(data.tidy, "^tidy_")
