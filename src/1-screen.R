@@ -89,7 +89,7 @@ eligible <- anti_join(eligible, excl_preg, by = "pie.id")
 
 exclude <- list(screen = nrow(screen),
                 prisoners = nrow(excl_prison),
-                pregnant = nrow(excl_preg)
+                pregnant = nrow(excl_preg),
                 mult_icd_types = nrow(excl_icd))
 
 saveRDS(eligible, "data/tidy/eligible.Rds")
