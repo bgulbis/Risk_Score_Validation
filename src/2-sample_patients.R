@@ -32,6 +32,8 @@ pts.sample <- bind_rows(icd9, icd10) %>%
 
 pie <- concat_encounters(pts.sample$pie.id)
 
+saveRDS(pts.sample, "data/tidy/patients_sampled.Rds")
+
 # Run EDW Queries:
 #   - DRG Codes - All
 #   - ICU Assessments (CAM-ICU, GCS, RASS)
@@ -40,12 +42,13 @@ pie <- concat_encounters(pts.sample$pie.id)
 #   - Labs - Chemistry
 #   - Labs - LFTs
 #   - Location History
-#   - Measures (Heigh and Weight)
+#   - Measures (Height and Weight)
 #   - Procedure Codes (ICD-9-CM/ICD-10-PCS) - All
 #   - Surgeries
 #   - Urine Output
 #   - Ventilator Data - Settings
 #   - Ventilator Data - Start and Stop
+#   - Visit Data
 #   - Vitals
 #
 # Using the following parameters:
