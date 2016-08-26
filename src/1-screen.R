@@ -6,6 +6,8 @@ library(lubridate)
 
 data_raw <- "data/raw"
 
+# potential patients -----------------------------------
+
 # Run EDW query: Patients - by Unit Admission
 #   * Person Location - Nurse Unit (To):
 #       - Cullen 2 E Medical Intensive Care Unit
@@ -27,6 +29,8 @@ screen <- read_data(data_raw, "screen") %>%
     arrange(pie.id)
 
 pie <- concat_encounters(screen$pie.id, 910)
+
+# demographics -----------------------------------------
 
 # Run EDW Query: Demographics
 #   * PowerInsight Encounter Id: all values from object pie
@@ -50,6 +54,8 @@ eligible <- demograph %>%
 
 pie2 <- concat_encounters(eligible$pie.id)
 
+# ICD codes --------------------------------------------
+
 # Run EDW Query: Diagnosis Codes (ICD-9/10-CM) - All
 #   * PowerInsight Encounter Id: all values from object pie2
 icd_codes <- read_data(data_raw, "diagnosis") %>%
@@ -64,6 +70,8 @@ excl_icd <- icd_codes %>%
     filter(n > 1)
 
 eligible <- anti_join(eligible, excl_icd, by = "pie.id")
+
+# pregnancy --------------------------------------------
 
 female <- demograph %>%
     semi_join(eligible, by = "pie.id") %>%
@@ -87,15 +95,69 @@ excl_preg <- icd_codes %>%
 
 eligible <- anti_join(eligible, excl_preg, by = "pie.id")
 
+pie4 <- concat_encounters(eligible$pie.id, 950)
+
+# hospital locations -----------------------------------
+
+# Run EDW Query: Location History
+#   * PowerInsight Encounter Id: all values from object pie4
+
+# list of ICU's
+icu <- c("HVI Cardiovascular Intensive Care Unit",
+         "Cullen 2 E Medical Intensive Care Unit",
+         "Jones 7 J Elective Neuro ICU",
+         "Hermann 3 Shock Trauma Intensive Care Unit",
+         "Hermann 3 Transplant Surgical ICU",
+         "HVI Cardiac Care Unit")
+
+icu_admit <- read_data(data_raw, "locations") %>%
+    as.locations() %>%
+    tidy_data() %>%
+    filter(location %in% icu) %>%
+    arrange(pie.id, arrive.datetime) %>%
+    group_by(pie.id) %>%
+    distinct(.keep_all = TRUE) %>%
+    filter(unit.length.stay > 0.5)
+
+excl_icu_short <- anti_join(eligible, icu_admit, by = "pie.id")
+
+eligible <- semi_join(eligible, icu_admit, by = "pie.id")
+
+pie5 <- concat_encounters(eligible$pie.id, 975)
+
+# labs -------------------------------------------------
+
+# Run EDW Query: Clinical Events - Prompt
+#   * PowerInsight Encounter Id: all values from object pie5
+#   * Clinical Event:
+#       - Sodium Lvl
+#       - Potassium Lvl
+#       - CO2
+#       - Creatinine Lvl
+#       - BUN
+#       - Glucose Lvl
+#       - Albumin Lvl
+#       - Bilirubin Total
+#       - Bili Total
+#       - POC A pH
+#       - POC A PCO2
+#       - POC A PO2
+#       - WBC (multiple matching)
+#       - Hct
+#       - HCT
+
+# save files -------------------------------------------
+
 exclude <- list(screen = nrow(screen),
                 prisoners = nrow(excl_prison),
                 pregnant = nrow(excl_preg),
-                mult_icd_types = nrow(excl_icd))
+                mult_icd_types = nrow(excl_icd),
+                icu_short = nrow(excl_icu_short))
 
 saveRDS(eligible, "data/tidy/eligible.Rds")
 saveRDS(exclude, "data/tidy/exclude.Rds")
 
-# queries to run: labs - abg, cbc, chemistry, lfts; location history; measures;
+# queries to run: measures;
 # urine output; ventilator data - settings, start and stop; vitals; icu
 # assessments; surgeries?
 
