@@ -3,6 +3,8 @@
 library(edwr)
 library(dplyr)
 library(lubridate)
+library(stringr)
+library(tidyr)
 
 data_raw <- "data/raw"
 
@@ -146,6 +148,23 @@ pie5 <- concat_encounters(eligible$pie.id, 975)
 #       - Hct
 #       - HCT
 
+labs <- read_data(data_raw, "labs_apache \\(12\\)") %>%
+    as.labs() %>%
+    tidy_data() %>%
+    inner_join(icu_admit, by = "pie.id") %>%
+    filter(lab.datetime >= arrive.datetime,
+           lab.datetime <= min(arrive.datetime + hours(24), depart.datetime)) %>%
+    mutate(lab = str_replace_all(lab, " lvl", ""),
+           lab = str_replace_all(lab, "poc a", "arterial"),
+           lab = str_replace_all(lab, "bilirubin", "bili"),
+           lab = str_replace_all(lab, " ", "_")) %>%
+    select(pie.id, lab, lab.result) %>%
+    group_by(pie.id, lab) %>%
+    summarize(min = min(lab.result)) %>%
+    spread(lab, min) %>%
+    drop_na()
+    # summarize_all(funs(min, max))
+
 # save files -------------------------------------------
 
 exclude <- list(screen = nrow(screen),
@@ -161,7 +180,7 @@ saveRDS(exclude, "data/tidy/exclude.Rds")
 # urine output; ventilator data - settings, start and stop; vitals; icu
 # assessments; surgeries?
 
-# need to add: VBGs; components of GCS; DRG codes
+# need to add: VBGs;
 
 # apply exclusion criteria; randomly select 100 each before and after Oct 1, 2015
 # (ICD-10 implementation)
