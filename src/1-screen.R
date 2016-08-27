@@ -153,17 +153,22 @@ labs <- read_data(data_raw, "labs_apache") %>%
     tidy_data() %>%
     inner_join(icu_admit, by = "pie.id") %>%
     filter(lab.datetime >= arrive.datetime,
-           lab.datetime <= arrive.datetime + hours(24)) %>%
-           # lab.datetime <= min(arrive.datetime + hours(24), depart.datetime)) %>%
+           lab.datetime <= arrive.datetime + hours(24),
+           lab.datetime <= depart.datetime) %>%
     mutate(lab = str_replace_all(lab, " lvl", ""),
            lab = str_replace_all(lab, "poc a", "arterial"),
            lab = str_replace_all(lab, "bilirubin", "bili"),
            lab = str_replace_all(lab, " ", "_")) %>%
-    # select(pie.id, lab, lab.result) %>%
     group_by(pie.id, lab) %>%
     summarize(min = min(lab.result)) %>%
     spread(lab, min) %>%
     drop_na()
+
+excl_labs <- anti_join(eligible, labs, by = "pie.id")
+
+eligible <- semi_join(eligible, labs, by = "pie.id")
+
+pie6 <- concat_encounters(eligible$pie.id)
 
 # check_icd <- icd_codes %>%
 #     semi_join(labs.all, by = "pie.id") %>%
@@ -176,7 +181,8 @@ exclude <- list(screen = nrow(screen),
                 prisoners = nrow(excl_prison),
                 pregnant = nrow(excl_preg),
                 mult_icd_types = nrow(excl_icd),
-                icu_short = nrow(excl_icu_short))
+                icu_short = nrow(excl_icu_short),
+                labs_missing = nrow(excl_labs))
 
 saveRDS(eligible, "data/tidy/eligible.Rds")
 saveRDS(exclude, "data/tidy/exclude.Rds")
