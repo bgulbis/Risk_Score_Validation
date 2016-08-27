@@ -13,7 +13,7 @@ icd_codes <- read_data(data_raw, "diagnosis") %>%
     semi_join(eligible, by = "pie.id")
 
 # separate patients with ICD-9 and ICD-10 codes and sample evenly from both
-num <- 900
+num <- 100
 
 set.seed(7708)
 icd9 <- icd_codes %>%
@@ -37,11 +37,6 @@ saveRDS(pts_sample, "data/tidy/patients_sampled.Rds")
 # Run EDW Queries:
 #   - DRG Codes - All
 #   - ICU Assessments (CAM-ICU, GCS, RASS)
-#   - Labs - ABG
-#   - Labs - CBC
-#   - Labs - Chemistry
-#   - Labs - LFTs
-#   - Location History
 #   - Measures (Height and Weight)
 #   - Procedure Codes (ICD-9-CM/ICD-10-PCS) - All
 #   - Surgeries

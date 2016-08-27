@@ -168,7 +168,7 @@ excl_labs <- anti_join(eligible, labs, by = "pie.id")
 
 eligible <- semi_join(eligible, labs, by = "pie.id")
 
-pie6 <- concat_encounters(eligible$pie.id)
+# pie6 <- concat_encounters(eligible$pie.id)
 
 # check_icd <- icd_codes %>%
 #     semi_join(labs.all, by = "pie.id") %>%
