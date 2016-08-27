@@ -148,22 +148,27 @@ pie5 <- concat_encounters(eligible$pie.id, 975)
 #       - Hct
 #       - HCT
 
-labs <- read_data(data_raw, "labs_apache \\(12\\)") %>%
+labs <- read_data(data_raw, "labs_apache") %>%
     as.labs() %>%
     tidy_data() %>%
     inner_join(icu_admit, by = "pie.id") %>%
     filter(lab.datetime >= arrive.datetime,
-           lab.datetime <= min(arrive.datetime + hours(24), depart.datetime)) %>%
+           lab.datetime <= arrive.datetime + hours(24)) %>%
+           # lab.datetime <= min(arrive.datetime + hours(24), depart.datetime)) %>%
     mutate(lab = str_replace_all(lab, " lvl", ""),
            lab = str_replace_all(lab, "poc a", "arterial"),
            lab = str_replace_all(lab, "bilirubin", "bili"),
            lab = str_replace_all(lab, " ", "_")) %>%
-    select(pie.id, lab, lab.result) %>%
+    # select(pie.id, lab, lab.result) %>%
     group_by(pie.id, lab) %>%
     summarize(min = min(lab.result)) %>%
     spread(lab, min) %>%
     drop_na()
-    # summarize_all(funs(min, max))
+
+# check_icd <- icd_codes %>%
+#     semi_join(labs.all, by = "pie.id") %>%
+#     distinct(pie.id, icd9) %>%
+#     count(icd9)
 
 # save files -------------------------------------------
 
