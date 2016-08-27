@@ -17,6 +17,10 @@ tidy_codes_icd <- read_data(data.raw, "diagnosis") %>%
     tidy_data() %>%
     semi_join(patients, by = "pie.id")
 
+tidy_codes_drg <- read_data(data.raw, "drg") %>%
+    as.drg() %>%
+    semi_join(patients, by = "pie.id")
+
 tidy_icu_scores <- read_data(data.raw, "icu-scores") %>%
     as.icu_assess() %>%
     semi_join(patients, by = "pie.id")
