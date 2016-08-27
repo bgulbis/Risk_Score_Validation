@@ -185,7 +185,7 @@ exclude <- list(screen = nrow(screen),
                 labs_missing = nrow(excl_labs))
 
 saveRDS(eligible, "data/tidy/eligible.Rds")
-saveRDS(exclude, "data/tidy/exclude.Rds")
+saveRDS(exclude, "data/final/exclude.Rds")
 
 # queries to run: measures;
 # urine output; ventilator data - settings, start and stop; vitals; icu
