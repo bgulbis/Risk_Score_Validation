@@ -23,6 +23,7 @@ data_labs <- tidy_labs %>%
     inner_join(tmp_icu_stay, by = "pie.id") %>%
     filter(lab.datetime >= arrive.datetime,
            lab.datetime <= arrive.datetime + hours(24),
+           lab.datetime <= depart.datetime,
            lab %in% labs) %>%
     mutate(lab = str_replace_all(lab, " lvl", ""),
            lab = str_replace_all(lab, "poc a", "arterial"),
@@ -41,4 +42,11 @@ lab_max <- data_labs %>%
     select(-min) %>%
     spread(lab, max)
 
-labs_min_max <- bind_rows(lab_min, lab_max)
+labs_min_max <- bind_rows(lab_min, lab_max) %>%
+    rename(pco2 = arterial_pco2,
+           ph = arterial_ph,
+           pao2 = arterial_po2,
+           scr = creatinine,
+           hco3 = co2)
+
+saveRDS(labs_min_max, "data/external/apache_test.Rds")
