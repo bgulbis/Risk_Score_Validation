@@ -185,13 +185,9 @@ exclude <- list(screen = nrow(screen),
                 labs_missing = nrow(excl_labs))
 
 saveRDS(eligible, "data/tidy/eligible.Rds")
+saveRDS(icu_admit, "data/tidy/icu_admit.Rds")
 saveRDS(exclude, "data/final/exclude.Rds")
-
-# queries to run: measures;
-# urine output; ventilator data - settings, start and stop; vitals; icu
-# assessments; surgeries?
 
 # need to add: VBGs;
 
-# apply exclusion criteria; randomly select 100 each before and after Oct 1, 2015
-# (ICD-10 implementation)
+# apply exclusion criteria; randomly select 100 each with ICD-9-CM and ICD-10-CM codes
