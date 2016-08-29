@@ -10,26 +10,8 @@ data.tidy <- "data/tidy"
 
 dirr::get_rds(data.tidy)
 
-# list of ICU's
-icu <- c("HVI Cardiovascular Intensive Care Unit",
-         "Cullen 2 E Medical Intensive Care Unit",
-         "Jones 7 J Elective Neuro ICU",
-         "Hermann 3 Shock Trauma Intensive Care Unit",
-         "Hermann 3 Transplant Surgical ICU",
-         "HVI Cardiac Care Unit")
-
-data_icu_admit <- tidy_locations %>%
-    filter(location %in% icu) %>%
-    arrange(pie.id, arrive.datetime) %>%
-    group_by(pie.id) %>%
-    distinct(.keep_all = TRUE) %>%
-    filter(unit.length.stay > 0)
-
-excl_icu <- anti_join(patients_sampled, data_icu_admit, by = "pie.id")
-
-eligible <- semi_join(patients_sampled, data_icu_admit, by = "pie.id")
-
-tmp_icu_stay <- select(data_icu_admit, pie.id, arrive.datetime, depart.datetime)
+tmp_icu_stay <- select(icu_admit, pie.id, arrive.datetime, depart.datetime) %>%
+    semi_join(patients_sampled, by = "pie.id")
 
 labs <- c("sodium lvl", "potassium lvl", "co2", "creatinine lvl", "bun",
           "glucose lvl", "albumin lvl", "bilirubin total", "bili total",
@@ -50,3 +32,13 @@ data_labs <- tidy_labs %>%
     group_by(pie.id, lab) %>%
     summarize_all(funs(min, max))
     # spread(lab, lab.result)
+
+lab_min <- data_labs %>%
+    select(-max) %>%
+    spread(lab, min)
+
+lab_max <- data_labs %>%
+    select(-min) %>%
+    spread(lab, max)
+
+labs_min_max <- bind_rows(lab_min, lab_max)
