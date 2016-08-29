@@ -32,21 +32,95 @@ data_labs <- tidy_labs %>%
     select(pie.id, lab, lab.result) %>%
     group_by(pie.id, lab) %>%
     summarize_all(funs(min, max))
-    # spread(lab, lab.result)
 
 lab_min <- data_labs %>%
     select(-max) %>%
-    spread(lab, min)
+    spread(lab, min) %>%
+    mutate(min = TRUE)
 
 lab_max <- data_labs %>%
     select(-min) %>%
-    spread(lab, max)
+    spread(lab, max) %>%
+    mutate(min = FALSE)
 
 labs_min_max <- bind_rows(lab_min, lab_max) %>%
     rename(pco2 = arterial_pco2,
            ph = arterial_ph,
            pao2 = arterial_po2,
            scr = creatinine,
-           hco3 = co2)
+           hco3 = co2) %>%
+    select(pie.id, min, pco2, ph, pao2, hco3, scr, hct:wbc)
 
-saveRDS(labs_min_max, "data/external/apache_test.Rds")
+vitals <- c("arterial systolic bp 1" = "sbp",
+            "systolic blood pressure" = "sbp",
+            "arterial diastolic bp 1" = "dbp",
+            "diastolic blood pressure" = "dbp",
+            "mean arterial pressure \\(invasive\\)" = "map",
+            "mean arterial pressure" = "map",
+            "spo2 percent" = "spo2",
+            "apical heart rate" = "hr",
+            "peripheral pulse rate" = "hr",
+            "respiratory rate" = "rr",
+            "temperature axillary" = "temp2",
+            "temperature oral" = "temp2",
+            "temperature bladder" = "temp",
+            "temperature intravascular" = "temp",
+            "temperature rectal" = "temp")
+
+data_vitals <- tidy_vitals %>%
+    inner_join(tmp_icu_stay, by = "pie.id") %>%
+    filter(vital.datetime >= arrive.datetime,
+           vital.datetime <= arrive.datetime + hours(24),
+           vital.datetime <= depart.datetime) %>%
+    mutate(vital = str_replace_all(vital, vitals)) %>%
+    select(pie.id, vital, vital.result) %>%
+    group_by(pie.id, vital) %>%
+    summarize_all(funs(min, max))
+
+vital_min <- data_vitals %>%
+    select(-max) %>%
+    spread(vital, min) %>%
+    mutate(min = TRUE)
+
+vital_max <- data_vitals %>%
+    select(-min) %>%
+    spread(vital, max) %>%
+    mutate(min = FALSE)
+
+vitals_min_max <- bind_rows(vital_min, vital_max) %>%
+    mutate(temp = coalesce(temp, temp2)) %>%
+    select(-temp2)
+
+
+# tmp <- distinct(tidy_vent_settings, vent.event)
+
+vent <- c("fio2 \\(%\\)" = "fio2",
+          "spo2 percent" = "spo2",
+          "oxygen therapy mode" = "mode",
+          "invasive ventilation mode" = "mode",
+          "poc a %fio2" = "fio2",
+          "poc a peep" = "peep",
+          "poc a po2" = "pao2",
+          "poc a o2 sat" = "spo2",
+          "non-invasive ventillation mode" = "mode")
+
+data_vent <- tidy_vent_settings %>%
+    inner_join(tmp_icu_stay, by = "pie.id") %>%
+    filter(vent.datetime >= arrive.datetime,
+           vent.datetime <= arrive.datetime + hours(24),
+           vent.datetime <= depart.datetime) %>%
+    mutate(vent.event = str_replace_all(vent.event, vent)) %>%
+    filter(vent.event == "fio2") %>%
+    select(pie.id, vent.event, vent.result) %>%
+    group_by(pie.id, vent.event) %>%
+    summarize_all(funs(max)) %>%
+    spread(vent.event, vent.result)
+
+apache_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
+    left_join(data_vent, by = "pie.id") %>%
+    mutate_if(is.character, as.numeric) %>%
+    mutate(fio2 = coalesce(fio2, 21)) %>%
+    select(-dbp, -sbp, -spo2)
+
+saveRDS(apache_test, "data/external/apache_test.Rds")
+
