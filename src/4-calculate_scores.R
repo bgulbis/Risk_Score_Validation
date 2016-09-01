@@ -125,11 +125,14 @@ data_gcs <- tidy_icu_scores %>%
     group_by(pie.id) %>%
     summarize(gcs = min(assess.result))
 
+# identify patients with ARF
+
 apache_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
     left_join(data_gcs, by = "pie.id") %>%
     mutate_if(is.character, as.numeric) %>%
-    mutate(fio2 = coalesce(fio2, 21)) %>%
+    mutate(fio2 = coalesce(fio2, 21),
+           arf = FALSE) %>%
     select(-dbp, -sbp, -spo2)
 
 saveRDS(apache_test, "data/external/apache_test.Rds")
