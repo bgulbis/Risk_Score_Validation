@@ -116,8 +116,18 @@ data_vent <- tidy_vent_settings %>%
     summarize_all(funs(max)) %>%
     spread(vent.event, vent.result)
 
+data_gcs <- tidy_icu_scores %>%
+    inner_join(tmp_icu_stay, by = "pie.id") %>%
+    filter(assess.datetime >= arrive.datetime,
+           assess.datetime <= arrive.datetime + hours(24),
+           assess.datetime <= depart.datetime,
+           assessment == "glasgow coma score") %>%
+    group_by(pie.id) %>%
+    summarize(gcs = min(assess.result))
+
 apache_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
+    left_join(data_gcs, by = "pie.id") %>%
     mutate_if(is.character, as.numeric) %>%
     mutate(fio2 = coalesce(fio2, 21)) %>%
     select(-dbp, -sbp, -spo2)
