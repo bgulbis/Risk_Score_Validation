@@ -1,4 +1,4 @@
-# manual_patients
+# export_manual_patients
 
 library(edwr)
 library(dplyr)
