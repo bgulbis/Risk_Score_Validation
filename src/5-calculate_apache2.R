@@ -141,14 +141,34 @@ arf <- tidy_labs %>%
               arf2 = sum(arf2)) %>%
     mutate(arf = arf1 > 0 | arf2 > 0)
 
+# identify surgery patients
+
+surg <- tidy_surgeries %>%
+    select(-priority, -`asa class`, -surgery) %>%
+    left_join(tidy_visits[c("pie.id", "admit.datetime", "admit.type")], by = "pie.id") %>%
+    left_join(tmp_icu_stay, by = "pie.id") %>%
+    filter(primary.proc == TRUE) %>%
+    arrange(pie.id, surg.start.datetime) %>%
+    distinct(pie.id, .keep_all = TRUE) %>%
+    mutate(surg_admit = surg.start.datetime <= admit.datetime + hours(24),
+           surg_icu = surg.start.datetime >= arrive.datetime - hours(24) &
+               arrive.datetime <= surg.stop.datetime + hours(4),
+           elective = add.on == FALSE &
+               !str_detect(asa.class, "E") &
+               admit.type != "Emergency" &
+               surg_admit == TRUE) %>%
+    filter(surg_icu == TRUE)
+
 apache_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
     left_join(data_gcs, by = "pie.id") %>%
     left_join(tidy_demographics[c("pie.id", "age")], by = "pie.id") %>%
     left_join(arf[c("pie.id", "arf")], by = "pie.id") %>%
+    left_join(surg[c("pie.id", "elective")], by = "pie.id") %>%
     mutate_if(is.character, as.numeric) %>%
-    mutate(fio2 = coalesce(fio2, 21)) %>%
-    select(-dbp, -sbp, -spo2)
+    mutate(fio2 = coalesce(fio2, 21),
+           surgical_status = if_else(elective == FALSE, "elective", "emergency", "nonoperative")) %>%
+    select(-dbp, -sbp, -spo2, -elective)
 
 saveRDS(apache_test, "data/external/apache_test.Rds")
 
