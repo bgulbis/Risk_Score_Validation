@@ -126,13 +126,28 @@ data_gcs <- tidy_icu_scores %>%
     summarize(gcs = min(assess.result))
 
 # identify patients with ARF
+# change from < 1.4 to > 2 or initial > 2 which returned to normal (< 1.4)
+arf <- tidy_labs %>%
+    semi_join(patients_sampled, by = "pie.id") %>%
+    inner_join(tmp_icu_stay, by = "pie.id") %>%
+    filter(lab == "creatinine lvl") %>%
+    arrange(pie.id, lab.datetime) %>%
+    group_by(pie.id) %>%
+    mutate(normal_baseline = lab.datetime <= arrive.datetime + hours(24) & lab.result < 1.4,
+           arf1 = normal_baseline == TRUE & lab.datetime <= arrive.datetime + hours(24) & lab.result > 2,
+           high_baseline = first(lab.result) > 2,
+           arf2 = high_baseline == TRUE & lab.result < 1.4) %>%
+    summarize(arf1 = sum(arf1),
+              arf2 = sum(arf2)) %>%
+    mutate(arf = arf1 > 0 | arf2 > 0)
 
 apache_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
     left_join(data_gcs, by = "pie.id") %>%
+    left_join(tidy_demographics[c("pie.id", "age")], by = "pie.id") %>%
+    left_join(arf[c("pie.id", "arf")], by = "pie.id") %>%
     mutate_if(is.character, as.numeric) %>%
-    mutate(fio2 = coalesce(fio2, 21),
-           arf = FALSE) %>%
+    mutate(fio2 = coalesce(fio2, 21)) %>%
     select(-dbp, -sbp, -spo2)
 
 saveRDS(apache_test, "data/external/apache_test.Rds")
