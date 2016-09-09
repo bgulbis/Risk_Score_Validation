@@ -2,6 +2,7 @@
 
 library(edwr)
 library(dplyr)
+library(purrr)
 library(lubridate)
 library(stringr)
 library(tidyr)
@@ -142,7 +143,6 @@ arf <- tidy_labs %>%
     mutate(arf = arf1 > 0 | arf2 > 0)
 
 # identify surgery patients
-
 surg <- tidy_surgeries %>%
     select(-priority, -`asa class`, -surgery) %>%
     left_join(tidy_visits[c("pie.id", "admit.datetime", "admit.type")], by = "pie.id") %>%
@@ -158,6 +158,14 @@ surg <- tidy_surgeries %>%
                admit.type != "Emergency" &
                surg_admit == TRUE) %>%
     filter(surg_icu == TRUE)
+
+# find MDC for each MS-DRG
+mdc <- readr::read_csv("data/external/msdrg_to_mdc.csv") %>%
+    dmap_at("mdc", str_replace_all, pattern = "No MDC|MDC ", replacement = "")
+
+msdrg <- tidy_codes_drg %>%
+    left_join(mdc[c("msdrg", "mdc")], by = c("drg" = "msdrg"))
+
 
 apache_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
