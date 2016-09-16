@@ -1,11 +1,10 @@
 # calculate_apache2
 
 library(edwr)
-library(dplyr)
-library(purrr)
+library(tidyverse)
 library(lubridate)
 library(stringr)
-library(tidyr)
+library(icuriskr)
 
 data.tidy <- "data/tidy"
 
