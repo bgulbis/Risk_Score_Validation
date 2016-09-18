@@ -2,10 +2,9 @@
 
 source("src/6-calculate_saps2.R")
 
-labs_min_max_aps3 <- bind_rows(lab_min, lab_max) %>%
-    rename(bili = bili_total) %>%
-    select(pie.id, min, albumin, glucose, bili)
-
+# labs_apache3 <- bind_rows(lab_min, lab_max) %>%
+#     select(pie.id, min, albuminpco2, ph, pao2, hco3, scr, hct:wbc)
+# select(pie.id, min, albumin, glucose, bili)
 
 gcs_apache3 <- tidy_icu_scores %>%
     inner_join(tmp_icu_stay, by = "pie.id") %>%
@@ -25,13 +24,16 @@ gcs_apache3 <- tidy_icu_scores %>%
     summarize(neuro = max(neuro))
 
 # need to check for chronic HD
-apache3_test <- apache_test %>%
-    select(-hco3, -potassium, -gcs, -surgical_status) %>%
-    left_join(labs_min_max_aps3, by = c("pie.id", "min")) %>%
-    left_join(vent, by = "pie.id") %>%
+apache3_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
+    left_join(tidy_demographics[c("pie.id", "age")], by = "pie.id") %>%
+    left_join(data_vent, by = "pie.id") %>%
     left_join(uop, by = "pie.id") %>%
     left_join(gcs_apache3, by = "pie.id") %>%
-    mutate(aa_grad = aa_gradient(pco2, pao2, fio2, F_to_C(temp), 13.106),
+    mutate_if(is.character, as.numeric) %>%
+    mutate(fio2 = coalesce(fio2, 21),
+           aa_grad = aa_gradient(pco2, pao2, fio2, F_to_C(temp), 13.106),
            arf = scr >= 1.5 & uop < 410)
 
 saveRDS(gcs_apache3, "data/external/apache3_neuro_test.Rds")
+
+apache3_score <- apache3(apache3_test)

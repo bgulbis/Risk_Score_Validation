@@ -52,8 +52,8 @@ labs_min_max <- bind_rows(lab_min, lab_max) %>%
            hco3 = co2,
            bili = bili_total)
 
-labs_apache2 <- labs_min_max %>%
-    select(pie.id, min, pco2, ph, pao2, hco3, scr, hct:wbc)
+# labs_apache2 <- labs_min_max %>%
+    # select(pie.id, min, pco2, ph, pao2, hco3, scr, hct:wbc)
 
 vitals <- c("arterial systolic bp 1" = "sbp",
             "systolic blood pressure" = "sbp",
@@ -171,7 +171,7 @@ msdrg <- tidy_codes_drg %>%
     left_join(mdc[c("msdrg", "mdc")], by = c("drg" = "msdrg"))
 
 
-apache_test <- inner_join(labs_apache2, vitals_min_max, by = c("pie.id", "min")) %>%
+apache_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
     left_join(data_gcs, by = "pie.id") %>%
     left_join(tidy_demographics[c("pie.id", "age")], by = "pie.id") %>%
@@ -180,19 +180,9 @@ apache_test <- inner_join(labs_apache2, vitals_min_max, by = c("pie.id", "min"))
     mutate_if(is.character, as.numeric) %>%
     mutate(fio2 = coalesce(fio2, 21),
            aa_grad = aa_gradient(pco2, pao2, fio2, F_to_C(temp), 13.106),
-           surgical_status = if_else(elective == FALSE, "elective", "emergency", "nonoperative")) %>%
-    select(-dbp, -sbp, -spo2, -pco2, -elective)
+           surgical_status = if_else(elective == FALSE, "elective", "emergency", "nonoperative"))
+    # select(-dbp, -sbp, -spo2, -pco2, -elective)
 
 apache2_score <- apache2(apache_test)
 
 saveRDS(apache_test, "data/external/apache_test.Rds")
-
-# params <- c("hr", "map", "temp", "rr", "pao2", "aa_grad", "hct", "wbc",
-#             "scr", "hco3", "sodium", "potassium", "gcs", "ph", "age")
-#
-# tmp <- purrr::unslice(apache_test) %>%
-#     purrr::dmap_at(params, icuriskr:::as.aps2) %>%
-#     purrr::dmap_at("hr", icuriskr:::as.hr) %>%
-#     purrr::dmap_at("ph", icuriskr:::as.ph) %>%
-#     purrr::dmap_at("hr", icuriskr:::aps2_score) %>%
-#     purrr::dmap_at("ph", icuriskr:::aps2_score)

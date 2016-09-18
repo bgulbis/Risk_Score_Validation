@@ -2,14 +2,14 @@
 
 source("src/5-calculate_apache2.R")
 
-labs_saps2 <- bind_rows(lab_min, lab_max) %>%
-    rename(pco2 = arterial_pco2,
-           ph = arterial_ph,
-           pao2 = arterial_po2,
-           scr = creatinine,
-           hco3 = co2,
-           bili = bili_total) %>%
-    select(pie.id, min, pao2:hco3, potassium:wbc)
+# labs_saps2 <- bind_rows(lab_min, lab_max) %>%
+#     rename(pco2 = arterial_pco2,
+#            ph = arterial_ph,
+#            pao2 = arterial_po2,
+#            scr = creatinine,
+#            hco3 = co2,
+#            bili = bili_total) %>%
+#     select(pie.id, min, pao2:hco3, potassium:wbc)
 
 uop <- tidy_uop %>%
     inner_join(tmp_icu_stay, by = "pie.id") %>%
@@ -28,7 +28,7 @@ vent <- tidy_vent_times %>%
     summarize(vent = sum(vent, na.rm = TRUE)) %>%
     mutate(vent = vent >= 1)
 
-saps2_test <- inner_join(labs_saps2, vitals_min_max, by = c("pie.id", "min")) %>%
+saps2_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
     left_join(data_gcs, by = "pie.id") %>%
     left_join(tidy_demographics[c("pie.id", "age")], by = "pie.id") %>%
