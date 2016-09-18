@@ -170,6 +170,22 @@ mdc <- readr::read_csv("data/external/msdrg_to_mdc.csv") %>%
 msdrg <- tidy_codes_drg %>%
     left_join(mdc[c("msdrg", "mdc")], by = c("drg" = "msdrg"))
 
+data_comorbidities_icd9 <- tidy_codes_icd %>%
+    filter(icd9 == TRUE) %>%
+    icd_comorbid(comorbidity_map_icd9,
+                 visit_name = "pie.id",
+                 icd_name = "diag.code",
+                 short_code = FALSE,
+                 return_df = TRUE)
+
+apache2_comorbid <- data_comorbidities_icd9 %>%
+    transmute(pie.id = pie.id,
+              liver = (portal_htn & (cirrhosis | upper_gi_bleed)) | encephalopathy_coma,
+              cardiovasc = chf,
+              respiratory = pulmonary | pvd | hypoxia | hypercapnia | polycythemia | pulm_htn | resp_depend,
+              renal = chronic_hd,
+              immunocomp = immunosuppress | chemo | radiation | steroids | leukemia | lymphoma | (hiv & (kaposi | pneumocytosis | toxoplasmosis | tuberculosis))) %>%
+    mutate(comorbidity = liver | cardiovasc | respiratory | renal | immunocomp)
 
 apache_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
@@ -177,11 +193,11 @@ apache_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min"))
     left_join(tidy_demographics[c("pie.id", "age")], by = "pie.id") %>%
     left_join(arf_apache2[c("pie.id", "arf")], by = "pie.id") %>%
     left_join(data_surgery[c("pie.id", "elective")], by = "pie.id") %>%
+    left_join(apache2_comorbid[c("pie.id", "comorbidity")], by = "pie.id") %>%
     mutate_if(is.character, as.numeric) %>%
     mutate(fio2 = coalesce(fio2, 21),
            aa_grad = aa_gradient(pco2, pao2, fio2, F_to_C(temp), 13.106),
-           surgical_status = if_else(elective == FALSE, "elective", "emergency", "nonoperative"))
-    # select(-dbp, -sbp, -spo2, -pco2, -elective)
+           admit = if_else(elective == FALSE, "elective", "emergency", "nonoperative"))
 
 apache2_score <- apache2(apache_test)
 
