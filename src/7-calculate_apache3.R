@@ -27,6 +27,7 @@ gcs_apache3 <- tidy_icu_scores %>%
 apache3_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(tidy_demographics[c("pie.id", "age")], by = "pie.id") %>%
     left_join(data_vent, by = "pie.id") %>%
+    left_join(vent, by = "pie.id") %>%
     left_join(uop, by = "pie.id") %>%
     left_join(gcs_apache3, by = "pie.id") %>%
     mutate_if(is.character, as.numeric) %>%
