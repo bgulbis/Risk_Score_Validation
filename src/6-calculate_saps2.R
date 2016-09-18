@@ -2,7 +2,7 @@
 
 source("src/5-calculate_apache2.R")
 
-labs_min_max_saps <- bind_rows(lab_min, lab_max) %>%
+labs_saps2 <- bind_rows(lab_min, lab_max) %>%
     rename(pco2 = arterial_pco2,
            ph = arterial_ph,
            pao2 = arterial_po2,
@@ -28,12 +28,12 @@ vent <- tidy_vent_times %>%
     summarize(vent = sum(vent, na.rm = TRUE)) %>%
     mutate(vent = vent >= 1)
 
-saps2_test <- inner_join(labs_min_max_saps, vitals_min_max, by = c("pie.id", "min")) %>%
+saps2_test <- inner_join(labs_saps2, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
     left_join(data_gcs, by = "pie.id") %>%
     left_join(tidy_demographics[c("pie.id", "age")], by = "pie.id") %>%
     left_join(uop, by = "pie.id") %>%
-    left_join(surg[c("pie.id", "elective")], by = "pie.id") %>%
+    left_join(data_surgery[c("pie.id", "elective")], by = "pie.id") %>%
     left_join(vent, by = "pie.id") %>%
     mutate_if(is.character, as.numeric) %>%
     mutate(fio2 = coalesce(fio2, 21),
@@ -42,3 +42,4 @@ saps2_test <- inner_join(labs_min_max_saps, vitals_min_max, by = c("pie.id", "mi
 
 saveRDS(saps2_test, "data/external/saps2_test.Rds")
 
+saps2_score <- saps2(saps2_test)

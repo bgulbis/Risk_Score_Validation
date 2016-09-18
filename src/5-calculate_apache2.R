@@ -4,6 +4,7 @@ library(edwr)
 library(tidyverse)
 library(lubridate)
 library(stringr)
+library(icd)
 library(icuriskr)
 
 data.tidy <- "data/tidy"
@@ -48,7 +49,10 @@ labs_min_max <- bind_rows(lab_min, lab_max) %>%
            ph = arterial_ph,
            pao2 = arterial_po2,
            scr = creatinine,
-           hco3 = co2) %>%
+           hco3 = co2,
+           bili = bili_total)
+
+labs_apache2 <- labs_min_max %>%
     select(pie.id, min, pco2, ph, pao2, hco3, scr, hct:wbc)
 
 vitals <- c("arterial systolic bp 1" = "sbp",
@@ -87,6 +91,7 @@ vital_max <- data_vitals %>%
     spread(vital, max) %>%
     mutate(min = FALSE)
 
+# use rectal, bladder, or intravascular temp if available, if not, use any temp
 vitals_min_max <- bind_rows(vital_min, vital_max) %>%
     mutate(temp = coalesce(temp, temp2)) %>%
     select(-temp2)
@@ -127,7 +132,7 @@ data_gcs <- tidy_icu_scores %>%
 
 # identify patients with ARF
 # change from < 1.4 to > 2 or initial > 2 which returned to normal (< 1.4)
-arf <- tidy_labs %>%
+arf_apache2 <- tidy_labs %>%
     semi_join(patients_sampled, by = "pie.id") %>%
     inner_join(tmp_icu_stay, by = "pie.id") %>%
     filter(lab == "creatinine lvl") %>%
@@ -142,7 +147,7 @@ arf <- tidy_labs %>%
     mutate(arf = arf1 > 0 | arf2 > 0)
 
 # identify surgery patients
-surg <- tidy_surgeries %>%
+data_surgery <- tidy_surgeries %>%
     select(-priority, -`asa class`, -surgery) %>%
     left_join(tidy_visits[c("pie.id", "admit.datetime", "admit.type")], by = "pie.id") %>%
     left_join(tmp_icu_stay, by = "pie.id") %>%
@@ -166,16 +171,28 @@ msdrg <- tidy_codes_drg %>%
     left_join(mdc[c("msdrg", "mdc")], by = c("drg" = "msdrg"))
 
 
-apache_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
+apache_test <- inner_join(labs_apache2, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
     left_join(data_gcs, by = "pie.id") %>%
     left_join(tidy_demographics[c("pie.id", "age")], by = "pie.id") %>%
-    left_join(arf[c("pie.id", "arf")], by = "pie.id") %>%
-    left_join(surg[c("pie.id", "elective")], by = "pie.id") %>%
+    left_join(arf_apache2[c("pie.id", "arf")], by = "pie.id") %>%
+    left_join(data_surgery[c("pie.id", "elective")], by = "pie.id") %>%
     mutate_if(is.character, as.numeric) %>%
     mutate(fio2 = coalesce(fio2, 21),
+           aa_grad = aa_gradient(pco2, pao2, fio2, F_to_C(temp), 13.106),
            surgical_status = if_else(elective == FALSE, "elective", "emergency", "nonoperative")) %>%
-    select(-dbp, -sbp, -spo2, -elective)
+    select(-dbp, -sbp, -spo2, -pco2, -elective)
+
+apache2_score <- apache2(apache_test)
 
 saveRDS(apache_test, "data/external/apache_test.Rds")
 
+# params <- c("hr", "map", "temp", "rr", "pao2", "aa_grad", "hct", "wbc",
+#             "scr", "hco3", "sodium", "potassium", "gcs", "ph", "age")
+#
+# tmp <- purrr::unslice(apache_test) %>%
+#     purrr::dmap_at(params, icuriskr:::as.aps2) %>%
+#     purrr::dmap_at("hr", icuriskr:::as.hr) %>%
+#     purrr::dmap_at("ph", icuriskr:::as.ph) %>%
+#     purrr::dmap_at("hr", icuriskr:::aps2_score) %>%
+#     purrr::dmap_at("ph", icuriskr:::aps2_score)
