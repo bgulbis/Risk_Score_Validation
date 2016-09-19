@@ -1,4 +1,4 @@
-# calculate apache3
+# prepare apache3
 
 source("src/6-calculate_saps2.R")
 
