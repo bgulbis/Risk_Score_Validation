@@ -211,5 +211,10 @@ data_apache2 <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")
 apache2_icd <- left_join(data_apache2, apache2_comorbid[c("pie.id", "comorbidity")], by = "pie.id")
 apache2_man <- left_join(data_apache2, apache2_manual[c("pie.id", "comorbidity")], by = "pie.id")
 
+score_apache2_icd <- apache2(apache2_icd)
+score_apache2_man <- apache2(apache2_man)
+
 saveRDS(apache2_icd, "data/final/apache2_icd.Rds")
 saveRDS(apache2_man, "data/final/apache2_man.Rds")
+saveRDS(score_apache2_icd, "data/final/score_apache2_icd.Rds")
+saveRDS(score_apache2_man, "data/final/score_apache2_man.Rds")
