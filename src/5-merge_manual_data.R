@@ -42,9 +42,8 @@ manual <- read_excel(paste(data.external, "2016-09-18_manual_data.xlsx", sep = "
            comments = Comments) %>%
     mutate(value = if_else(value == 1, TRUE, FALSE, NA),
            comorbidity = str_replace_all(comorbidity, comorbid)) %>%
-    filter(!is.na(fin),
-           value == TRUE) %>%
+    filter(!is.na(fin)) %>%
     left_join(identifiers, by = "fin") %>%
-    select(pie.id, comorbidity)
+    select(pie.id, comorbidity, value)
 
 saveRDS(manual, "data/tidy/manual_data.Rds")
