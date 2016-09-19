@@ -187,7 +187,7 @@ apache2_comorbid <- data_comorbidities_icd9 %>%
               immunocomp = immunosuppress | chemo | radiation | steroids | leukemia | lymphoma | (hiv & (kaposi | pneumocytosis | toxoplasmosis | tuberculosis))) %>%
     mutate(comorbidity = liver | cardiovasc | respiratory | renal | immunocomp)
 
-apache_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
+data_apache2 <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
     left_join(data_gcs, by = "pie.id") %>%
     left_join(tidy_demographics[c("pie.id", "age")], by = "pie.id") %>%
@@ -199,6 +199,6 @@ apache_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min"))
            aa_grad = aa_gradient(pco2, pao2, fio2, F_to_C(temp), 13.106),
            admit = if_else(elective == FALSE, "elective", "emergency", "nonoperative"))
 
-apache2_score <- apache2(apache_test)
+score_apache2 <- apache2(data_apache2)
 
-saveRDS(apache_test, "data/external/apache_test.Rds")
+# saveRDS(apache_test, "data/external/data_apache2.Rds")

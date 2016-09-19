@@ -46,7 +46,7 @@ apache3_comorbid <- tmp_comorbid %>%
     distinct(pie.id, .keep_all = TRUE)
 
 # need to check for chronic HD
-apache3_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
+data_apache3 <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(tidy_demographics[c("pie.id", "age")], by = "pie.id") %>%
     left_join(data_vent, by = "pie.id") %>%
     left_join(vent, by = "pie.id") %>%
@@ -60,6 +60,6 @@ apache3_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")
            arf = scr >= 1.5 & uop < 410,
            admit = if_else(elective == FALSE, "elective", "emergency", "nonoperative"))
 
-saveRDS(gcs_apache3, "data/external/apache3_neuro_test.Rds")
+# saveRDS(gcs_apache3, "data/external/apache3_neuro_test.Rds")
 
-apache3_score <- apache3(apache3_test)
+score_apache3 <- apache3(data_apache3)

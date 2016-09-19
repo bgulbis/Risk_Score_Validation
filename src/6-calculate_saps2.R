@@ -48,7 +48,7 @@ saps2_comorbid <- tmp_comorbid %>%
     arrange(pie.id, score) %>%
     distinct(pie.id, .keep_all = TRUE)
 
-saps2_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
+data_saps2 <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
     left_join(data_gcs, by = "pie.id") %>%
     left_join(tidy_demographics[c("pie.id", "age")], by = "pie.id") %>%
@@ -61,6 +61,6 @@ saps2_test <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) 
            admit_type = if_else(elective == FALSE, "elective", "emergency", "nonoperative")) %>%
     select(-dbp, -map, -rr, -spo2, -elective)
 
-saveRDS(saps2_test, "data/external/saps2_test.Rds")
+# saveRDS(saps2_test, "data/external/saps2_test.Rds")
 
-saps2_score <- saps2(saps2_test)
+score_saps2 <- saps2(data_saps2)
