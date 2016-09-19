@@ -187,18 +187,29 @@ apache2_comorbid <- data_comorbidities_icd9 %>%
               immunocomp = immunosuppress | chemo | radiation | steroids | leukemia | lymphoma | (hiv & (kaposi | pneumocytosis | toxoplasmosis | tuberculosis))) %>%
     mutate(comorbidity = liver | cardiovasc | respiratory | renal | immunocomp)
 
+apache2_manual <- manual_data %>%
+    spread(comorbidity, value) %>%
+    transmute(pie.id = pie.id,
+              liver = cirrhosis | upper_gi_bleed | encephalopathy_coma,
+              cardiovasc = chf,
+              respiratory = pulmonary | hypoxia | hypercapnia | polycythemia | pulm_htn | resp_depend,
+              renal = chronic_hd,
+              immunocomp = immunosuppress | chemo | radiation | steroids | leukemia | lymphoma | aids) %>%
+    mutate(comorbidity = liver | cardiovasc | respiratory | renal | immunocomp)
+
 data_apache2 <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
     left_join(data_gcs, by = "pie.id") %>%
     left_join(tidy_demographics[c("pie.id", "age")], by = "pie.id") %>%
     left_join(arf_apache2[c("pie.id", "arf")], by = "pie.id") %>%
     left_join(data_surgery[c("pie.id", "elective")], by = "pie.id") %>%
-    left_join(apache2_comorbid[c("pie.id", "comorbidity")], by = "pie.id") %>%
     mutate_if(is.character, as.numeric) %>%
     mutate(fio2 = coalesce(fio2, 21),
            aa_grad = aa_gradient(pco2, pao2, fio2, F_to_C(temp), 13.106),
            admit = if_else(elective == FALSE, "elective", "emergency", "nonoperative"))
 
-score_apache2 <- apache2(data_apache2)
+apache2_icd <- left_join(data_apache2, apache2_comorbid[c("pie.id", "comorbidity")], by = "pie.id")
+apache2_man <- left_join(data_apache2, apache2_manual[c("pie.id", "comorbidity")], by = "pie.id")
 
-# saveRDS(apache_test, "data/external/data_apache2.Rds")
+saveRDS(apache2_icd, "data/final/apache2_icd.Rds")
+saveRDS(apache2_man, "data/final/apache2_man.Rds")
