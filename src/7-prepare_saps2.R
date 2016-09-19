@@ -28,25 +28,16 @@ vent <- tidy_vent_times %>%
     summarize(vent = sum(vent, na.rm = TRUE)) %>%
     mutate(vent = vent >= 1)
 
-tmp_comorbid <- data_comorbidities_icd9 %>%
+saps2_comorbid <- data_comorbidities_icd9 %>%
     mutate(aids = hiv & (kaposi | lymphoma | pneumocytosis | toxoplasmosis | tuberculosis),
            heme = leukemia | lymphoma | mult_myeloma) %>%
     select(pie.id, aids, heme, cancer_mets) %>%
-    gather(comorbidity, val, -pie.id) %>%
-    filter(val == TRUE)
-
-z <- tmp_comorbid$comorbidity
-
-tmp_comorbid$score <- case_when(
-    z == "aids" ~ 3,
-    z == "heme" ~ 2,
-    z == "cancer_mets" ~ 1,
-    is.character(z) ~ 0
-)
-
-saps2_comorbid <- tmp_comorbid %>%
-    arrange(pie.id, score) %>%
-    distinct(pie.id, .keep_all = TRUE)
+    mutate(comorbidity = if_else(aids, "aids",
+                             if_else(heme, "heme",
+                                     if_else(cancer_mets, "cancer_mets", "none", "none"),
+                                     "none"),
+                             "none")) %>%
+    select(pie.id, comorbidity)
 
 saps2_manual <- manual_data %>%
     spread(comorbidity, value) %>%
