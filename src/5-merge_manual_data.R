@@ -5,10 +5,7 @@ library(edwr)
 library(tidyverse)
 library(stringr)
 
-data.tidy <- "data/tidy"
 data.external <- "data/external"
-
-dirr::get_rds(data.tidy)
 
 identifiers <- read_data(data.external, "^identifiers") %>%
     as.id()
@@ -46,8 +43,8 @@ manual <- read_excel(paste(data.external, "2016-09-18_manual_data.xlsx", sep = "
     mutate(value = if_else(value == 1, TRUE, FALSE, NA),
            comorbidity = str_replace_all(comorbidity, comorbid)) %>%
     filter(!is.na(fin),
-           value == TRUE,
-           comorbidity != "arf") %>%
+           value == TRUE) %>%
     left_join(identifiers, by = "fin") %>%
     select(pie.id, comorbidity)
 
+saveRDS(manual, "data/tidy/manual_data.Rds")
