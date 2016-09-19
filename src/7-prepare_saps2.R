@@ -1,6 +1,6 @@
 # prepare_saps2
 
-source("src/5-calculate_apache2.R")
+source("src/6-prepare_apache2.R")
 
 # labs_saps2 <- bind_rows(lab_min, lab_max) %>%
 #     rename(pco2 = arterial_pco2,
@@ -48,6 +48,15 @@ saps2_comorbid <- tmp_comorbid %>%
     arrange(pie.id, score) %>%
     distinct(pie.id, .keep_all = TRUE)
 
+saps2_manual <- manual_data %>%
+    spread(comorbidity, value) %>%
+    mutate(heme = leukemia | lymphoma | mult_myeloma) %>%
+    select(pie.id, aids, heme, cancer_mets) %>%
+    mutate(comorbidity = if_else(aids, "aids",
+                                 if_else(heme, "heme",
+                                         if_else(cancer_mets, "cancer_mets", "none")))) %>%
+    select(pie.id, comorbidity)
+
 data_saps2 <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
     left_join(data_gcs, by = "pie.id") %>%
@@ -56,11 +65,17 @@ data_saps2 <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) 
     left_join(data_surgery[c("pie.id", "elective")], by = "pie.id") %>%
     left_join(vent, by = "pie.id") %>%
     mutate_if(is.character, as.numeric) %>%
-    left_join(saps2_comorbid[c("pie.id", "comorbidity")], by = "pie.id") %>%
     mutate(fio2 = coalesce(fio2, 21),
            admit_type = if_else(elective == FALSE, "elective", "emergency", "nonoperative")) %>%
     select(-dbp, -map, -rr, -spo2, -elective)
 
-# saveRDS(saps2_test, "data/external/saps2_test.Rds")
+saps2_icd <- left_join(data_saps2, saps2_comorbid[c("pie.id", "comorbidity")], by = "pie.id")
+saps2_man <- left_join(data_saps2, saps2_manual[c("pie.id", "comorbidity")], by = "pie.id")
 
-score_saps2 <- saps2(data_saps2)
+score_saps2_icd <- saps2(saps2_icd)
+score_saps2_man <- saps2(saps2_man)
+
+saveRDS(saps2_icd, "data/final/saps2_icd.Rds")
+saveRDS(saps2_man, "data/final/saps2_man.Rds")
+saveRDS(score_saps2_icd, "data/final/score_saps2_icd.Rds")
+saveRDS(score_saps2_man, "data/final/score_saps2_man.Rds")
