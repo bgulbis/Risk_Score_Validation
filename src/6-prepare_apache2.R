@@ -179,7 +179,9 @@ data_comorbidities_icd9 <- tidy_codes_icd %>%
                  visit_name = "pie.id",
                  icd_name = "diag.code",
                  short_code = FALSE,
-                 return_df = TRUE) %>%
+                 return_df = TRUE)
+
+data_comorbidities_drg <- data_comorbidities_drg %>%
     gather(comorbidity, value, -pie.id) %>%
     left_join(msdrg, by = "pie.id") %>%
     left_join(comorbidity_drg, by = "comorbidity") %>%
