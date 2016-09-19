@@ -34,7 +34,7 @@ comorbid <- c("Cirrhosis" = "cirrhosis",
               "Lymphoma" = "lymphoma",
               "AIDS" = "aids")
 
-manual <- read_excel(paste(data.external, "2016-09-18_manual_data.xlsx", sep = "/"),
+manual_data <- read_excel(paste(data.external, "2016-09-18_manual_data.xlsx", sep = "/"),
                      col_types = c("text", "text", "numeric", "text")) %>%
     rename(fin = `Patient ID`,
            comorbidity = `Co-morbidity`,
@@ -44,6 +44,8 @@ manual <- read_excel(paste(data.external, "2016-09-18_manual_data.xlsx", sep = "
            comorbidity = str_replace_all(comorbidity, comorbid)) %>%
     filter(!is.na(fin)) %>%
     left_join(identifiers, by = "fin") %>%
-    select(pie.id, comorbidity, value)
+    select(pie.id, comorbidity, value) %>%
+    arrange(pie.id, comorbidity, desc(value)) %>%
+    distinct(pie.id, comorbidity, .keep_all = TRUE)
 
-saveRDS(manual, "data/tidy/manual_data.Rds")
+saveRDS(manual_data, "data/tidy/manual_data.Rds")
