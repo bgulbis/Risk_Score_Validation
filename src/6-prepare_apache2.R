@@ -168,15 +168,26 @@ mdc <- readr::read_csv("data/external/msdrg_to_mdc.csv") %>%
     dmap_at("mdc", str_replace_all, pattern = "No MDC|MDC ", replacement = "")
 
 msdrg <- tidy_codes_drg %>%
-    left_join(mdc[c("msdrg", "mdc")], by = c("drg" = "msdrg"))
+    left_join(mdc[c("msdrg", "mdc")], by = c("drg" = "msdrg")) %>%
+    distinct(pie.id, mdc)
 
+# convert any positive comorbidities to false if the comorbidity was related to
+# their primary drg
 data_comorbidities_icd9 <- tidy_codes_icd %>%
     filter(icd9 == TRUE) %>%
     icd_comorbid(comorbidity_map_icd9,
                  visit_name = "pie.id",
                  icd_name = "diag.code",
                  short_code = FALSE,
-                 return_df = TRUE)
+                 return_df = TRUE) %>%
+    gather(comorbidity, value, -pie.id) %>%
+    left_join(msdrg, by = "pie.id") %>%
+    left_join(comorbidity_drg, by = "comorbidity") %>%
+    mutate(is_comorbid = value == TRUE & mdc != drg) %>%
+    select(pie.id, comorbidity, is_comorbid) %>%
+    arrange(pie.id, comorbidity, desc(is_comorbid)) %>%
+    distinct(pie.id, comorbidity, .keep_all = TRUE) %>%
+    spread(comorbidity, is_comorbid)
 
 apache2_comorbid <- data_comorbidities_icd9 %>%
     transmute(pie.id = pie.id,
