@@ -26,8 +26,7 @@ data_labs <- tidy_labs %>%
            lab.datetime <= arrive.datetime + hours(24),
            lab.datetime <= depart.datetime,
            lab %in% labs) %>%
-    mutate(lab = str_replace_all(lab, " lvl", ""),
-           lab = str_replace_all(lab, "poc a", "arterial"),
+    mutate(lab = str_replace_all(lab, " lvl|poc a ", ""),
            lab = str_replace_all(lab, "bilirubin", "bili"),
            lab = str_replace_all(lab, " ", "_")) %>%
     select(pie.id, lab, lab.result) %>%
@@ -45,10 +44,7 @@ lab_max <- data_labs %>%
     mutate(min = FALSE)
 
 labs_min_max <- bind_rows(lab_min, lab_max) %>%
-    rename(pco2 = arterial_pco2,
-           ph = arterial_ph,
-           pao2 = arterial_po2,
-           scr = creatinine,
+    rename(scr = creatinine,
            hco3 = co2,
            bili = bili_total)
 
