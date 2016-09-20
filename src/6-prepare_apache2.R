@@ -233,6 +233,18 @@ data_comorbidities <- c(comorbid_maps, comorbid_maps_drg)
 # make comorbidities for APACHE II
 tmp_apache2_comorbidity <- map(data_comorbidities, apache2_comorbidity)
 
+apache2_manual <- manual_data %>%
+    spread(comorbidity, value) %>%
+    transmute(pie.id = pie.id,
+              liver = cirrhosis | upper_gi_bleed | encephalopathy_coma,
+              cardiovasc = chf,
+              respiratory = pulmonary | hypoxia | hypercapnia | polycythemia | pulm_htn | resp_depend,
+              renal = chronic_hd,
+              immunocomp = immunosuppress | chemo | radiation | steroids | leukemia | lymphoma | aids) %>%
+    mutate(comorbidity = liver | cardiovasc | respiratory | renal | immunocomp)
+
+tmp_apache2_comorbidity <- c(tmp_apache2_comorbidity, list(apache2_manual))
+
 data_apache2 <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
     left_join(data_gcs, by = "pie.id") %>%
@@ -247,8 +259,8 @@ data_apache2 <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")
 apache2_icd <- map(tmp_apache2_comorbidity, ~left_join(data_apache2, .x, by = "pie.id"))
 score_apache2 <- map(apache2_icd, apache2)
 
-comorbid_names <- c("manual", "elixhauser", "quan", "ahrq", "manual_drg",
-                    "elixhauser_drg", "quan_drg", "ahrq_drg")
+comorbid_names <- c("ek", "elixhauser", "quan", "ahrq", "manual_drg",
+                    "elixhauser_drg", "quan_drg", "ahrq_drg", "manual")
 
 walk2(apache2_icd, comorbid_names, ~saveRDS(.x, file = paste0("data/final/data_apache2_", .y, ".Rds")))
 walk2(score_apache2, comorbid_names, ~saveRDS(.x, file = paste0("data/final/score_apache2_", .y, ".Rds")))
