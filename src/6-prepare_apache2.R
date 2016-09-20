@@ -259,7 +259,7 @@ data_apache2 <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")
 apache2_icd <- map(tmp_apache2_comorbidity, ~left_join(data_apache2, .x, by = "pie.id"))
 score_apache2 <- map(apache2_icd, apache2)
 
-comorbid_names <- c("ek", "elixhauser", "quan", "ahrq", "manual_drg",
+comorbid_names <- c("ek", "elixhauser", "quan", "ahrq", "ek_drg",
                     "elixhauser_drg", "quan_drg", "ahrq_drg", "manual")
 
 walk2(apache2_icd, comorbid_names, ~saveRDS(.x, file = paste0("data/final/data_apache2_", .y, ".Rds")))
