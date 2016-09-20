@@ -28,25 +28,27 @@ vent <- tidy_vent_times %>%
     summarize(vent = sum(vent, na.rm = TRUE)) %>%
     mutate(vent = vent >= 1)
 
-saps2_comorbid <- data_comorbidities_icd9 %>%
-    mutate(aids = hiv & (kaposi | lymphoma | pneumocytosis | toxoplasmosis | tuberculosis),
-           heme = leukemia | lymphoma | mult_myeloma) %>%
-    select(pie.id, aids, heme, cancer_mets) %>%
-    mutate(comorbidity = if_else(aids, "aids",
-                             if_else(heme, "heme",
-                                     if_else(cancer_mets, "cancer_mets", "none", "none"),
-                                     "none"),
-                             "none")) %>%
-    select(pie.id, comorbidity)
+saps2_comorbidity <- function(df) {
+    df %>%
+        dplyr::mutate_(.dots = purrr::set_names(
+            x = list(~hiv & (kaposi | lymphoma | pneumocytosis | toxoplasmosis | tuberculosis),
+                     ~leukemia | lymphoma | mult_myeloma),
+            nm = list("aids", "heme"))) %>%
+        dplyr::select_(.dots = list("pie.id", "aids", "heme", "cancer_mets")) %>%
+        dplyr::mutate_(.dots = purrr::set_names(
+            x = list(
+                ~dplyr::if_else(aids, "aids",
+                                dplyr::if_else(heme, "heme",
+                                               dplyr::if_else(cancer_mets, "cancer_mets", "none", "none"),
+                                               "none"),
+                                "none")
+            ),
+            nm = "comorbidity"
+        )) %>%
+        dplyr::select_(.dots = list("pie.id", "comorbidity"))
+}
 
-saps2_manual <- manual_data %>%
-    spread(comorbidity, value) %>%
-    mutate(heme = leukemia | lymphoma | mult_myeloma) %>%
-    select(pie.id, aids, heme, cancer_mets) %>%
-    mutate(comorbidity = if_else(aids, "aids",
-                                 if_else(heme, "heme",
-                                         if_else(cancer_mets, "cancer_mets", "none")))) %>%
-    select(pie.id, comorbidity)
+tmp_saps2_comorbidity <- map(data_comorbidities, saps2_comorbidity)
 
 data_saps2 <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
@@ -60,13 +62,8 @@ data_saps2 <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) 
            admit_type = if_else(elective == FALSE, "elective", "emergency", "nonoperative")) %>%
     select(-dbp, -map, -rr, -spo2, -elective)
 
-saps2_icd <- left_join(data_saps2, saps2_comorbid[c("pie.id", "comorbidity")], by = "pie.id")
-saps2_man <- left_join(data_saps2, saps2_manual[c("pie.id", "comorbidity")], by = "pie.id")
+saps2_icd <- map(tmp_saps2_comorbidity, ~left_join(data_saps2, .x, by = "pie.id"))
+score_saps2 <- map(saps2_icd, saps2)
 
-score_saps2_icd <- saps2(saps2_icd)
-score_saps2_man <- saps2(saps2_man)
-
-saveRDS(saps2_icd, "data/final/saps2_icd.Rds")
-saveRDS(saps2_man, "data/final/saps2_man.Rds")
-saveRDS(score_saps2_icd, "data/final/score_saps2_icd.Rds")
-saveRDS(score_saps2_man, "data/final/score_saps2_man.Rds")
+walk2(saps2_icd, comorbid_names, ~saveRDS(.x, file = paste0("data/final/data_saps2_", .y, ".Rds")))
+walk2(score_saps2, comorbid_names, ~saveRDS(.x, file = paste0("data/final/score_saps2_", .y, ".Rds")))
