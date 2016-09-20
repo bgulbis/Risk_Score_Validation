@@ -45,6 +45,7 @@ lab_max <- data_labs %>%
 
 labs_min_max <- bind_rows(lab_min, lab_max) %>%
     rename(scr = creatinine,
+           pao2 = po2,
            hco3 = co2,
            bili = bili_total)
 
@@ -167,44 +168,70 @@ msdrg <- tidy_codes_drg %>%
     left_join(mdc[c("msdrg", "mdc")], by = c("drg" = "msdrg")) %>%
     distinct(pie.id, mdc)
 
+# comorbidity functions --------------------------------
+
+map_comorbidity <- function(df, icd_map) {
+    icd::icd_comorbid(df, icd_map, return_df = TRUE, short_code = FALSE)
+}
+
+use_drg <- function(df, msdrg) {
+    df %>%
+        tidyr::gather_("comorbidity", "value", gather_cols = names(df[, -1])) %>%
+        dplyr::left_join(msdrg, by = "pie.id") %>%
+        dplyr::left_join(icuriskr::comorbidity_drg, by = "comorbidity") %>%
+        dplyr::mutate_(.dots = purrr::set_names(list(~value == TRUE & mdc != drg), "is_comorbid")) %>%
+        dplyr::select_(.dots = list("pie.id", "comorbidity", "is_comorbid")) %>%
+        dplyr::arrange_(.dots = list("pie.id", "comorbidity", ~dplyr::desc(is_comorbid))) %>%
+        dplyr::distinct_(.dots = list("pie.id", "comorbidity"), .keep_all = TRUE) %>%
+        tidyr::spread_("comorbidity", "is_comorbid")
+}
+
+apache2_comorbidity <- function(df) {
+    df %>%
+        dplyr::transmute_(.dots = purrr::set_names(
+            x = list("pie.id",
+                     ~(portal_htn & (cirrhosis | upper_gi_bleed)) | encephalopathy_coma,
+                     "chf",
+                     ~pulmonary | pvd | hypoxia | hypercapnia | polycythemia | pulm_htn | resp_depend,
+                     "chronic_hd",
+                     ~immunosuppress | chemo | radiation | steroids | leukemia | lymphoma | (hiv & (kaposi | pneumocytosis | toxoplasmosis | tuberculosis))),
+            nm = list("pie.id", "liver", "cardiovasc", "respiratory", "renal", "immunocomp")
+        )) %>%
+        dplyr::mutate_(.dots = purrr::set_names(
+            x = list(~liver | cardiovasc | respiratory | renal | immunocomp),
+            nm = "comorbidity"
+        ))
+}
+
 # convert any positive comorbidities to false if the comorbidity was related to
 # their primary drg
-data_comorbidities_icd9 <- tidy_codes_icd %>%
-    filter(icd9 == TRUE) %>%
-    icd_comorbid(comorbidity_map_icd9,
-                 visit_name = "pie.id",
-                 icd_name = "diag.code",
-                 short_code = FALSE,
-                 return_df = TRUE)
+tmp_icd9 <- filter(tidy_codes_icd, icd9 == TRUE)
 
-data_comorbidities_drg <- data_comorbidities_drg %>%
-    gather(comorbidity, value, -pie.id) %>%
-    left_join(msdrg, by = "pie.id") %>%
-    left_join(comorbidity_drg, by = "comorbidity") %>%
-    mutate(is_comorbid = value == TRUE & mdc != drg) %>%
-    select(pie.id, comorbidity, is_comorbid) %>%
-    arrange(pie.id, comorbidity, desc(is_comorbid)) %>%
-    distinct(pie.id, comorbidity, .keep_all = TRUE) %>%
-    spread(comorbidity, is_comorbid)
+icd9_maps <- list(comorbidity_map_icd9_ek,
+                  comorbidity_map_icd9_elix,
+                  comorbidity_map_icd9_quan,
+                  comorbidity_map_icd9_ahrq)
 
-apache2_comorbid <- data_comorbidities_icd9 %>%
-    transmute(pie.id = pie.id,
-              liver = (portal_htn & (cirrhosis | upper_gi_bleed)) | encephalopathy_coma,
-              cardiovasc = chf,
-              respiratory = pulmonary | pvd | hypoxia | hypercapnia | polycythemia | pulm_htn | resp_depend,
-              renal = chronic_hd,
-              immunocomp = immunosuppress | chemo | radiation | steroids | leukemia | lymphoma | (hiv & (kaposi | pneumocytosis | toxoplasmosis | tuberculosis))) %>%
-    mutate(comorbidity = liver | cardiovasc | respiratory | renal | immunocomp)
+comorbid_maps_icd9 <- map(icd9_maps, ~map_comorbidity(tmp_icd9, .x))
+comorbid_maps_icd9_drg <- map(comorbid_maps_icd9, use_drg, msdrg)
 
-apache2_manual <- manual_data %>%
-    spread(comorbidity, value) %>%
-    transmute(pie.id = pie.id,
-              liver = cirrhosis | upper_gi_bleed | encephalopathy_coma,
-              cardiovasc = chf,
-              respiratory = pulmonary | hypoxia | hypercapnia | polycythemia | pulm_htn | resp_depend,
-              renal = chronic_hd,
-              immunocomp = immunosuppress | chemo | radiation | steroids | leukemia | lymphoma | aids) %>%
-    mutate(comorbidity = liver | cardiovasc | respiratory | renal | immunocomp)
+tmp_icd10 <- filter(tidy_codes_icd, icd9 == FALSE)
+
+icd10_maps <- list(comorbidity_map_icd10_ek,
+                  comorbidity_map_icd10_elix,
+                  comorbidity_map_icd10_quan,
+                  comorbidity_map_icd10_ahrq)
+
+comorbid_maps_icd10 <- map(icd10_maps, ~map_comorbidity(tmp_icd10, .x))
+comorbid_maps_icd10_drg <- map(comorbid_maps_icd10, use_drg, msdrg)
+
+comorbid_maps <- map2(comorbid_maps_icd9, comorbid_maps_icd10, bind_rows)
+comorbid_maps_drg <- map2(comorbid_maps_icd9_drg, comorbid_maps_icd10_drg, bind_rows)
+
+data_comorbidities <- c(comorbid_maps, comorbid_maps_drg)
+
+# make comorbidities for APACHE II
+tmp_apache2_comorbidity <- map(data_comorbidities, apache2_comorbidity)
 
 data_apache2 <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
@@ -217,13 +244,11 @@ data_apache2 <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")
            aa_grad = aa_gradient(pco2, pao2, fio2, F_to_C(temp), 13.106),
            admit = if_else(elective == FALSE, "elective", "emergency", "nonoperative"))
 
-apache2_icd <- left_join(data_apache2, apache2_comorbid[c("pie.id", "comorbidity")], by = "pie.id")
-apache2_man <- left_join(data_apache2, apache2_manual[c("pie.id", "comorbidity")], by = "pie.id")
+apache2_icd <- map(tmp_apache2_comorbidity, ~left_join(data_apache2, .x, by = "pie.id"))
+score_apache2 <- map(apache2_icd, apache2)
 
-score_apache2_icd <- apache2(apache2_icd)
-score_apache2_man <- apache2(apache2_man)
+comorbid_names <- c("manual", "elixhauser", "quan", "ahrq", "manual_drg",
+                    "elixhauser_drg", "quan_drg", "ahrq_drg")
 
-saveRDS(apache2_icd, "data/final/apache2_icd.Rds")
-saveRDS(apache2_man, "data/final/apache2_man.Rds")
-saveRDS(score_apache2_icd, "data/final/score_apache2_icd.Rds")
-saveRDS(score_apache2_man, "data/final/score_apache2_man.Rds")
+walk2(apache2_icd, comorbid_names, ~saveRDS(.x, file = paste0("data/final/data_apache2_", .y, ".Rds")))
+walk2(score_apache2, comorbid_names, ~saveRDS(.x, file = paste0("data/final/score_apache2_", .y, ".Rds")))
