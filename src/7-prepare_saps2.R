@@ -50,6 +50,17 @@ saps2_comorbidity <- function(df) {
 
 tmp_saps2_comorbidity <- map(data_comorbidities, saps2_comorbidity)
 
+saps2_manual <- manual_data %>%
+    spread(comorbidity, value) %>%
+    mutate(heme = leukemia | lymphoma | mult_myeloma) %>%
+    select(pie.id, aids, heme, cancer_mets) %>%
+    mutate(comorbidity = if_else(aids, "aids",
+                                 if_else(heme, "heme",
+                                         if_else(cancer_mets, "cancer_mets", "none")))) %>%
+    select(pie.id, comorbidity)
+
+tmp_saps2_comorbidity <- c(tmp_saps2_comorbidity, list(saps2_manual))
+
 data_saps2 <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")) %>%
     left_join(data_vent, by = "pie.id") %>%
     left_join(data_gcs, by = "pie.id") %>%
