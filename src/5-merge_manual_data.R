@@ -48,4 +48,7 @@ manual_data <- read_excel(paste(data.external, "2016-09-18_manual_data.xlsx", se
     arrange(pie.id, comorbidity, desc(value)) %>%
     distinct(pie.id, comorbidity, .keep_all = TRUE)
 
+manual_patients <- distinct(manual_data, pie.id)
+
 saveRDS(manual_data, "data/tidy/manual_data.Rds")
+saveRDS(manual_patients, "data/final/manual_patients.Rds")
