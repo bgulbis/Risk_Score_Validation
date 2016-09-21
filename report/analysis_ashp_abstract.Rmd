@@ -10,6 +10,7 @@ output:
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(tableone)
 
 dirr::get_rds("../data/final")
 ```
@@ -29,7 +30,74 @@ dirr::get_rds("../data/final")
 
 ### Primary endpoint
 
-#### The difference in score between electronic and manual scoring for each of APACHE II, APACHE III, and SAPS II.
+#### Difference in APACHE II score
+
+```{r}
+scores <- ls(pattern = "score_apache2")
+
+all_scores <- map(scores, ~mutate(get(.x), score = .x)) %>%
+    map(~select(.x, pie.id, score, apache2)) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    spread(score, apache2) %>%
+    mutate_at(vars(-pie.id, -score_apache2_manual), funs(abs(. - score_apache2_manual))) %>%
+    select(-pie.id, -score_apache2_manual)
+
+tbl <- CreateTableOne(vars = names(all_scores), data = all_scores)
+ptbl <- print(tbl, printToggle = FALSE)
+knitr::kable(ptbl, caption = "Mean Difference in APACHE II Scores")
+```
+
+```{r}
+ptbl <- print(tbl, printToggle = FALSE, nonnormal = names(all_scores))
+knitr::kable(ptbl, caption = "Median Difference in APACHE II Scores")
+
+```
+
+#### Difference in APACHE III score
+
+```{r}
+scores <- ls(pattern = "score_apache3")
+
+all_scores <- map(scores, ~mutate(get(.x), score = .x)) %>%
+    map(~select(.x, pie.id, score, apache3)) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    spread(score, apache3) %>%
+    mutate_at(vars(-pie.id, -score_apache3_manual), funs(abs(. - score_apache3_manual))) %>%
+    select(-pie.id, -score_apache3_manual)
+
+tbl <- CreateTableOne(vars = names(all_scores), data = all_scores)
+ptbl <- print(tbl, printToggle = FALSE)
+knitr::kable(ptbl, caption = "Mean Difference in APACHE III Scores")
+```
+
+```{r}
+ptbl <- print(tbl, printToggle = FALSE, nonnormal = names(all_scores))
+knitr::kable(ptbl, caption = "Median Difference in APACHE III Scores")
+
+```
+
+#### Difference in SAPS II score
+
+```{r}
+scores <- ls(pattern = "score_saps2")
+
+all_scores <- map(scores, ~mutate(get(.x), score = .x)) %>%
+    map(~select(.x, pie.id, score, saps2)) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    spread(score, saps2) %>%
+    mutate_at(vars(-pie.id, -score_saps2_manual), funs(abs(. - score_saps2_manual))) %>%
+    select(-pie.id, -score_saps2_manual)
+
+tbl <- CreateTableOne(vars = names(all_scores), data = all_scores)
+ptbl <- print(tbl, printToggle = FALSE)
+knitr::kable(ptbl, caption = "Mean Difference in SAPS II Scores")
+```
+
+```{r}
+ptbl <- print(tbl, printToggle = FALSE, nonnormal = names(all_scores))
+knitr::kable(ptbl, caption = "Median Difference in SAPS II Scores")
+
+```
 
 ### Secondary endpoints
 

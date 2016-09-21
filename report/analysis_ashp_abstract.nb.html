@@ -288,8 +288,404 @@ div.tocify {
 <h2>Outcomes</h2>
 <div id="primary-endpoint" class="section level3">
 <h3>Primary endpoint</h3>
-<div id="the-difference-in-score-between-electronic-and-manual-scoring-for-each-of-apache-ii-apache-iii-and-saps-ii." class="section level4">
-<h4>The difference in score between electronic and manual scoring for each of APACHE II, APACHE III, and SAPS II.</h4>
+<div id="difference-in-apache-ii-score" class="section level4">
+<h4>Difference in APACHE II score</h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2NvcmVzIDwtIGxzKHBhdHRlcm4gPSBcInNjb3JlX2FwYWNoZTJcIilcbmFsbF9zY29yZXMgPC0gbWFwKHNjb3Jlcywgfm11dGF0ZShnZXQoLngpLCBzY29yZSA9IC54KSkgJT4lXG4gICAgbWFwKH5zZWxlY3QoLngsIHBpZS5pZCwgc2NvcmUsIGFwYWNoZTIpKSAlPiVcbiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9IFwicGllLmlkXCIpKSAlPiVcbiAgICBzcHJlYWQoc2NvcmUsIGFwYWNoZTIpICU+JVxuICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1zY29yZV9hcGFjaGUyX21hbnVhbCksIGZ1bnMoYWJzKC4gLSBzY29yZV9hcGFjaGUyX21hbnVhbCkpKSAlPiVcbiAgICBzZWxlY3QoLXBpZS5pZCwgLXNjb3JlX2FwYWNoZTJfbWFudWFsKVxudGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhhbGxfc2NvcmVzKSwgZGF0YSA9IGFsbF9zY29yZXMpXG5wdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSlcbmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gXCJNZWFuIERpZmZlcmVuY2UgaW4gQVBBQ0hFIElJIFNjb3Jlc1wiKVxuYGBgIn0= -->
+<pre class="r"><code>scores &lt;- ls(pattern = &quot;score_apache2&quot;)
+all_scores &lt;- map(scores, ~mutate(get(.x), score = .x)) %&gt;%
+    map(~select(.x, pie.id, score, apache2)) %&gt;%
+    map_df(~semi_join(.x, manual_patients, by = &quot;pie.id&quot;)) %&gt;%
+    spread(score, apache2) %&gt;%
+    mutate_at(vars(-pie.id, -score_apache2_manual), funs(abs(. - score_apache2_manual))) %&gt;%
+    select(-pie.id, -score_apache2_manual)
+tbl &lt;- CreateTableOne(vars = names(all_scores), data = all_scores)
+ptbl &lt;- print(tbl, printToggle = FALSE)
+knitr::kable(ptbl, caption = &quot;Mean Difference in APACHE II Scores&quot;)</code></pre>
+<!-- rnb-source-end -->
+
+<!-- rnb-html-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImtuaXRfYXNpcyJdfX0= -->
+
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">Overall</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">n</td>
+<td align="left">10</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache2_ahrq (mean (sd))</td>
+<td align="left">1.20 (2.10)</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache2_ahrq_drg (mean (sd))</td>
+<td align="left">1.20 (2.10)</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache2_ek (mean (sd))</td>
+<td align="left">1.20 (2.10)</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache2_ek_drg (mean (sd))</td>
+<td align="left">1.70 (2.36)</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache2_elixhauser (mean (sd))</td>
+<td align="left">1.20 (2.10)</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache2_elixhauser_drg (mean (sd))</td>
+<td align="left">1.20 (2.10)</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache2_quan (mean (sd))</td>
+<td align="left">1.20 (2.10)</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache2_quan_drg (mean (sd))</td>
+<td align="left">1.20 (2.10)</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- rnb-html-end -->
+
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UsIG5vbm5vcm1hbCA9IG5hbWVzKGFsbF9zY29yZXMpKVxua25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSBcIk1lZGlhbiBEaWZmZXJlbmNlIGluIEFQQUNIRSBJSSBTY29yZXNcIilcbmBgYCJ9 -->
+<pre class="r"><code>ptbl &lt;- print(tbl, printToggle = FALSE, nonnormal = names(all_scores))
+knitr::kable(ptbl, caption = &quot;Median Difference in APACHE II Scores&quot;)</code></pre>
+<!-- rnb-source-end -->
+
+<!-- rnb-html-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImtuaXRfYXNpcyJdfX0= -->
+
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">Overall</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">n</td>
+<td align="left">10</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache2_ahrq (median [IQR])</td>
+<td align="left">0.00 [0.00, 1.50]</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache2_ahrq_drg (median [IQR])</td>
+<td align="left">0.00 [0.00, 1.50]</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache2_ek (median [IQR])</td>
+<td align="left">0.00 [0.00, 1.50]</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache2_ek_drg (median [IQR])</td>
+<td align="left">0.00 [0.00, 4.25]</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache2_elixhauser (median [IQR])</td>
+<td align="left">0.00 [0.00, 1.50]</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache2_elixhauser_drg (median [IQR])</td>
+<td align="left">0.00 [0.00, 1.50]</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache2_quan (median [IQR])</td>
+<td align="left">0.00 [0.00, 1.50]</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache2_quan_drg (median [IQR])</td>
+<td align="left">0.00 [0.00, 1.50]</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- rnb-html-end -->
+
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="difference-in-apache-iii-score" class="section level4">
+<h4>Difference in APACHE III score</h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2NvcmVzIDwtIGxzKHBhdHRlcm4gPSBcInNjb3JlX2FwYWNoZTNcIilcbmFsbF9zY29yZXMgPC0gbWFwKHNjb3Jlcywgfm11dGF0ZShnZXQoLngpLCBzY29yZSA9IC54KSkgJT4lXG4gICAgbWFwKH5zZWxlY3QoLngsIHBpZS5pZCwgc2NvcmUsIGFwYWNoZTMpKSAlPiVcbiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9IFwicGllLmlkXCIpKSAlPiVcbiAgICBzcHJlYWQoc2NvcmUsIGFwYWNoZTMpICU+JVxuICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1zY29yZV9hcGFjaGUzX21hbnVhbCksIGZ1bnMoYWJzKC4gLSBzY29yZV9hcGFjaGUzX21hbnVhbCkpKSAlPiVcbiAgICBzZWxlY3QoLXBpZS5pZCwgLXNjb3JlX2FwYWNoZTNfbWFudWFsKVxudGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhhbGxfc2NvcmVzKSwgZGF0YSA9IGFsbF9zY29yZXMpXG5wdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSlcbmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gXCJNZWFuIERpZmZlcmVuY2UgaW4gQVBBQ0hFIElJSSBTY29yZXNcIilcbmBgYCJ9 -->
+<pre class="r"><code>scores &lt;- ls(pattern = &quot;score_apache3&quot;)
+all_scores &lt;- map(scores, ~mutate(get(.x), score = .x)) %&gt;%
+    map(~select(.x, pie.id, score, apache3)) %&gt;%
+    map_df(~semi_join(.x, manual_patients, by = &quot;pie.id&quot;)) %&gt;%
+    spread(score, apache3) %&gt;%
+    mutate_at(vars(-pie.id, -score_apache3_manual), funs(abs(. - score_apache3_manual))) %&gt;%
+    select(-pie.id, -score_apache3_manual)
+tbl &lt;- CreateTableOne(vars = names(all_scores), data = all_scores)
+ptbl &lt;- print(tbl, printToggle = FALSE)
+knitr::kable(ptbl, caption = &quot;Mean Difference in APACHE III Scores&quot;)</code></pre>
+<!-- rnb-source-end -->
+
+<!-- rnb-html-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImtuaXRfYXNpcyJdfX0= -->
+
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">Overall</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">n</td>
+<td align="left">10</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache3_ahrq (mean (sd))</td>
+<td align="left">0.00 (0.00)</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache3_ahrq_drg (mean (sd))</td>
+<td align="left">0.30 (0.95)</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache3_ek (mean (sd))</td>
+<td align="left">0.00 (0.00)</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache3_ek_drg (mean (sd))</td>
+<td align="left">0.30 (0.95)</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache3_elixhauser (mean (sd))</td>
+<td align="left">0.00 (0.00)</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache3_elixhauser_drg (mean (sd))</td>
+<td align="left">0.30 (0.95)</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache3_quan (mean (sd))</td>
+<td align="left">0.00 (0.00)</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache3_quan_drg (mean (sd))</td>
+<td align="left">0.30 (0.95)</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- rnb-html-end -->
+
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UsIG5vbm5vcm1hbCA9IG5hbWVzKGFsbF9zY29yZXMpKVxua25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSBcIk1lZGlhbiBEaWZmZXJlbmNlIGluIEFQQUNIRSBJSUkgU2NvcmVzXCIpXG5gYGAifQ== -->
+<pre class="r"><code>ptbl &lt;- print(tbl, printToggle = FALSE, nonnormal = names(all_scores))
+knitr::kable(ptbl, caption = &quot;Median Difference in APACHE III Scores&quot;)</code></pre>
+<!-- rnb-source-end -->
+
+<!-- rnb-html-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImtuaXRfYXNpcyJdfX0= -->
+
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">Overall</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">n</td>
+<td align="left">10</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache3_ahrq (median [IQR])</td>
+<td align="left">0.00 [0.00, 0.00]</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache3_ahrq_drg (median [IQR])</td>
+<td align="left">0.00 [0.00, 0.00]</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache3_ek (median [IQR])</td>
+<td align="left">0.00 [0.00, 0.00]</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache3_ek_drg (median [IQR])</td>
+<td align="left">0.00 [0.00, 0.00]</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache3_elixhauser (median [IQR])</td>
+<td align="left">0.00 [0.00, 0.00]</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache3_elixhauser_drg (median [IQR])</td>
+<td align="left">0.00 [0.00, 0.00]</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache3_quan (median [IQR])</td>
+<td align="left">0.00 [0.00, 0.00]</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache3_quan_drg (median [IQR])</td>
+<td align="left">0.00 [0.00, 0.00]</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- rnb-html-end -->
+
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="difference-in-saps-ii-score" class="section level4">
+<h4>Difference in SAPS II score</h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2NvcmVzIDwtIGxzKHBhdHRlcm4gPSBcInNjb3JlX3NhcHMyXCIpXG5hbGxfc2NvcmVzIDwtIG1hcChzY29yZXMsIH5tdXRhdGUoZ2V0KC54KSwgc2NvcmUgPSAueCkpICU+JVxuICAgIG1hcCh+c2VsZWN0KC54LCBwaWUuaWQsIHNjb3JlLCBzYXBzMikpICU+JVxuICAgIG1hcF9kZih+c2VtaV9qb2luKC54LCBtYW51YWxfcGF0aWVudHMsIGJ5ID0gXCJwaWUuaWRcIikpICU+JVxuICAgIHNwcmVhZChzY29yZSwgc2FwczIpICU+JVxuICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1zY29yZV9zYXBzMl9tYW51YWwpLCBmdW5zKGFicyguIC0gc2NvcmVfc2FwczJfbWFudWFsKSkpICU+JVxuICAgIHNlbGVjdCgtcGllLmlkLCAtc2NvcmVfc2FwczJfbWFudWFsKVxudGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhhbGxfc2NvcmVzKSwgZGF0YSA9IGFsbF9zY29yZXMpXG5wdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSlcbmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gXCJNZWFuIERpZmZlcmVuY2UgaW4gU0FQUyBJSSBTY29yZXNcIilcbmBgYCJ9 -->
+<pre class="r"><code>scores &lt;- ls(pattern = &quot;score_saps2&quot;)
+all_scores &lt;- map(scores, ~mutate(get(.x), score = .x)) %&gt;%
+    map(~select(.x, pie.id, score, saps2)) %&gt;%
+    map_df(~semi_join(.x, manual_patients, by = &quot;pie.id&quot;)) %&gt;%
+    spread(score, saps2) %&gt;%
+    mutate_at(vars(-pie.id, -score_saps2_manual), funs(abs(. - score_saps2_manual))) %&gt;%
+    select(-pie.id, -score_saps2_manual)
+tbl &lt;- CreateTableOne(vars = names(all_scores), data = all_scores)
+ptbl &lt;- print(tbl, printToggle = FALSE)
+knitr::kable(ptbl, caption = &quot;Mean Difference in SAPS II Scores&quot;)</code></pre>
+<!-- rnb-source-end -->
+
+<!-- rnb-html-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImtuaXRfYXNpcyJdfX0= -->
+
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">Overall</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">n</td>
+<td align="left">10</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_ahrq (mean (sd))</td>
+<td align="left">1.00 (3.16)</td>
+</tr>
+<tr class="odd">
+<td align="left">score_saps2_ahrq_drg (mean (sd))</td>
+<td align="left">0.00 (0.00)</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_ek (mean (sd))</td>
+<td align="left">1.00 (3.16)</td>
+</tr>
+<tr class="odd">
+<td align="left">score_saps2_ek_drg (mean (sd))</td>
+<td align="left">0.00 (0.00)</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_elixhauser (mean (sd))</td>
+<td align="left">1.00 (3.16)</td>
+</tr>
+<tr class="odd">
+<td align="left">score_saps2_elixhauser_drg (mean (sd))</td>
+<td align="left">0.00 (0.00)</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_quan (mean (sd))</td>
+<td align="left">1.00 (3.16)</td>
+</tr>
+<tr class="odd">
+<td align="left">score_saps2_quan_drg (mean (sd))</td>
+<td align="left">0.00 (0.00)</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- rnb-html-end -->
+
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UsIG5vbm5vcm1hbCA9IG5hbWVzKGFsbF9zY29yZXMpKVxua25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSBcIk1lZGlhbiBEaWZmZXJlbmNlIGluIFNBUFMgSUkgU2NvcmVzXCIpXG5gYGAifQ== -->
+<pre class="r"><code>ptbl &lt;- print(tbl, printToggle = FALSE, nonnormal = names(all_scores))
+knitr::kable(ptbl, caption = &quot;Median Difference in SAPS II Scores&quot;)</code></pre>
+<!-- rnb-source-end -->
+
+<!-- rnb-html-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImtuaXRfYXNpcyJdfX0= -->
+
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">Overall</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">n</td>
+<td align="left">10</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_ahrq (median [IQR])</td>
+<td align="left">0.00 [0.00, 0.00]</td>
+</tr>
+<tr class="odd">
+<td align="left">score_saps2_ahrq_drg (median [IQR])</td>
+<td align="left">0.00 [0.00, 0.00]</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_ek (median [IQR])</td>
+<td align="left">0.00 [0.00, 0.00]</td>
+</tr>
+<tr class="odd">
+<td align="left">score_saps2_ek_drg (median [IQR])</td>
+<td align="left">0.00 [0.00, 0.00]</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_elixhauser (median [IQR])</td>
+<td align="left">0.00 [0.00, 0.00]</td>
+</tr>
+<tr class="odd">
+<td align="left">score_saps2_elixhauser_drg (median [IQR])</td>
+<td align="left">0.00 [0.00, 0.00]</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_quan (median [IQR])</td>
+<td align="left">0.00 [0.00, 0.00]</td>
+</tr>
+<tr class="odd">
+<td align="left">score_saps2_quan_drg (median [IQR])</td>
+<td align="left">0.00 [0.00, 0.00]</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- rnb-html-end -->
+
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 </div>
 </div>
 <div id="secondary-endpoints" class="section level3">
@@ -307,7 +703,7 @@ div.tocify {
 </div>
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlZhbGlkYXRpb24gb2YgSUNELTktQ00vSUNELTEwLUNNIENvZGVzIGZvciBBdXRvbWF0ZWQgRWxlY3Ryb25pYyBTY29yaW5nIG9mIEFQQUNIRSBJSSwgQVBBQ0hFIElJSSwgYW5kIFNBUFMgSUkiDQpzdWJ0aXRsZTogIlByZWxpbWluYXJ5IEFuYWx5c2lzIGZvciBBU0hQIEFic3RyYWN0IFN1Ym1pc3Npb24iDQpvdXRwdXQ6IA0KICAgIGh0bWxfbm90ZWJvb2s6DQogICAgICAgIGNvZGVfZm9sZGluZzogaGlkZQ0KICAgICAgICB0b2M6IHllcw0KICAgICAgICB0b2NfZmxvYXQ6IHllcw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeSh0aWR5dmVyc2UpDQoNCmRpcnI6OmdldF9yZHMoIi4uL2RhdGEvZmluYWwiKQ0KYGBgDQoNCiMjIFBhdGllbnQgU2VsZWN0aW9uDQoNCiogUGF0aWVudHMgbWVldGluZyBpbmNsdXNpb24gY3JpdGVyaWE6IGByIGV4Y2x1ZGUkc2NyZWVuYA0KKiBSZWFzb25zIGZvciBleGNsdXNpb246DQogICAgLSBQcmVnbmFudDogYHIgZXhjbHVkZSRwcmVnbmFudGANCiAgICAtIFByaXNvbmVyOiBgciBleGNsdWRlJHByaXNvbmVyc2ANCiAgICAtIElDVSBzdGF5IDwgMTIgaG91cnM6IGByIGV4Y2x1ZGUkaWN1X3Nob3J0YA0KICAgIC0gRGlhZ25vc2lzIGNvZGluZyBjb250YWluZWQgYm90aCBJQ0QtOS1DTSBhbmQgSUNELTEwLUNNOiBgciBleGNsdWRlJG11bHRfaWNkX3R5cGVzYA0KICAgIC0gTWlzc2luZyBkYXRhIG5lZWRlZCB0byBjYWxjdWxhdGUgcmlzayBzY29yZXM6IGByIGV4Y2x1ZGUkbGFic19taXNzaW5nYA0KKiBUb3RhbCBudW1iZXIgb2YgZWxpZ2libGUgcGF0aWVudHMgcmVtYWluaW5nOiBgciBmbGF0dGVuX2ludChleGNsdWRlKVsxXSAtIHN1bShmbGF0dGVuX2ludChleGNsdWRlKVstMV0pYA0KDQojIyBPdXRjb21lcw0KDQojIyMgUHJpbWFyeSBlbmRwb2ludA0KDQojIyMjIFRoZSBkaWZmZXJlbmNlIGluIHNjb3JlIGJldHdlZW4gZWxlY3Ryb25pYyBhbmQgbWFudWFsIHNjb3JpbmcgZm9yIGVhY2ggb2YgQVBBQ0hFIElJLCBBUEFDSEUgSUlJLCBhbmQgU0FQUyBJSS4NCg0KIyMjIFNlY29uZGFyeSBlbmRwb2ludHMNCg0KIyMjIyBUaGUgZGlmZmVyZW5jZSBpbiBwcmVkaWN0ZWQgbW9ydGFsaXR5IGJldHdlZW4gZWxlY3Ryb25pYyBhbmQgbWFudWFsIHNjb3JpbmcgZm9yIGVhY2ggcmlzayBzY29yZS4NCiMjIyMgVGhlIGRpZmZlcmVuY2UgaW4gbnVtYmVyIG9mIGNvbW9yYmlkaXRpZXMgaWRlbnRpZmllZCBieSBlbGVjdHJvbmljIGFuZCBtYW51YWwgc2NvcmluZyBmb3IgZWFjaCByaXNrIHNjb3JlLg0KIyMjIyBUaGUgbnVtYmVyIG9mIGNvbW9yYmlkaXRpZXMgaWRlbnRpZmllZCBieSBlbGVjdHJvbmljIG9yIGJ5IG1hbnVhbCBzY29yaW5nIGJ1dCBub3QgYnkgYm90aC4NCg0KDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlZhbGlkYXRpb24gb2YgSUNELTktQ00vSUNELTEwLUNNIENvZGVzIGZvciBBdXRvbWF0ZWQgRWxlY3Ryb25pYyBTY29yaW5nIG9mIEFQQUNIRSBJSSwgQVBBQ0hFIElJSSwgYW5kIFNBUFMgSUkiDQpzdWJ0aXRsZTogIlByZWxpbWluYXJ5IEFuYWx5c2lzIGZvciBBU0hQIEFic3RyYWN0IFN1Ym1pc3Npb24iDQpvdXRwdXQ6IA0KICAgIGh0bWxfbm90ZWJvb2s6DQogICAgICAgIGNvZGVfZm9sZGluZzogaGlkZQ0KICAgICAgICB0b2M6IHllcw0KICAgICAgICB0b2NfZmxvYXQ6IHllcw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeSh0aWR5dmVyc2UpDQpsaWJyYXJ5KHRhYmxlb25lKQ0KDQpkaXJyOjpnZXRfcmRzKCIuLi9kYXRhL2ZpbmFsIikNCmBgYA0KDQojIyBQYXRpZW50IFNlbGVjdGlvbg0KDQoqIFBhdGllbnRzIG1lZXRpbmcgaW5jbHVzaW9uIGNyaXRlcmlhOiBgciBleGNsdWRlJHNjcmVlbmANCiogUmVhc29ucyBmb3IgZXhjbHVzaW9uOg0KICAgIC0gUHJlZ25hbnQ6IGByIGV4Y2x1ZGUkcHJlZ25hbnRgDQogICAgLSBQcmlzb25lcjogYHIgZXhjbHVkZSRwcmlzb25lcnNgDQogICAgLSBJQ1Ugc3RheSA8IDEyIGhvdXJzOiBgciBleGNsdWRlJGljdV9zaG9ydGANCiAgICAtIERpYWdub3NpcyBjb2RpbmcgY29udGFpbmVkIGJvdGggSUNELTktQ00gYW5kIElDRC0xMC1DTTogYHIgZXhjbHVkZSRtdWx0X2ljZF90eXBlc2ANCiAgICAtIE1pc3NpbmcgZGF0YSBuZWVkZWQgdG8gY2FsY3VsYXRlIHJpc2sgc2NvcmVzOiBgciBleGNsdWRlJGxhYnNfbWlzc2luZ2ANCiogVG90YWwgbnVtYmVyIG9mIGVsaWdpYmxlIHBhdGllbnRzIHJlbWFpbmluZzogYHIgZmxhdHRlbl9pbnQoZXhjbHVkZSlbMV0gLSBzdW0oZmxhdHRlbl9pbnQoZXhjbHVkZSlbLTFdKWANCg0KIyMgT3V0Y29tZXMNCg0KIyMjIFByaW1hcnkgZW5kcG9pbnQNCg0KIyMjIyBEaWZmZXJlbmNlIGluIEFQQUNIRSBJSSBzY29yZQ0KDQpgYGB7cn0NCnNjb3JlcyA8LSBscyhwYXR0ZXJuID0gInNjb3JlX2FwYWNoZTIiKQ0KDQphbGxfc2NvcmVzIDwtIG1hcChzY29yZXMsIH5tdXRhdGUoZ2V0KC54KSwgc2NvcmUgPSAueCkpICU+JQ0KICAgIG1hcCh+c2VsZWN0KC54LCBwaWUuaWQsIHNjb3JlLCBhcGFjaGUyKSkgJT4lDQogICAgbWFwX2RmKH5zZW1pX2pvaW4oLngsIG1hbnVhbF9wYXRpZW50cywgYnkgPSAicGllLmlkIikpICU+JQ0KICAgIHNwcmVhZChzY29yZSwgYXBhY2hlMikgJT4lDQogICAgbXV0YXRlX2F0KHZhcnMoLXBpZS5pZCwgLXNjb3JlX2FwYWNoZTJfbWFudWFsKSwgZnVucyhhYnMoLiAtIHNjb3JlX2FwYWNoZTJfbWFudWFsKSkpICU+JQ0KICAgIHNlbGVjdCgtcGllLmlkLCAtc2NvcmVfYXBhY2hlMl9tYW51YWwpDQoNCnRibCA8LSBDcmVhdGVUYWJsZU9uZSh2YXJzID0gbmFtZXMoYWxsX3Njb3JlcyksIGRhdGEgPSBhbGxfc2NvcmVzKQ0KcHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJNZWFuIERpZmZlcmVuY2UgaW4gQVBBQ0hFIElJIFNjb3JlcyIpDQpgYGANCg0KYGBge3J9DQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSwgbm9ubm9ybWFsID0gbmFtZXMoYWxsX3Njb3JlcykpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJNZWRpYW4gRGlmZmVyZW5jZSBpbiBBUEFDSEUgSUkgU2NvcmVzIikNCg0KYGBgDQoNCiMjIyMgRGlmZmVyZW5jZSBpbiBBUEFDSEUgSUlJIHNjb3JlDQoNCmBgYHtyfQ0Kc2NvcmVzIDwtIGxzKHBhdHRlcm4gPSAic2NvcmVfYXBhY2hlMyIpDQoNCmFsbF9zY29yZXMgPC0gbWFwKHNjb3Jlcywgfm11dGF0ZShnZXQoLngpLCBzY29yZSA9IC54KSkgJT4lDQogICAgbWFwKH5zZWxlY3QoLngsIHBpZS5pZCwgc2NvcmUsIGFwYWNoZTMpKSAlPiUNCiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9ICJwaWUuaWQiKSkgJT4lDQogICAgc3ByZWFkKHNjb3JlLCBhcGFjaGUzKSAlPiUNCiAgICBtdXRhdGVfYXQodmFycygtcGllLmlkLCAtc2NvcmVfYXBhY2hlM19tYW51YWwpLCBmdW5zKGFicyguIC0gc2NvcmVfYXBhY2hlM19tYW51YWwpKSkgJT4lDQogICAgc2VsZWN0KC1waWUuaWQsIC1zY29yZV9hcGFjaGUzX21hbnVhbCkNCg0KdGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhhbGxfc2NvcmVzKSwgZGF0YSA9IGFsbF9zY29yZXMpDQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSkNCmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gIk1lYW4gRGlmZmVyZW5jZSBpbiBBUEFDSEUgSUlJIFNjb3JlcyIpDQpgYGANCg0KYGBge3J9DQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSwgbm9ubm9ybWFsID0gbmFtZXMoYWxsX3Njb3JlcykpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJNZWRpYW4gRGlmZmVyZW5jZSBpbiBBUEFDSEUgSUlJIFNjb3JlcyIpDQoNCmBgYA0KDQojIyMjIERpZmZlcmVuY2UgaW4gU0FQUyBJSSBzY29yZQ0KDQpgYGB7cn0NCnNjb3JlcyA8LSBscyhwYXR0ZXJuID0gInNjb3JlX3NhcHMyIikNCg0KYWxsX3Njb3JlcyA8LSBtYXAoc2NvcmVzLCB+bXV0YXRlKGdldCgueCksIHNjb3JlID0gLngpKSAlPiUNCiAgICBtYXAofnNlbGVjdCgueCwgcGllLmlkLCBzY29yZSwgc2FwczIpKSAlPiUNCiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9ICJwaWUuaWQiKSkgJT4lDQogICAgc3ByZWFkKHNjb3JlLCBzYXBzMikgJT4lDQogICAgbXV0YXRlX2F0KHZhcnMoLXBpZS5pZCwgLXNjb3JlX3NhcHMyX21hbnVhbCksIGZ1bnMoYWJzKC4gLSBzY29yZV9zYXBzMl9tYW51YWwpKSkgJT4lDQogICAgc2VsZWN0KC1waWUuaWQsIC1zY29yZV9zYXBzMl9tYW51YWwpDQoNCnRibCA8LSBDcmVhdGVUYWJsZU9uZSh2YXJzID0gbmFtZXMoYWxsX3Njb3JlcyksIGRhdGEgPSBhbGxfc2NvcmVzKQ0KcHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJNZWFuIERpZmZlcmVuY2UgaW4gU0FQUyBJSSBTY29yZXMiKQ0KYGBgDQoNCmBgYHtyfQ0KcHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UsIG5vbm5vcm1hbCA9IG5hbWVzKGFsbF9zY29yZXMpKQ0Ka25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSAiTWVkaWFuIERpZmZlcmVuY2UgaW4gU0FQUyBJSSBTY29yZXMiKQ0KDQpgYGANCg0KIyMjIFNlY29uZGFyeSBlbmRwb2ludHMNCg0KIyMjIyBUaGUgZGlmZmVyZW5jZSBpbiBwcmVkaWN0ZWQgbW9ydGFsaXR5IGJldHdlZW4gZWxlY3Ryb25pYyBhbmQgbWFudWFsIHNjb3JpbmcgZm9yIGVhY2ggcmlzayBzY29yZS4NCiMjIyMgVGhlIGRpZmZlcmVuY2UgaW4gbnVtYmVyIG9mIGNvbW9yYmlkaXRpZXMgaWRlbnRpZmllZCBieSBlbGVjdHJvbmljIGFuZCBtYW51YWwgc2NvcmluZyBmb3IgZWFjaCByaXNrIHNjb3JlLg0KIyMjIyBUaGUgbnVtYmVyIG9mIGNvbW9yYmlkaXRpZXMgaWRlbnRpZmllZCBieSBlbGVjdHJvbmljIG9yIGJ5IG1hbnVhbCBzY29yaW5nIGJ1dCBub3QgYnkgYm90aC4NCg0KDQo=</div>
 
 
 </div>
