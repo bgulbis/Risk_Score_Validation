@@ -263,5 +263,9 @@ score_apache2 <- map(apache2_icd, apache2)
 comorbid_names <- c("ek", "elixhauser", "quan", "ahrq", "ek_drg",
                     "elixhauser_drg", "quan_drg", "ahrq_drg", "manual")
 
+tmp_manual <- spread(manual_data, comorbidity, value)
+comorbidities <- c(data_comorbidities, list(tmp_manual))
+
 walk2(apache2_icd, comorbid_names, ~saveRDS(.x, file = paste0("data/final/data_apache2_", .y, ".Rds")))
 walk2(score_apache2, comorbid_names, ~saveRDS(.x, file = paste0("data/final/score_apache2_", .y, ".Rds")))
+walk2(comorbidities, comorbid_names, ~saveRDS(.x, file=paste0("data/final/data_comorbidities_", .y, ".Rds")))
