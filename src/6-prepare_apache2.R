@@ -171,7 +171,8 @@ msdrg <- tidy_codes_drg %>%
 # comorbidity functions --------------------------------
 
 map_comorbidity <- function(df, icd_map) {
-    icd::icd_comorbid(df, icd_map, return_df = TRUE, short_code = FALSE)
+    icd::icd_comorbid(df, icd_map, return_df = TRUE, visit_name = "pie.id",
+                      icd_name = "diag.code", short_code = FALSE, short_map = TRUE)
 }
 
 use_drg <- function(df, msdrg) {
