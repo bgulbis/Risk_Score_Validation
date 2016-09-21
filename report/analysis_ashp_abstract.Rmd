@@ -1,0 +1,40 @@
+---
+title: "Validation of ICD-9-CM/ICD-10-CM Codes for Automated Electronic Scoring of APACHE II, APACHE III, and SAPS II"
+subtitle: "Preliminary Analysis for ASHP Abstract Submission"
+output: 
+    html_notebook:
+        code_folding: hide
+        toc: yes
+        toc_float: yes
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+
+dirr::get_rds("../data/final")
+```
+
+## Patient Selection
+
+* Patients meeting inclusion criteria: `r exclude$screen`
+* Reasons for exclusion:
+    - Pregnant: `r exclude$pregnant`
+    - Prisoner: `r exclude$prisoners`
+    - ICU stay < 12 hours: `r exclude$icu_short`
+    - Diagnosis coding contained both ICD-9-CM and ICD-10-CM: `r exclude$mult_icd_types`
+    - Missing data needed to calculate risk scores: `r exclude$labs_missing`
+* Total number of eligible patients remaining: `r flatten_int(exclude)[1] - sum(flatten_int(exclude)[-1])`
+
+## Outcomes
+
+### Primary endpoint
+
+#### The difference in score between electronic and manual scoring for each of APACHE II, APACHE III, and SAPS II.
+
+### Secondary endpoints
+
+#### The difference in predicted mortality between electronic and manual scoring for each risk score.
+#### The difference in number of comorbidities identified by electronic and manual scoring for each risk score.
+#### The number of comorbidities identified by electronic or by manual scoring but not by both.
+
+
