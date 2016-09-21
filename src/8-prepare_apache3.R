@@ -96,4 +96,3 @@ score_apache3 <- map(apache3_icd, apache3)
 
 walk2(apache3_icd, comorbid_names, ~saveRDS(.x, file = paste0("data/final/data_apache3_", .y, ".Rds")))
 walk2(score_apache3, comorbid_names, ~saveRDS(.x, file = paste0("data/final/score_apache3_", .y, ".Rds")))
-
