@@ -19,49 +19,52 @@ gcs_apache3 <- tidy_icu_scores %>%
     group_by(pie.id) %>%
     summarize(neuro = max(neuro))
 
-tmp_comorbid <- data_comorbidities_icd9 %>%
-    mutate(aids = hiv & (kaposi | lymphoma | pneumocytosis | toxoplasmosis | tuberculosis)) %>%
-    select(pie.id, aids, hepatic_failure, lymphoma, cancer_mets, leukemia, mult_myeloma, immunosuppress, cirrhosis) %>%
-    gather(comorbidity, val, -pie.id) %>%
-    filter(val == TRUE)
+map_comorbidity3 <- function(df) {
+    dots <- list("pie.id", "aids", "hepatic_failure", "lymphoma", "cancer_mets",
+                 "leukemia", "mult_myeloma", "immunosuppress", "cirrhosis")
 
-z <- tmp_comorbid$comorbidity
+    df %>%
+        dplyr::mutate_(.dots = purrr::set_names(
+            x = list(~hiv & (kaposi | lymphoma | pneumocytosis | toxoplasmosis | tuberculosis)),
+            nm = "aids")) %>%
+        dplyr::select_(.dots = dots) %>%
+        tidyr::gather_("comorbidity", "val", gather_cols = purrr::flatten_chr(dots)[-1]) %>%
+        dplyr::filter_(.dots = list(~val == TRUE))
+}
 
-tmp_comorbid$score <- case_when(
-    z == "aids" ~ 6,
-    z == "hepatic_failure" ~ 5,
-    z == "lymphoma" ~ 4,
-    z == "cancer_mets" ~ 3,
-    z == "leukemia" | z == "mult_myeloma" | z == "immunosuppress" ~ 2,
-    z == "cirrhosis" ~ 1,
-    is.character(z) ~ 0
-)
+apache3_comorbidity <- function(df) {
+    x <- df$comorbidity
 
-apache3_comorbid <- tmp_comorbid %>%
-    arrange(pie.id, score) %>%
-    distinct(pie.id, .keep_all = TRUE)
+    df$score <- dplyr::case_when(
+        x == "aids" ~ 6,
+        x == "hepatic_failure" ~ 5,
+        x == "lymphoma" ~ 4,
+        x == "cancer_mets" ~ 3,
+        x == "leukemia" | x == "mult_myeloma" | x == "immunosuppress" ~ 2,
+        x == "cirrhosis" ~ 1,
+        is.character(x) ~ 0
+    )
 
-tmp_comorbid <- manual_data %>%
+    df %>%
+        dplyr::arrange_(.dots = list("pie.id", ~dplyr::desc(score))) %>%
+        dplyr::distinct_(.dots = list("pie.id"), .keep_all = TRUE)
+}
+
+get_hd <- function(df) {
+    dplyr::select_(df, .dots = list("pie.id", "chronic_hd"))
+}
+
+tmp_apache3_comorbidity <- map(data_comorbidities, map_comorbidity3) %>%
+    map(apache3_comorbidity)
+
+tmp_manual <- manual_data %>%
     spread(comorbidity, value) %>%
-    select(pie.id, aids, hepatic_failure, lymphoma, cancer_mets, leukemia, mult_myeloma, immunosuppress, cirrhosis) %>%
+    select(pie.id, aids, hepatic_failure, lymphoma, cancer_mets, leukemia,
+           mult_myeloma, immunosuppress, cirrhosis) %>%
     gather(comorbidity, val, -pie.id) %>%
-    filter(val == TRUE)
-
-z <- tmp_comorbid$comorbidity
-
-tmp_comorbid$score <- case_when(
-    z == "aids" ~ 6,
-    z == "hepatic_failure" ~ 5,
-    z == "lymphoma" ~ 4,
-    z == "cancer_mets" ~ 3,
-    z == "leukemia" | z == "mult_myeloma" | z == "immunosuppress" ~ 2,
-    z == "cirrhosis" ~ 1,
-    is.character(z) ~ 0
-)
-
-apache3_manual <- tmp_comorbid %>%
-    arrange(pie.id, score) %>%
-    distinct(pie.id, .keep_all = TRUE)
+    filter(val == TRUE) %>%
+    apache3_comorbidity() %>%
+    select(pie.id, comorbidity)
 
 manual_hd <- manual_data %>%
     filter(comorbidity == "chronic_hd") %>%
@@ -80,18 +83,17 @@ data_apache3 <- inner_join(labs_min_max, vitals_min_max, by = c("pie.id", "min")
            aa_grad = aa_gradient(pco2, pao2, fio2, F_to_C(temp), 13.106),
            admit = if_else(elective == FALSE, "elective", "emergency", "nonoperative"))
 
-apache3_icd <- left_join(data_apache3, apache3_comorbid[c("pie.id", "comorbidity")], by = "pie.id") %>%
-    left_join(data_comorbidities_icd9[c("pie.id", "chronic_hd")], by = "pie.id") %>%
-    mutate(arf = scr >= 1.5 & uop < 410 & chronic_hd == FALSE)
+apache3_man <- left_join(data_apache3, tmp_manual, by = "pie.id") %>%
+    left_join(manual_hd, by = "pie.id")
 
-apache3_man <- left_join(data_apache3, apache3_manual[c("pie.id", "comorbidity")], by = "pie.id") %>%
-    left_join(manual_hd, by = "pie.id") %>%
-    mutate(arf = scr >= 1.5 & uop < 410 & (is.na(chronic_hd) | chronic_hd == FALSE))
+apache3_icd <- map(tmp_apache3_comorbidity, ~left_join(data_apache3, .x, by = "pie.id")) %>%
+    map2(map(data_comorbidities, get_hd), ~left_join(.x, .y, by = "pie.id"))
 
-score_apache3_icd <- apache3(apache3_icd)
-score_apache3_man <- apache3(apache3_man)
+apache3_icd <- c(apache3_icd, list(apache3_man)) %>%
+    map(~mutate(.x, arf = scr >= 1.5 & uop < 410 & (is.na(chronic_hd) | chronic_hd == FALSE)))
 
-saveRDS(apache3_icd, "data/final/apache3_icd.Rds")
-saveRDS(apache3_man, "data/final/apache3_man.Rds")
-saveRDS(score_apache3_icd, "data/final/score_apache3_icd.Rds")
-saveRDS(score_apache3_man, "data/final/score_apache3_man.Rds")
+score_apache3 <- map(apache3_icd, apache3)
+
+walk2(apache3_icd, comorbid_names, ~saveRDS(.x, file = paste0("data/final/data_apache3_", .y, ".Rds")))
+walk2(score_apache3, comorbid_names, ~saveRDS(.x, file = paste0("data/final/score_apache3_", .y, ".Rds")))
+
