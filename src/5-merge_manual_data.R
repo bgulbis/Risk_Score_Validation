@@ -34,7 +34,7 @@ comorbid <- c("Cirrhosis" = "cirrhosis",
               "Lymphoma" = "lymphoma",
               "AIDS" = "aids")
 
-manual_data <- read_excel(paste(data.external, "2016-09-18_manual_data.xlsx", sep = "/"),
+manual_data <- read_excel(paste(data.external, "2016-09-22_manual_data.xlsx", sep = "/"),
                      col_types = c("text", "text", "numeric", "text")) %>%
     rename(fin = `Patient ID`,
            comorbidity = `Co-morbidity`,
