@@ -1,10 +1,9 @@
 # 1-screen.R
 
 library(edwr)
-library(dplyr)
+library(tidyverse)
 library(lubridate)
 library(stringr)
-library(tidyr)
 
 data_raw <- "data/raw"
 
@@ -53,6 +52,8 @@ eligible <- demograph %>%
     arrange(person.id, discharge.datetime) %>%
     summarize(pie.id = first(pie.id)) %>%
     arrange(pie.id)
+
+excl_reencounter <- anti_join(demograph, eligible, by = "pie.id")
 
 pie2 <- concat_encounters(eligible$pie.id)
 
@@ -182,7 +183,8 @@ exclude <- list(screen = nrow(screen),
                 pregnant = nrow(excl_preg),
                 mult_icd_types = nrow(excl_icd),
                 icu_short = nrow(excl_icu_short),
-                labs_missing = nrow(excl_labs))
+                labs_missing = nrow(excl_labs),
+                reencounter = nrow(excl_reencounter))
 
 saveRDS(eligible, "data/tidy/eligible.Rds")
 saveRDS(icu_admit, "data/tidy/icu_admit.Rds")
