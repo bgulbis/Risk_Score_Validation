@@ -103,7 +103,26 @@ knitr::kable(ptbl, caption = "Median Difference in SAPS II Scores")
 
 ### Secondary endpoints
 
-#### The difference in predicted mortality between electronic and manual scoring for each risk score.
+#### Difference in predicted mortality using SAPS II
+
+```{r}
+comorbid <- ls(pattern = "score_saps2_")
+
+all_df <- map(comorbid, ~mutate(get(.x), score = .x)) %>%
+    map(~select(.x, pie.id, score, saps2)) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    distinct(pie.id, score, .keep_all = TRUE) %>%
+    mutate(logit = -7.763 + 0.0737 * saps2 + 0.9971 * log(saps2 + 1),
+           mortality = exp(logit) / (1 + exp(logit))) %>%
+    select(pie.id, score, mortality) %>%
+    spread(score, mortality) %>%
+    mutate_at(vars(-pie.id, -score_saps2_manual), funs(abs(. - score_saps2_manual))) %>%
+    select(-pie.id, -score_saps2_manual)
+
+tbl <- CreateTableOne(vars = names(all_df), data = all_df)
+ptbl <- print(tbl, printToggle = FALSE)
+knitr::kable(ptbl, caption = "Mean Difference in Predicted Mortality using SAPS II")
+```
 
 #### Difference in number of comorbidities identified using APACHE II
 
