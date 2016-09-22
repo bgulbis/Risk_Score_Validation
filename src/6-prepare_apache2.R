@@ -166,7 +166,8 @@ mdc <- readr::read_csv("data/external/msdrg_to_mdc.csv") %>%
 
 msdrg <- tidy_codes_drg %>%
     left_join(mdc[c("msdrg", "mdc")], by = c("drg" = "msdrg")) %>%
-    distinct(pie.id, mdc)
+    distinct(pie.id, mdc) %>%
+    mutate_at("mdc", na_if, y = "")
 
 # comorbidity functions --------------------------------
 
@@ -180,7 +181,7 @@ use_drg <- function(df, msdrg) {
         tidyr::gather_("comorbidity", "value", gather_cols = names(df[, -1])) %>%
         dplyr::left_join(msdrg, by = "pie.id") %>%
         dplyr::left_join(icuriskr::comorbidity_drg, by = "comorbidity") %>%
-        dplyr::mutate_(.dots = purrr::set_names(list(~value == TRUE & mdc != drg), "is_comorbid")) %>%
+        dplyr::mutate_(.dots = purrr::set_names(list(~value == TRUE & (is.na(mdc) | mdc != drg)), "is_comorbid")) %>%
         dplyr::select_(.dots = list("pie.id", "comorbidity", "is_comorbid")) %>%
         dplyr::arrange_(.dots = list("pie.id", "comorbidity", ~dplyr::desc(is_comorbid))) %>%
         dplyr::distinct_(.dots = list("pie.id", "comorbidity"), .keep_all = TRUE) %>%
