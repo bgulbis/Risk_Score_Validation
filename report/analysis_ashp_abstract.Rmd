@@ -102,7 +102,70 @@ knitr::kable(ptbl, caption = "Median Difference in SAPS II Scores")
 ### Secondary endpoints
 
 #### The difference in predicted mortality between electronic and manual scoring for each risk score.
-#### The difference in number of comorbidities identified by electronic and manual scoring for each risk score.
-#### The number of comorbidities identified by electronic or by manual scoring but not by both.
 
+#### Difference in number of comorbidities identified using APACHE II
 
+```{r}
+comorbid <- ls(pattern = "data_apache2_")
+
+all_df <- map(comorbid, ~mutate(get(.x), score = .x)) %>%
+    map(~select(.x, pie.id, score, liver:comorbidity)) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    distinct(pie.id, score, .keep_all = TRUE) %>%
+    arrange(pie.id, score) %>%
+    mutate_if(is.logical, as.numeric) %>%
+    by_row(function(x) sum(x[, 3:7], na.rm = TRUE), .collate = "rows", .to = "num_comorbid") %>%
+    select(pie.id, score, num_comorbid) %>%
+    spread(score, num_comorbid) %>%
+    mutate_at(vars(-pie.id, -data_apache2_manual), funs(abs(. - data_apache2_manual))) %>%
+    select(-pie.id, -data_apache2_manual)
+
+tbl <- CreateTableOne(vars = names(all_df), data = all_df)
+ptbl <- print(tbl, printToggle = FALSE)
+knitr::kable(ptbl, caption = "Mean Difference in Number of APACHE II Comorbidities")
+```
+
+```{r}
+ptbl <- print(tbl, printToggle = FALSE, nonnormal = names(all_df))
+knitr::kable(ptbl, caption = "Median Difference in Number of APACHE II Comorbidities")
+```
+
+#### Proportion of patients with a differing primary comorbidity using APACHE III
+
+```{r}
+comorbid <- ls(pattern = "data_apache3_")
+
+all_df <- map(comorbid, ~mutate(get(.x), score = .x)) %>%
+    map(~select(.x, pie.id, score, comorbidity)) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    distinct(pie.id, score, .keep_all = TRUE) %>%
+    spread(score, comorbidity, fill = "") %>%
+    mutate_at(vars(-pie.id, -data_apache3_manual), funs(. != data_apache3_manual)) %>%
+    mutate_if(is.logical, as.numeric) %>%
+    ungroup() %>%
+    select(-pie.id, -data_apache3_manual)
+
+tbl <- CreateTableOne(vars = names(all_df), data = all_df)
+ptbl <- print(tbl, printToggle = FALSE)
+knitr::kable(ptbl, caption = "Proportion of Patients with a Differing Primary Comorbidity using APACHE III")
+```
+
+#### Proportion of patients with a differing primary comorbidity using SAPS II
+
+```{r}
+comorbid <- ls(pattern = "data_saps2_")
+
+all_df <- map(comorbid, ~mutate(get(.x), score = .x)) %>%
+    map(~select(.x, pie.id, score, comorbidity)) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    distinct(pie.id, score, .keep_all = TRUE) %>%
+    spread(score, comorbidity, fill = "") %>%
+    mutate_at(vars(-pie.id, -data_saps2_manual), funs(. != data_saps2_manual)) %>%
+    mutate_if(is.logical, as.numeric) %>%
+    ungroup() %>%
+    select(-pie.id, -data_saps2_manual)
+
+tbl <- CreateTableOne(vars = names(all_df), data = all_df)
+ptbl <- print(tbl, printToggle = FALSE)
+knitr::kable(ptbl, caption = "Proportion of Patients with a Differing Primary Comorbidity using SAPS II")
+```
