@@ -124,3 +124,7 @@ This will be a retrospective observational study. Patients will be identified by
 1. The difference in number of comorbidities identified by electronic and manual scoring for each risk score.
 1. The number of comorbidities identified by electronic or by manual scoring but not by both.
 
+## Analysis
+
+1. [Analysis for ASHP abstract submission](https://bgulbis.github.io/Risk_Score_Validation/report/analysis_ashp_abstract.nb.html)
+

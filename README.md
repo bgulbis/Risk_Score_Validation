@@ -125,3 +125,8 @@ Outcomes
 1.  The difference in predicted mortality between electronic and manual scoring for each risk score.
 2.  The difference in number of comorbidities identified by electronic and manual scoring for each risk score.
 3.  The number of comorbidities identified by electronic or by manual scoring but not by both.
+
+Analysis
+--------
+
+1.  [Analysis for ASHP abstract submission](https://bgulbis.github.io/Risk_Score_Validation/report/analysis_ashp_abstract.nb.html)
