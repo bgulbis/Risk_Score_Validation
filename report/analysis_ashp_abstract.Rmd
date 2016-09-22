@@ -24,7 +24,8 @@ dirr::get_rds("../data/final")
     - ICU stay < 12 hours: `r exclude$icu_short`
     - Diagnosis coding contained both ICD-9-CM and ICD-10-CM: `r exclude$mult_icd_types`
     - Missing data needed to calculate risk scores: `r exclude$labs_missing`
-* Total number of eligible patients remaining: `r flatten_int(exclude)[1] - sum(flatten_int(exclude)[-1])`
+    - Re-encounters (only included each patient once) : `r exclude$reencounter`
+* Total number of eligible patients remaining to sample from: `r flatten_int(exclude)[1] - sum(flatten_int(exclude)[-1])`
 
 ## Outcomes
 
