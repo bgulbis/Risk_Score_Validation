@@ -1,11 +1,12 @@
 ---
-title: "Validation of ICD-9-CM/ICD-10-CM Codes for Automated Electronic Scoring of APACHE II, APACHE III, and SAPS II"
-subtitle: "Preliminary Analysis for ASHP Abstract Submission"
-output: 
-    html_notebook:
-        code_folding: hide
-        toc: yes
-        toc_float: yes
+title: Validation of ICD-9-CM/ICD-10-CM Codes for Automated Electronic Scoring of
+  APACHE II, APACHE III, and SAPS II
+subtitle: Preliminary Analysis for ASHP Abstract Submission
+output:
+  html_notebook:
+    code_folding: hide
+    toc: yes
+    toc_float: yes
 ---
 
 ```{r setup, include=FALSE}
