@@ -289,19 +289,254 @@ div.tocify {
 <h2>Outcomes</h2>
 <div id="primary-endpoint" class="section level3">
 <h3>Primary endpoint</h3>
-<div id="difference-in-apache-ii-score" class="section level4">
-<h4>Difference in APACHE II score</h4>
+<div id="apache-ii" class="section level4">
+<h4>APACHE II</h4>
+<div id="comparison-of-scores" class="section level5">
+<h5>Comparison of scores</h5>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2NvcmVzIDwtIGxzKHBhdHRlcm4gPSBcInNjb3JlX2FwYWNoZTJcIilcbmFsbF9zY29yZXMgPC0gbWFwKHNjb3Jlcywgfm11dGF0ZShnZXQoLngpLCBzY29yZSA9IC54KSkgJT4lXG4gICAgbWFwKH5zZWxlY3QoLngsIHBpZS5pZCwgc2NvcmUsIGFwYWNoZTIpKSAlPiVcbiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9IFwicGllLmlkXCIpKSAlPiVcbiAgICBzcHJlYWQoc2NvcmUsIGFwYWNoZTIpICU+JVxuICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1zY29yZV9hcGFjaGUyX21hbnVhbCksIGZ1bnMoYWJzKC4gLSBzY29yZV9hcGFjaGUyX21hbnVhbCkpKSAlPiVcbiAgICBzZWxlY3QoLXBpZS5pZCwgLXNjb3JlX2FwYWNoZTJfbWFudWFsKVxudGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhhbGxfc2NvcmVzKSwgZGF0YSA9IGFsbF9zY29yZXMpXG5wdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSlcbmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gXCJNZWFuIERpZmZlcmVuY2UgaW4gQVBBQ0hFIElJIFNjb3Jlc1wiKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2NvcmVzIDwtIGxzKHBhdHRlcm4gPSBcInNjb3JlX2FwYWNoZTJcIilcbmFsbF9zY29yZXMgPC0gbWFwKHNjb3Jlcywgfm11dGF0ZShnZXQoLngpLCBzY29yZSA9IC54KSkgJT4lXG4gICAgbWFwKH5zZWxlY3QoLngsIHBpZS5pZCwgc2NvcmUsIGFwYWNoZTIpKSAlPiVcbiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9IFwicGllLmlkXCIpKSBcbm1hbiA8LSBmaWx0ZXIoYWxsX3Njb3Jlcywgc2NvcmUgPT0gXCJzY29yZV9hcGFjaGUyX21hbnVhbFwiKSRhcGFjaGUyXG50IDwtIGFsbF9zY29yZXNbLCAtMV0gJT4lXG4gICAgZmlsdGVyKHNjb3JlICE9IFwic2NvcmVfYXBhY2hlMl9tYW51YWxcIikgJT4lXG4gICAgZ3JvdXBfYnkoc2NvcmUpICU+JVxuICAgIGRvKHRpZHkodC50ZXN0KC4kYXBhY2hlMiwgbWFuLCBwYWlyZWQgPSBUUlVFKSkpXG5rbml0cjo6a2FibGUodClcbmBgYCJ9 -->
 <pre class="r"><code>scores &lt;- ls(pattern = &quot;score_apache2&quot;)
 all_scores &lt;- map(scores, ~mutate(get(.x), score = .x)) %&gt;%
     map(~select(.x, pie.id, score, apache2)) %&gt;%
-    map_df(~semi_join(.x, manual_patients, by = &quot;pie.id&quot;)) %&gt;%
+    map_df(~semi_join(.x, manual_patients, by = &quot;pie.id&quot;)) 
+man &lt;- filter(all_scores, score == &quot;score_apache2_manual&quot;)$apache2
+t &lt;- all_scores[, -1] %&gt;%
+    filter(score != &quot;score_apache2_manual&quot;) %&gt;%
+    group_by(score) %&gt;%
+    do(tidy(t.test(.$apache2, man, paired = TRUE)))
+knitr::kable(t)</code></pre>
+<!-- rnb-source-end -->
+
+<!-- rnb-html-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImtuaXRfYXNpcyJdfX0= -->
+
+<table style="width:100%;">
+<colgroup>
+<col width="23%" />
+<col width="9%" />
+<col width="9%" />
+<col width="8%" />
+<col width="8%" />
+<col width="9%" />
+<col width="8%" />
+<col width="11%" />
+<col width="10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">score</th>
+<th align="right">estimate</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+<th align="right">parameter</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="left">method</th>
+<th align="left">alternative</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">score_apache2_ahrq</td>
+<td align="right">0.1000000</td>
+<td align="right">0.2486638</td>
+<td align="right">0.8053735</td>
+<td align="right">29</td>
+<td align="right">-0.7224879</td>
+<td align="right">0.9224879</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache2_ahrq_drg</td>
+<td align="right">-0.5666667</td>
+<td align="right">-1.4582927</td>
+<td align="right">0.1555060</td>
+<td align="right">29</td>
+<td align="right">-1.3614066</td>
+<td align="right">0.2280733</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache2_ek</td>
+<td align="right">0.1000000</td>
+<td align="right">0.2486638</td>
+<td align="right">0.8053735</td>
+<td align="right">29</td>
+<td align="right">-0.7224879</td>
+<td align="right">0.9224879</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache2_ek_drg</td>
+<td align="right">-0.5666667</td>
+<td align="right">-1.4582927</td>
+<td align="right">0.1555060</td>
+<td align="right">29</td>
+<td align="right">-1.3614066</td>
+<td align="right">0.2280733</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache2_elixhauser</td>
+<td align="right">0.1000000</td>
+<td align="right">0.2486638</td>
+<td align="right">0.8053735</td>
+<td align="right">29</td>
+<td align="right">-0.7224879</td>
+<td align="right">0.9224879</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache2_elixhauser_drg</td>
+<td align="right">-0.5666667</td>
+<td align="right">-1.4582927</td>
+<td align="right">0.1555060</td>
+<td align="right">29</td>
+<td align="right">-1.3614066</td>
+<td align="right">0.2280733</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache2_quan</td>
+<td align="right">0.1000000</td>
+<td align="right">0.2486638</td>
+<td align="right">0.8053735</td>
+<td align="right">29</td>
+<td align="right">-0.7224879</td>
+<td align="right">0.9224879</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache2_quan_drg</td>
+<td align="right">-0.5666667</td>
+<td align="right">-1.4582927</td>
+<td align="right">0.1555060</td>
+<td align="right">29</td>
+<td align="right">-1.3614066</td>
+<td align="right">0.2280733</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- rnb-html-end -->
+
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua3cgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiVcbiAgICBmaWx0ZXIoc2NvcmUgIT0gXCJzY29yZV9hcGFjaGUyX21hbnVhbFwiKSAlPiVcbiAgICBncm91cF9ieShzY29yZSkgJT4lXG4gICAgZG8odGlkeShrcnVza2FsLnRlc3QoLiRhcGFjaGUyLCBtYW4sIHBhaXJlZCA9IFRSVUUpKSlcbmtuaXRyOjprYWJsZShrdylcbmBgYCJ9 -->
+<pre class="r"><code>kw &lt;- all_scores[, -1] %&gt;%
+    filter(score != &quot;score_apache2_manual&quot;) %&gt;%
+    group_by(score) %&gt;%
+    do(tidy(kruskal.test(.$apache2, man, paired = TRUE)))
+knitr::kable(kw)</code></pre>
+<!-- rnb-source-end -->
+
+<!-- rnb-html-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImtuaXRfYXNpcyJdfX0= -->
+
+<table>
+<colgroup>
+<col width="32%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="32%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">score</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+<th align="right">parameter</th>
+<th align="left">method</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">score_apache2_ahrq</td>
+<td align="right">27.98621</td>
+<td align="right">0.0450996</td>
+<td align="right">17</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache2_ahrq_drg</td>
+<td align="right">27.79977</td>
+<td align="right">0.0473329</td>
+<td align="right">17</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache2_ek</td>
+<td align="right">27.98621</td>
+<td align="right">0.0450996</td>
+<td align="right">17</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache2_ek_drg</td>
+<td align="right">27.79977</td>
+<td align="right">0.0473329</td>
+<td align="right">17</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache2_elixhauser</td>
+<td align="right">27.98621</td>
+<td align="right">0.0450996</td>
+<td align="right">17</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache2_elixhauser_drg</td>
+<td align="right">27.79977</td>
+<td align="right">0.0473329</td>
+<td align="right">17</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache2_quan</td>
+<td align="right">27.98621</td>
+<td align="right">0.0450996</td>
+<td align="right">17</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache2_quan_drg</td>
+<td align="right">27.79977</td>
+<td align="right">0.0473329</td>
+<td align="right">17</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- rnb-html-end -->
+
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="difference-in-score" class="section level5">
+<h5>Difference in score</h5>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGlmZiA8LSBhbGxfc2NvcmVzICU+JVxuICAgIHNwcmVhZChzY29yZSwgYXBhY2hlMikgJT4lXG4gICAgbXV0YXRlX2F0KHZhcnMoLXBpZS5pZCwgLXNjb3JlX2FwYWNoZTJfbWFudWFsKSwgZnVucyhhYnMoLiAtIHNjb3JlX2FwYWNoZTJfbWFudWFsKSkpICU+JVxuICAgIHNlbGVjdCgtcGllLmlkLCAtc2NvcmVfYXBhY2hlMl9tYW51YWwpXG50YmwgPC0gQ3JlYXRlVGFibGVPbmUodmFycyA9IG5hbWVzKGRpZmYpLCBkYXRhID0gZGlmZilcbnB0YmwgPC0gcHJpbnQodGJsLCBwcmludFRvZ2dsZSA9IEZBTFNFKVxua25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSBcIk1lYW4gRGlmZmVyZW5jZSBpbiBBUEFDSEUgSUkgU2NvcmVzXCIpXG5gYGAifQ== -->
+<pre class="r"><code>diff &lt;- all_scores %&gt;%
     spread(score, apache2) %&gt;%
     mutate_at(vars(-pie.id, -score_apache2_manual), funs(abs(. - score_apache2_manual))) %&gt;%
     select(-pie.id, -score_apache2_manual)
-tbl &lt;- CreateTableOne(vars = names(all_scores), data = all_scores)
+tbl &lt;- CreateTableOne(vars = names(diff), data = diff)
 ptbl &lt;- print(tbl, printToggle = FALSE)
 knitr::kable(ptbl, caption = &quot;Mean Difference in APACHE II Scores&quot;)</code></pre>
 <!-- rnb-source-end -->
@@ -362,8 +597,8 @@ knitr::kable(ptbl, caption = &quot;Mean Difference in APACHE II Scores&quot;)</c
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UsIG5vbm5vcm1hbCA9IG5hbWVzKGFsbF9zY29yZXMpKVxua25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSBcIk1lZGlhbiBEaWZmZXJlbmNlIGluIEFQQUNIRSBJSSBTY29yZXNcIilcbmBgYCJ9 -->
-<pre class="r"><code>ptbl &lt;- print(tbl, printToggle = FALSE, nonnormal = names(all_scores))
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UsIG5vbm5vcm1hbCA9IG5hbWVzKGRpZmYpKVxua25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSBcIk1lZGlhbiBEaWZmZXJlbmNlIGluIEFQQUNIRSBJSSBTY29yZXNcIilcbmBgYCJ9 -->
+<pre class="r"><code>ptbl &lt;- print(tbl, printToggle = FALSE, nonnormal = names(diff))
 knitr::kable(ptbl, caption = &quot;Median Difference in APACHE II Scores&quot;)</code></pre>
 <!-- rnb-source-end -->
 
@@ -422,19 +657,248 @@ knitr::kable(ptbl, caption = &quot;Median Difference in APACHE II Scores&quot;)<
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="difference-in-apache-iii-score" class="section level4">
-<h4>Difference in APACHE III score</h4>
+</div>
+<div id="apache-iii" class="section level4">
+<h4>APACHE III</h4>
+<div id="comparison-of-scores-1" class="section level5">
+<h5>Comparison of scores</h5>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2NvcmVzIDwtIGxzKHBhdHRlcm4gPSBcInNjb3JlX2FwYWNoZTNcIilcbmFsbF9zY29yZXMgPC0gbWFwKHNjb3Jlcywgfm11dGF0ZShnZXQoLngpLCBzY29yZSA9IC54KSkgJT4lXG4gICAgbWFwKH5zZWxlY3QoLngsIHBpZS5pZCwgc2NvcmUsIGFwYWNoZTMpKSAlPiVcbiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9IFwicGllLmlkXCIpKSAlPiVcbiAgICBzcHJlYWQoc2NvcmUsIGFwYWNoZTMpICU+JVxuICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1zY29yZV9hcGFjaGUzX21hbnVhbCksIGZ1bnMoYWJzKC4gLSBzY29yZV9hcGFjaGUzX21hbnVhbCkpKSAlPiVcbiAgICBzZWxlY3QoLXBpZS5pZCwgLXNjb3JlX2FwYWNoZTNfbWFudWFsKVxudGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhhbGxfc2NvcmVzKSwgZGF0YSA9IGFsbF9zY29yZXMpXG5wdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSlcbmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gXCJNZWFuIERpZmZlcmVuY2UgaW4gQVBBQ0hFIElJSSBTY29yZXNcIilcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2NvcmVzIDwtIGxzKHBhdHRlcm4gPSBcInNjb3JlX2FwYWNoZTNcIilcbmFsbF9zY29yZXMgPC0gbWFwKHNjb3Jlcywgfm11dGF0ZShnZXQoLngpLCBzY29yZSA9IC54KSkgJT4lXG4gICAgbWFwKH5zZWxlY3QoLngsIHBpZS5pZCwgc2NvcmUsIGFwYWNoZTMpKSAlPiVcbiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9IFwicGllLmlkXCIpKSBcbm1hbiA8LSBmaWx0ZXIoYWxsX3Njb3Jlcywgc2NvcmUgPT0gXCJzY29yZV9hcGFjaGUzX21hbnVhbFwiKSRhcGFjaGUzXG50IDwtIGFsbF9zY29yZXNbLCAtMV0gJT4lXG4gICAgZmlsdGVyKHNjb3JlICE9IFwic2NvcmVfYXBhY2hlM19tYW51YWxcIikgJT4lXG4gICAgZ3JvdXBfYnkoc2NvcmUpICU+JVxuICAgIGRvKHRpZHkodC50ZXN0KC4kYXBhY2hlMywgbWFuLCBwYWlyZWQgPSBUUlVFKSkpXG5rbml0cjo6a2FibGUodClcbmBgYCJ9 -->
 <pre class="r"><code>scores &lt;- ls(pattern = &quot;score_apache3&quot;)
 all_scores &lt;- map(scores, ~mutate(get(.x), score = .x)) %&gt;%
     map(~select(.x, pie.id, score, apache3)) %&gt;%
-    map_df(~semi_join(.x, manual_patients, by = &quot;pie.id&quot;)) %&gt;%
+    map_df(~semi_join(.x, manual_patients, by = &quot;pie.id&quot;)) 
+man &lt;- filter(all_scores, score == &quot;score_apache3_manual&quot;)$apache3
+t &lt;- all_scores[, -1] %&gt;%
+    filter(score != &quot;score_apache3_manual&quot;) %&gt;%
+    group_by(score) %&gt;%
+    do(tidy(t.test(.$apache3, man, paired = TRUE)))
+knitr::kable(t)</code></pre>
+<!-- rnb-source-end -->
+
+<!-- rnb-html-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImtuaXRfYXNpcyJdfX0= -->
+
+<table>
+<colgroup>
+<col width="24%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="9%" />
+<col width="8%" />
+<col width="12%" />
+<col width="10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">score</th>
+<th align="right">estimate</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+<th align="right">parameter</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="left">method</th>
+<th align="left">alternative</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">score_apache3_ahrq</td>
+<td align="right">0.5</td>
+<td align="right">1.2226387</td>
+<td align="right">0.2313100</td>
+<td align="right">29</td>
+<td align="right">-0.3363999</td>
+<td align="right">1.336400</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache3_ahrq_drg</td>
+<td align="right">0.4</td>
+<td align="right">0.9410081</td>
+<td align="right">0.3544738</td>
+<td align="right">29</td>
+<td align="right">-0.4693782</td>
+<td align="right">1.269378</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache3_ek</td>
+<td align="right">0.5</td>
+<td align="right">1.2226387</td>
+<td align="right">0.2313100</td>
+<td align="right">29</td>
+<td align="right">-0.3363999</td>
+<td align="right">1.336400</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache3_ek_drg</td>
+<td align="right">0.4</td>
+<td align="right">0.9410081</td>
+<td align="right">0.3544738</td>
+<td align="right">29</td>
+<td align="right">-0.4693782</td>
+<td align="right">1.269378</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache3_elixhauser</td>
+<td align="right">0.5</td>
+<td align="right">1.2226387</td>
+<td align="right">0.2313100</td>
+<td align="right">29</td>
+<td align="right">-0.3363999</td>
+<td align="right">1.336400</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache3_elixhauser_drg</td>
+<td align="right">0.4</td>
+<td align="right">0.9410081</td>
+<td align="right">0.3544738</td>
+<td align="right">29</td>
+<td align="right">-0.4693782</td>
+<td align="right">1.269378</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache3_quan</td>
+<td align="right">0.5</td>
+<td align="right">1.2226387</td>
+<td align="right">0.2313100</td>
+<td align="right">29</td>
+<td align="right">-0.3363999</td>
+<td align="right">1.336400</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache3_quan_drg</td>
+<td align="right">0.4</td>
+<td align="right">0.9410081</td>
+<td align="right">0.3544738</td>
+<td align="right">29</td>
+<td align="right">-0.4693782</td>
+<td align="right">1.269378</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- rnb-html-end -->
+
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua3cgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiVcbiAgICBmaWx0ZXIoc2NvcmUgIT0gXCJzY29yZV9hcGFjaGUzX21hbnVhbFwiKSAlPiVcbiAgICBncm91cF9ieShzY29yZSkgJT4lXG4gICAgZG8odGlkeShrcnVza2FsLnRlc3QoLiRhcGFjaGUzLCBtYW4sIHBhaXJlZCA9IFRSVUUpKSlcbmtuaXRyOjprYWJsZShrdylcbmBgYCJ9 -->
+<pre class="r"><code>kw &lt;- all_scores[, -1] %&gt;%
+    filter(score != &quot;score_apache3_manual&quot;) %&gt;%
+    group_by(score) %&gt;%
+    do(tidy(kruskal.test(.$apache3, man, paired = TRUE)))
+knitr::kable(kw)</code></pre>
+<!-- rnb-source-end -->
+
+<!-- rnb-html-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImtuaXRfYXNpcyJdfX0= -->
+
+<table>
+<thead>
+<tr class="header">
+<th align="left">score</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+<th align="right">parameter</th>
+<th align="left">method</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">score_apache3_ahrq</td>
+<td align="right">29</td>
+<td align="right">0.263916</td>
+<td align="right">25</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache3_ahrq_drg</td>
+<td align="right">29</td>
+<td align="right">0.263916</td>
+<td align="right">25</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache3_ek</td>
+<td align="right">29</td>
+<td align="right">0.263916</td>
+<td align="right">25</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache3_ek_drg</td>
+<td align="right">29</td>
+<td align="right">0.263916</td>
+<td align="right">25</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache3_elixhauser</td>
+<td align="right">29</td>
+<td align="right">0.263916</td>
+<td align="right">25</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache3_elixhauser_drg</td>
+<td align="right">29</td>
+<td align="right">0.263916</td>
+<td align="right">25</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="odd">
+<td align="left">score_apache3_quan</td>
+<td align="right">29</td>
+<td align="right">0.263916</td>
+<td align="right">25</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="even">
+<td align="left">score_apache3_quan_drg</td>
+<td align="right">29</td>
+<td align="right">0.263916</td>
+<td align="right">25</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- rnb-html-end -->
+
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="difference-in-score-1" class="section level5">
+<h5>Difference in score</h5>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGlmZiA8LSBhbGxfc2NvcmVzICU+JVxuICAgIHNwcmVhZChzY29yZSwgYXBhY2hlMykgJT4lXG4gICAgbXV0YXRlX2F0KHZhcnMoLXBpZS5pZCwgLXNjb3JlX2FwYWNoZTNfbWFudWFsKSwgZnVucyhhYnMoLiAtIHNjb3JlX2FwYWNoZTNfbWFudWFsKSkpICU+JVxuICAgIHNlbGVjdCgtcGllLmlkLCAtc2NvcmVfYXBhY2hlM19tYW51YWwpXG50YmwgPC0gQ3JlYXRlVGFibGVPbmUodmFycyA9IG5hbWVzKGRpZmYpLCBkYXRhID0gZGlmZilcbnB0YmwgPC0gcHJpbnQodGJsLCBwcmludFRvZ2dsZSA9IEZBTFNFKVxua25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSBcIk1lYW4gRGlmZmVyZW5jZSBpbiBBUEFDSEUgSUlJIFNjb3Jlc1wiKVxuYGBgIn0= -->
+<pre class="r"><code>diff &lt;- all_scores %&gt;%
     spread(score, apache3) %&gt;%
     mutate_at(vars(-pie.id, -score_apache3_manual), funs(abs(. - score_apache3_manual))) %&gt;%
     select(-pie.id, -score_apache3_manual)
-tbl &lt;- CreateTableOne(vars = names(all_scores), data = all_scores)
+tbl &lt;- CreateTableOne(vars = names(diff), data = diff)
 ptbl &lt;- print(tbl, printToggle = FALSE)
 knitr::kable(ptbl, caption = &quot;Mean Difference in APACHE III Scores&quot;)</code></pre>
 <!-- rnb-source-end -->
@@ -495,8 +959,8 @@ knitr::kable(ptbl, caption = &quot;Mean Difference in APACHE III Scores&quot;)</
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UsIG5vbm5vcm1hbCA9IG5hbWVzKGFsbF9zY29yZXMpKVxua25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSBcIk1lZGlhbiBEaWZmZXJlbmNlIGluIEFQQUNIRSBJSUkgU2NvcmVzXCIpXG5gYGAifQ== -->
-<pre class="r"><code>ptbl &lt;- print(tbl, printToggle = FALSE, nonnormal = names(all_scores))
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UsIG5vbm5vcm1hbCA9IG5hbWVzKGRpZmYpKVxua25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSBcIk1lZGlhbiBEaWZmZXJlbmNlIGluIEFQQUNIRSBJSUkgU2NvcmVzXCIpXG5gYGAifQ== -->
+<pre class="r"><code>ptbl &lt;- print(tbl, printToggle = FALSE, nonnormal = names(diff))
 knitr::kable(ptbl, caption = &quot;Median Difference in APACHE III Scores&quot;)</code></pre>
 <!-- rnb-source-end -->
 
@@ -555,19 +1019,255 @@ knitr::kable(ptbl, caption = &quot;Median Difference in APACHE III Scores&quot;)
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="difference-in-saps-ii-score" class="section level4">
-<h4>Difference in SAPS II score</h4>
+</div>
+<div id="saps-ii" class="section level4">
+<h4>SAPS II</h4>
+<div id="comparison-of-scores-2" class="section level5">
+<h5>Comparison of scores</h5>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2NvcmVzIDwtIGxzKHBhdHRlcm4gPSBcInNjb3JlX3NhcHMyXCIpXG5hbGxfc2NvcmVzIDwtIG1hcChzY29yZXMsIH5tdXRhdGUoZ2V0KC54KSwgc2NvcmUgPSAueCkpICU+JVxuICAgIG1hcCh+c2VsZWN0KC54LCBwaWUuaWQsIHNjb3JlLCBzYXBzMikpICU+JVxuICAgIG1hcF9kZih+c2VtaV9qb2luKC54LCBtYW51YWxfcGF0aWVudHMsIGJ5ID0gXCJwaWUuaWRcIikpICU+JVxuICAgIHNwcmVhZChzY29yZSwgc2FwczIpICU+JVxuICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1zY29yZV9zYXBzMl9tYW51YWwpLCBmdW5zKGFicyguIC0gc2NvcmVfc2FwczJfbWFudWFsKSkpICU+JVxuICAgIHNlbGVjdCgtcGllLmlkLCAtc2NvcmVfc2FwczJfbWFudWFsKVxudGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhhbGxfc2NvcmVzKSwgZGF0YSA9IGFsbF9zY29yZXMpXG5wdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSlcbmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gXCJNZWFuIERpZmZlcmVuY2UgaW4gU0FQUyBJSSBTY29yZXNcIilcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2NvcmVzIDwtIGxzKHBhdHRlcm4gPSBcInNjb3JlX3NhcHMyXCIpXG5hbGxfc2NvcmVzIDwtIG1hcChzY29yZXMsIH5tdXRhdGUoZ2V0KC54KSwgc2NvcmUgPSAueCkpICU+JVxuICAgIG1hcCh+c2VsZWN0KC54LCBwaWUuaWQsIHNjb3JlLCBzYXBzMikpICU+JVxuICAgIG1hcF9kZih+c2VtaV9qb2luKC54LCBtYW51YWxfcGF0aWVudHMsIGJ5ID0gXCJwaWUuaWRcIikpIFxubWFuIDwtIGZpbHRlcihhbGxfc2NvcmVzLCBzY29yZSA9PSBcInNjb3JlX3NhcHMyX21hbnVhbFwiKSRzYXBzMlxudCA8LSBhbGxfc2NvcmVzWywgLTFdICU+JVxuICAgIGZpbHRlcihzY29yZSAhPSBcInNjb3JlX3NhcHMyX21hbnVhbFwiKSAlPiVcbiAgICBncm91cF9ieShzY29yZSkgJT4lXG4gICAgZG8odGlkeSh0LnRlc3QoLiRzYXBzMiwgbWFuLCBwYWlyZWQgPSBUUlVFKSkpXG5rbml0cjo6a2FibGUodClcbmBgYCJ9 -->
 <pre class="r"><code>scores &lt;- ls(pattern = &quot;score_saps2&quot;)
 all_scores &lt;- map(scores, ~mutate(get(.x), score = .x)) %&gt;%
     map(~select(.x, pie.id, score, saps2)) %&gt;%
-    map_df(~semi_join(.x, manual_patients, by = &quot;pie.id&quot;)) %&gt;%
+    map_df(~semi_join(.x, manual_patients, by = &quot;pie.id&quot;)) 
+man &lt;- filter(all_scores, score == &quot;score_saps2_manual&quot;)$saps2
+t &lt;- all_scores[, -1] %&gt;%
+    filter(score != &quot;score_saps2_manual&quot;) %&gt;%
+    group_by(score) %&gt;%
+    do(tidy(t.test(.$saps2, man, paired = TRUE)))
+knitr::kable(t)</code></pre>
+<!-- rnb-source-end -->
+
+<!-- rnb-html-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImtuaXRfYXNpcyJdfX0= -->
+
+<table>
+<colgroup>
+<col width="22%" />
+<col width="9%" />
+<col width="9%" />
+<col width="8%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="12%" />
+<col width="10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">score</th>
+<th align="right">estimate</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+<th align="right">parameter</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="left">method</th>
+<th align="left">alternative</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">score_saps2_ahrq</td>
+<td align="right">0.3333333</td>
+<td align="right">1</td>
+<td align="right">0.325582</td>
+<td align="right">29</td>
+<td align="right">-0.3484099</td>
+<td align="right">1.015076</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_ahrq_drg</td>
+<td align="right">0.3333333</td>
+<td align="right">1</td>
+<td align="right">0.325582</td>
+<td align="right">29</td>
+<td align="right">-0.3484099</td>
+<td align="right">1.015076</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="odd">
+<td align="left">score_saps2_ek</td>
+<td align="right">0.3333333</td>
+<td align="right">1</td>
+<td align="right">0.325582</td>
+<td align="right">29</td>
+<td align="right">-0.3484099</td>
+<td align="right">1.015076</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_ek_drg</td>
+<td align="right">0.3333333</td>
+<td align="right">1</td>
+<td align="right">0.325582</td>
+<td align="right">29</td>
+<td align="right">-0.3484099</td>
+<td align="right">1.015076</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="odd">
+<td align="left">score_saps2_elixhauser</td>
+<td align="right">0.3333333</td>
+<td align="right">1</td>
+<td align="right">0.325582</td>
+<td align="right">29</td>
+<td align="right">-0.3484099</td>
+<td align="right">1.015076</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_elixhauser_drg</td>
+<td align="right">0.3333333</td>
+<td align="right">1</td>
+<td align="right">0.325582</td>
+<td align="right">29</td>
+<td align="right">-0.3484099</td>
+<td align="right">1.015076</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="odd">
+<td align="left">score_saps2_quan</td>
+<td align="right">0.3333333</td>
+<td align="right">1</td>
+<td align="right">0.325582</td>
+<td align="right">29</td>
+<td align="right">-0.3484099</td>
+<td align="right">1.015076</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_quan_drg</td>
+<td align="right">0.3333333</td>
+<td align="right">1</td>
+<td align="right">0.325582</td>
+<td align="right">29</td>
+<td align="right">-0.3484099</td>
+<td align="right">1.015076</td>
+<td align="left">Paired t-test</td>
+<td align="left">two.sided</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- rnb-html-end -->
+
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua3cgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiVcbiAgICBmaWx0ZXIoc2NvcmUgIT0gXCJzY29yZV9zYXBzMl9tYW51YWxcIikgJT4lXG4gICAgZ3JvdXBfYnkoc2NvcmUpICU+JVxuICAgIGRvKHRpZHkoa3J1c2thbC50ZXN0KC4kc2FwczIsIG1hbiwgcGFpcmVkID0gVFJVRSkpKVxua25pdHI6OmthYmxlKGt3KVxuYGBgIn0= -->
+<pre class="r"><code>kw &lt;- all_scores[, -1] %&gt;%
+    filter(score != &quot;score_saps2_manual&quot;) %&gt;%
+    group_by(score) %&gt;%
+    do(tidy(kruskal.test(.$saps2, man, paired = TRUE)))
+knitr::kable(kw)</code></pre>
+<!-- rnb-source-end -->
+
+<!-- rnb-html-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImtuaXRfYXNpcyJdfX0= -->
+
+<table>
+<colgroup>
+<col width="30%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="32%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">score</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+<th align="right">parameter</th>
+<th align="left">method</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">score_saps2_ahrq</td>
+<td align="right">28.03032</td>
+<td align="right">0.1392936</td>
+<td align="right">21</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_ahrq_drg</td>
+<td align="right">28.03032</td>
+<td align="right">0.1392936</td>
+<td align="right">21</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="odd">
+<td align="left">score_saps2_ek</td>
+<td align="right">28.03032</td>
+<td align="right">0.1392936</td>
+<td align="right">21</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_ek_drg</td>
+<td align="right">28.03032</td>
+<td align="right">0.1392936</td>
+<td align="right">21</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="odd">
+<td align="left">score_saps2_elixhauser</td>
+<td align="right">28.03032</td>
+<td align="right">0.1392936</td>
+<td align="right">21</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_elixhauser_drg</td>
+<td align="right">28.03032</td>
+<td align="right">0.1392936</td>
+<td align="right">21</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="odd">
+<td align="left">score_saps2_quan</td>
+<td align="right">28.03032</td>
+<td align="right">0.1392936</td>
+<td align="right">21</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_quan_drg</td>
+<td align="right">28.03032</td>
+<td align="right">0.1392936</td>
+<td align="right">21</td>
+<td align="left">Kruskal-Wallis rank sum test</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- rnb-html-end -->
+
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="difference-in-score-2" class="section level5">
+<h5>Difference in score</h5>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGlmZiA8LSBhbGxfc2NvcmVzICU+JVxuICAgIHNwcmVhZChzY29yZSwgc2FwczIpICU+JVxuICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1zY29yZV9zYXBzMl9tYW51YWwpLCBmdW5zKGFicyguIC0gc2NvcmVfc2FwczJfbWFudWFsKSkpICU+JVxuICAgIHNlbGVjdCgtcGllLmlkLCAtc2NvcmVfc2FwczJfbWFudWFsKVxudGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhkaWZmKSwgZGF0YSA9IGRpZmYpXG5wdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSlcbmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gXCJNZWFuIERpZmZlcmVuY2UgaW4gU0FQUyBJSSBTY29yZXNcIilcbmBgYCJ9 -->
+<pre class="r"><code>diff &lt;- all_scores %&gt;%
     spread(score, saps2) %&gt;%
     mutate_at(vars(-pie.id, -score_saps2_manual), funs(abs(. - score_saps2_manual))) %&gt;%
     select(-pie.id, -score_saps2_manual)
-tbl &lt;- CreateTableOne(vars = names(all_scores), data = all_scores)
+tbl &lt;- CreateTableOne(vars = names(diff), data = diff)
 ptbl &lt;- print(tbl, printToggle = FALSE)
 knitr::kable(ptbl, caption = &quot;Mean Difference in SAPS II Scores&quot;)</code></pre>
 <!-- rnb-source-end -->
@@ -628,8 +1328,8 @@ knitr::kable(ptbl, caption = &quot;Mean Difference in SAPS II Scores&quot;)</cod
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UsIG5vbm5vcm1hbCA9IG5hbWVzKGFsbF9zY29yZXMpKVxua25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSBcIk1lZGlhbiBEaWZmZXJlbmNlIGluIFNBUFMgSUkgU2NvcmVzXCIpXG5gYGAifQ== -->
-<pre class="r"><code>ptbl &lt;- print(tbl, printToggle = FALSE, nonnormal = names(all_scores))
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UsIG5vbm5vcm1hbCA9IG5hbWVzKGRpZmYpKVxua25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSBcIk1lZGlhbiBEaWZmZXJlbmNlIGluIFNBUFMgSUkgU2NvcmVzXCIpXG5gYGAifQ== -->
+<pre class="r"><code>ptbl &lt;- print(tbl, printToggle = FALSE, nonnormal = names(diff))
 knitr::kable(ptbl, caption = &quot;Median Difference in SAPS II Scores&quot;)</code></pre>
 <!-- rnb-source-end -->
 
@@ -689,13 +1389,14 @@ knitr::kable(ptbl, caption = &quot;Median Difference in SAPS II Scores&quot;)</c
 <!-- rnb-text-begin -->
 </div>
 </div>
+</div>
 <div id="secondary-endpoints" class="section level3">
 <h3>Secondary endpoints</h3>
 <div id="difference-in-predicted-mortality-using-saps-ii" class="section level4">
 <h4>Difference in predicted mortality using SAPS II</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29tb3JiaWQgPC0gbHMocGF0dGVybiA9IFwic2NvcmVfc2FwczJfXCIpXG5hbGxfZGYgPC0gbWFwKGNvbW9yYmlkLCB+bXV0YXRlKGdldCgueCksIHNjb3JlID0gLngpKSAlPiVcbiAgICBtYXAofnNlbGVjdCgueCwgcGllLmlkLCBzY29yZSwgc2FwczIpKSAlPiVcbiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9IFwicGllLmlkXCIpKSAlPiVcbiAgICBkaXN0aW5jdChwaWUuaWQsIHNjb3JlLCAua2VlcF9hbGwgPSBUUlVFKSAlPiVcbiAgICBtdXRhdGUobG9naXQgPSAtNy43NjMgKyAwLjA3MzcgKiBzYXBzMiArIDAuOTk3MSAqIGxvZyhzYXBzMiArIDEpLFxuICAgICAgICAgICBtb3J0YWxpdHkgPSBleHAobG9naXQpIC8gKDEgKyBleHAobG9naXQpKSkgJT4lXG4gICAgc2VsZWN0KHBpZS5pZCwgc2NvcmUsIG1vcnRhbGl0eSkgJT4lXG4gICAgc3ByZWFkKHNjb3JlLCBtb3J0YWxpdHkpICU+JVxuICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1zY29yZV9zYXBzMl9tYW51YWwpLCBmdW5zKGFicyguIC0gc2NvcmVfc2FwczJfbWFudWFsKSkpICU+JVxuICAgIHNlbGVjdCgtcGllLmlkLCAtc2NvcmVfc2FwczJfbWFudWFsKVxudGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhhbGxfZGYpLCBkYXRhID0gYWxsX2RmKVxucHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UpXG5rbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9IFwiTWVhbiBEaWZmZXJlbmNlIGluIFByZWRpY3RlZCBNb3J0YWxpdHkgdXNpbmcgU0FQUyBJSVwiKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29tb3JiaWQgPC0gbHMocGF0dGVybiA9IFwic2NvcmVfc2FwczJfXCIpXG5hbGxfZGYgPC0gbWFwKGNvbW9yYmlkLCB+bXV0YXRlKGdldCgueCksIHNjb3JlID0gLngpKSAlPiVcbiAgICBtYXAofnNlbGVjdCgueCwgcGllLmlkLCBzY29yZSwgc2FwczIpKSAlPiVcbiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9IFwicGllLmlkXCIpKSAlPiVcbiAgICBkaXN0aW5jdChwaWUuaWQsIHNjb3JlLCAua2VlcF9hbGwgPSBUUlVFKSAlPiVcbiAgICBtdXRhdGUobG9naXQgPSAtNy43NjMgKyAwLjA3MzcgKiBzYXBzMiArIDAuOTk3MSAqIGxvZyhzYXBzMiArIDEpLFxuICAgICAgICAgICBtb3J0YWxpdHkgPSBleHAobG9naXQpIC8gKDEgKyBleHAobG9naXQpKSkgJT4lXG4gICAgc2VsZWN0KHBpZS5pZCwgc2NvcmUsIG1vcnRhbGl0eSkgXG5tYW4gPC0gZmlsdGVyKGFsbF9kZiwgc2NvcmUgPT0gXCJzY29yZV9zYXBzMl9tYW51YWxcIikkbW9ydGFsaXR5XG50IDwtIGFsbF9kZlssIC0xXSAlPiVcbiAgICBmaWx0ZXIoc2NvcmUgIT0gXCJzY29yZV9zYXBzMl9tYW51YWxcIikgJT4lXG4gICAgZ3JvdXBfYnkoc2NvcmUpICU+JVxuICAgIGRvKHRpZHkodC50ZXN0KC4kbW9ydGFsaXR5LCBtYW4sIHBhaXJlZCA9IFRSVUUpKSlcbmtuaXRyOjprYWJsZSh0WywgYygxOjQsIDY6NyldKVxuYGBgIn0= -->
 <pre class="r"><code>comorbid &lt;- ls(pattern = &quot;score_saps2_&quot;)
 all_df &lt;- map(comorbid, ~mutate(get(.x), score = .x)) %&gt;%
     map(~select(.x, pie.id, score, saps2)) %&gt;%
@@ -703,11 +1404,109 @@ all_df &lt;- map(comorbid, ~mutate(get(.x), score = .x)) %&gt;%
     distinct(pie.id, score, .keep_all = TRUE) %&gt;%
     mutate(logit = -7.763 + 0.0737 * saps2 + 0.9971 * log(saps2 + 1),
            mortality = exp(logit) / (1 + exp(logit))) %&gt;%
-    select(pie.id, score, mortality) %&gt;%
+    select(pie.id, score, mortality) 
+man &lt;- filter(all_df, score == &quot;score_saps2_manual&quot;)$mortality
+t &lt;- all_df[, -1] %&gt;%
+    filter(score != &quot;score_saps2_manual&quot;) %&gt;%
+    group_by(score) %&gt;%
+    do(tidy(t.test(.$mortality, man, paired = TRUE)))
+knitr::kable(t[, c(1:4, 6:7)])</code></pre>
+<!-- rnb-source-end -->
+
+<!-- rnb-html-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImtuaXRfYXNpcyJdfX0= -->
+
+<table>
+<thead>
+<tr class="header">
+<th align="left">score</th>
+<th align="right">estimate</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">score_saps2_ahrq</td>
+<td align="right">0.0052483</td>
+<td align="right">1</td>
+<td align="right">0.325582</td>
+<td align="right">-0.0054856</td>
+<td align="right">0.0159822</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_ahrq_drg</td>
+<td align="right">0.0052483</td>
+<td align="right">1</td>
+<td align="right">0.325582</td>
+<td align="right">-0.0054856</td>
+<td align="right">0.0159822</td>
+</tr>
+<tr class="odd">
+<td align="left">score_saps2_ek</td>
+<td align="right">0.0052483</td>
+<td align="right">1</td>
+<td align="right">0.325582</td>
+<td align="right">-0.0054856</td>
+<td align="right">0.0159822</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_ek_drg</td>
+<td align="right">0.0052483</td>
+<td align="right">1</td>
+<td align="right">0.325582</td>
+<td align="right">-0.0054856</td>
+<td align="right">0.0159822</td>
+</tr>
+<tr class="odd">
+<td align="left">score_saps2_elixhauser</td>
+<td align="right">0.0052483</td>
+<td align="right">1</td>
+<td align="right">0.325582</td>
+<td align="right">-0.0054856</td>
+<td align="right">0.0159822</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_elixhauser_drg</td>
+<td align="right">0.0052483</td>
+<td align="right">1</td>
+<td align="right">0.325582</td>
+<td align="right">-0.0054856</td>
+<td align="right">0.0159822</td>
+</tr>
+<tr class="odd">
+<td align="left">score_saps2_quan</td>
+<td align="right">0.0052483</td>
+<td align="right">1</td>
+<td align="right">0.325582</td>
+<td align="right">-0.0054856</td>
+<td align="right">0.0159822</td>
+</tr>
+<tr class="even">
+<td align="left">score_saps2_quan_drg</td>
+<td align="right">0.0052483</td>
+<td align="right">1</td>
+<td align="right">0.325582</td>
+<td align="right">-0.0054856</td>
+<td align="right">0.0159822</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- rnb-html-end -->
+
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGlmZiA8LSBhbGxfZGYgJT4lXG4gICAgc3ByZWFkKHNjb3JlLCBtb3J0YWxpdHkpICU+JVxuICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1zY29yZV9zYXBzMl9tYW51YWwpLCBmdW5zKGFicyguIC0gc2NvcmVfc2FwczJfbWFudWFsKSkpICU+JVxuICAgIHNlbGVjdCgtcGllLmlkLCAtc2NvcmVfc2FwczJfbWFudWFsKVxudGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhkaWZmKSwgZGF0YSA9IGRpZmYpXG5wdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSlcbmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gXCJNZWFuIERpZmZlcmVuY2UgaW4gUHJlZGljdGVkIE1vcnRhbGl0eSB1c2luZyBTQVBTIElJXCIpXG5gYGAifQ== -->
+<pre class="r"><code>diff &lt;- all_df %&gt;%
     spread(score, mortality) %&gt;%
     mutate_at(vars(-pie.id, -score_saps2_manual), funs(abs(. - score_saps2_manual))) %&gt;%
     select(-pie.id, -score_saps2_manual)
-tbl &lt;- CreateTableOne(vars = names(all_df), data = all_df)
+tbl &lt;- CreateTableOne(vars = names(diff), data = diff)
 ptbl &lt;- print(tbl, printToggle = FALSE)
 knitr::kable(ptbl, caption = &quot;Mean Difference in Predicted Mortality using SAPS II&quot;)</code></pre>
 <!-- rnb-source-end -->
@@ -771,7 +1570,7 @@ knitr::kable(ptbl, caption = &quot;Mean Difference in Predicted Mortality using 
 <h4>Difference in number of comorbidities identified using APACHE II</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29tb3JiaWQgPC0gbHMocGF0dGVybiA9IFwiZGF0YV9hcGFjaGUyX1wiKVxuYWxsX2RmIDwtIG1hcChjb21vcmJpZCwgfm11dGF0ZShnZXQoLngpLCBzY29yZSA9IC54KSkgJT4lXG4gICAgbWFwKH5zZWxlY3QoLngsIHBpZS5pZCwgc2NvcmUsIGxpdmVyOmNvbW9yYmlkaXR5KSkgJT4lXG4gICAgbWFwX2RmKH5zZW1pX2pvaW4oLngsIG1hbnVhbF9wYXRpZW50cywgYnkgPSBcInBpZS5pZFwiKSkgJT4lXG4gICAgZGlzdGluY3QocGllLmlkLCBzY29yZSwgLmtlZXBfYWxsID0gVFJVRSkgJT4lXG4gICAgYXJyYW5nZShwaWUuaWQsIHNjb3JlKSAlPiVcbiAgICBtdXRhdGVfaWYoaXMubG9naWNhbCwgYXMubnVtZXJpYykgJT4lXG4gICAgYnlfcm93KGZ1bmN0aW9uKHgpIHN1bSh4WywgMzo3XSwgbmEucm0gPSBUUlVFKSwgLmNvbGxhdGUgPSBcInJvd3NcIiwgLnRvID0gXCJudW1fY29tb3JiaWRcIikgJT4lXG4gICAgc2VsZWN0KHBpZS5pZCwgc2NvcmUsIG51bV9jb21vcmJpZCkgJT4lXG4gICAgc3ByZWFkKHNjb3JlLCBudW1fY29tb3JiaWQpICU+JVxuICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1kYXRhX2FwYWNoZTJfbWFudWFsKSwgZnVucyhhYnMoLiAtIGRhdGFfYXBhY2hlMl9tYW51YWwpKSkgJT4lXG4gICAgc2VsZWN0KC1waWUuaWQsIC1kYXRhX2FwYWNoZTJfbWFudWFsKVxudGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhhbGxfZGYpLCBkYXRhID0gYWxsX2RmKVxucHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UpXG5rbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9IFwiTWVhbiBEaWZmZXJlbmNlIGluIE51bWJlciBvZiBBUEFDSEUgSUkgQ29tb3JiaWRpdGllc1wiKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29tb3JiaWQgPC0gbHMocGF0dGVybiA9IFwiZGF0YV9hcGFjaGUyX1wiKVxuYWxsX2RmIDwtIG1hcChjb21vcmJpZCwgfm11dGF0ZShnZXQoLngpLCBzY29yZSA9IC54KSkgJT4lXG4gICAgbWFwKH5zZWxlY3QoLngsIHBpZS5pZCwgc2NvcmUsIGxpdmVyOmNvbW9yYmlkaXR5KSkgJT4lXG4gICAgbWFwX2RmKH5zZW1pX2pvaW4oLngsIG1hbnVhbF9wYXRpZW50cywgYnkgPSBcInBpZS5pZFwiKSkgJT4lXG4gICAgZGlzdGluY3QocGllLmlkLCBzY29yZSwgLmtlZXBfYWxsID0gVFJVRSkgJT4lXG4gICAgYXJyYW5nZShwaWUuaWQsIHNjb3JlKSAlPiVcbiAgICBtdXRhdGVfaWYoaXMubG9naWNhbCwgYXMubnVtZXJpYykgJT4lXG4gICAgYnlfcm93KGZ1bmN0aW9uKHgpIHN1bSh4WywgMzo3XSwgbmEucm0gPSBUUlVFKSwgLmNvbGxhdGUgPSBcInJvd3NcIiwgLnRvID0gXCJudW1fY29tb3JiaWRcIikgJT4lXG4gICAgc2VsZWN0KHBpZS5pZCwgc2NvcmUsIG51bV9jb21vcmJpZCkgXG5tYW4gPC0gZmlsdGVyKGFsbF9kZiwgc2NvcmUgPT0gXCJkYXRhX2FwYWNoZTJfbWFudWFsXCIpJG51bV9jb21vcmJpZFxudCA8LSBhbGxfZGZbLCAtMV0gJT4lXG4gICAgZmlsdGVyKHNjb3JlICE9IFwiZGF0YV9hcGFjaGUyX21hbnVhbFwiKSAlPiVcbiAgICBncm91cF9ieShzY29yZSkgJT4lXG4gICAgZG8odGlkeSh0LnRlc3QoLiRudW1fY29tb3JiaWQsIG1hbiwgcGFpcmVkID0gVFJVRSkpKVxua25pdHI6OmthYmxlKHRbLCBjKDE6NCwgNjo3KV0pXG5gYGAifQ== -->
 <pre class="r"><code>comorbid &lt;- ls(pattern = &quot;data_apache2_&quot;)
 all_df &lt;- map(comorbid, ~mutate(get(.x), score = .x)) %&gt;%
     map(~select(.x, pie.id, score, liver:comorbidity)) %&gt;%
@@ -780,11 +1579,117 @@ all_df &lt;- map(comorbid, ~mutate(get(.x), score = .x)) %&gt;%
     arrange(pie.id, score) %&gt;%
     mutate_if(is.logical, as.numeric) %&gt;%
     by_row(function(x) sum(x[, 3:7], na.rm = TRUE), .collate = &quot;rows&quot;, .to = &quot;num_comorbid&quot;) %&gt;%
-    select(pie.id, score, num_comorbid) %&gt;%
+    select(pie.id, score, num_comorbid) 
+man &lt;- filter(all_df, score == &quot;data_apache2_manual&quot;)$num_comorbid
+t &lt;- all_df[, -1] %&gt;%
+    filter(score != &quot;data_apache2_manual&quot;) %&gt;%
+    group_by(score) %&gt;%
+    do(tidy(t.test(.$num_comorbid, man, paired = TRUE)))
+knitr::kable(t[, c(1:4, 6:7)])</code></pre>
+<!-- rnb-source-end -->
+
+<!-- rnb-html-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImtuaXRfYXNpcyJdfX0= -->
+
+<table style="width:100%;">
+<colgroup>
+<col width="33%" />
+<col width="13%" />
+<col width="13%" />
+<col width="12%" />
+<col width="13%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">score</th>
+<th align="right">estimate</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">data_apache2_ahrq</td>
+<td align="right">0.1333333</td>
+<td align="right">0.9410081</td>
+<td align="right">0.3544738</td>
+<td align="right">-0.1564594</td>
+<td align="right">0.4231261</td>
+</tr>
+<tr class="even">
+<td align="left">data_apache2_ahrq_drg</td>
+<td align="right">-0.1000000</td>
+<td align="right">-0.6482977</td>
+<td align="right">0.5218930</td>
+<td align="right">-0.4154769</td>
+<td align="right">0.2154769</td>
+</tr>
+<tr class="odd">
+<td align="left">data_apache2_ek</td>
+<td align="right">0.1000000</td>
+<td align="right">0.7217743</td>
+<td align="right">0.4762131</td>
+<td align="right">-0.1833614</td>
+<td align="right">0.3833614</td>
+</tr>
+<tr class="even">
+<td align="left">data_apache2_ek_drg</td>
+<td align="right">-0.1333333</td>
+<td align="right">-0.8913588</td>
+<td align="right">0.3800729</td>
+<td align="right">-0.4392677</td>
+<td align="right">0.1726010</td>
+</tr>
+<tr class="odd">
+<td align="left">data_apache2_elixhauser</td>
+<td align="right">0.1000000</td>
+<td align="right">0.7217743</td>
+<td align="right">0.4762131</td>
+<td align="right">-0.1833614</td>
+<td align="right">0.3833614</td>
+</tr>
+<tr class="even">
+<td align="left">data_apache2_elixhauser_drg</td>
+<td align="right">-0.1333333</td>
+<td align="right">-0.8913588</td>
+<td align="right">0.3800729</td>
+<td align="right">-0.4392677</td>
+<td align="right">0.1726010</td>
+</tr>
+<tr class="odd">
+<td align="left">data_apache2_quan</td>
+<td align="right">0.1333333</td>
+<td align="right">0.9410081</td>
+<td align="right">0.3544738</td>
+<td align="right">-0.1564594</td>
+<td align="right">0.4231261</td>
+</tr>
+<tr class="even">
+<td align="left">data_apache2_quan_drg</td>
+<td align="right">-0.1000000</td>
+<td align="right">-0.6482977</td>
+<td align="right">0.5218930</td>
+<td align="right">-0.4154769</td>
+<td align="right">0.2154769</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- rnb-html-end -->
+
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGlmZiA8LSBhbGxfZGYgJT4lXG4gICAgc3ByZWFkKHNjb3JlLCBudW1fY29tb3JiaWQpICU+JVxuICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1kYXRhX2FwYWNoZTJfbWFudWFsKSwgZnVucyhhYnMoLiAtIGRhdGFfYXBhY2hlMl9tYW51YWwpKSkgJT4lXG4gICAgc2VsZWN0KC1waWUuaWQsIC1kYXRhX2FwYWNoZTJfbWFudWFsKVxudGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhkaWZmKSwgZGF0YSA9IGRpZmYpXG5wdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSlcbmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gXCJNZWFuIERpZmZlcmVuY2UgaW4gTnVtYmVyIG9mIEFQQUNIRSBJSSBDb21vcmJpZGl0aWVzXCIpXG5gYGAifQ== -->
+<pre class="r"><code>diff &lt;- all_df %&gt;%
     spread(score, num_comorbid) %&gt;%
     mutate_at(vars(-pie.id, -data_apache2_manual), funs(abs(. - data_apache2_manual))) %&gt;%
     select(-pie.id, -data_apache2_manual)
-tbl &lt;- CreateTableOne(vars = names(all_df), data = all_df)
+tbl &lt;- CreateTableOne(vars = names(diff), data = diff)
 ptbl &lt;- print(tbl, printToggle = FALSE)
 knitr::kable(ptbl, caption = &quot;Mean Difference in Number of APACHE II Comorbidities&quot;)</code></pre>
 <!-- rnb-source-end -->
@@ -865,36 +1770,36 @@ knitr::kable(ptbl, caption = &quot;Median Difference in Number of APACHE II Como
 <td align="left">30</td>
 </tr>
 <tr class="even">
-<td align="left">data_apache2_ahrq (median [IQR])</td>
-<td align="left">0.50 [0.00, 1.00]</td>
+<td align="left">data_apache2_ahrq (mean (sd))</td>
+<td align="left">0.53 (0.57)</td>
 </tr>
 <tr class="odd">
-<td align="left">data_apache2_ahrq_drg (median [IQR])</td>
-<td align="left">0.50 [0.00, 1.00]</td>
+<td align="left">data_apache2_ahrq_drg (mean (sd))</td>
+<td align="left">0.57 (0.63)</td>
 </tr>
 <tr class="even">
-<td align="left">data_apache2_ek (median [IQR])</td>
-<td align="left">0.00 [0.00, 1.00]</td>
+<td align="left">data_apache2_ek (mean (sd))</td>
+<td align="left">0.50 (0.57)</td>
 </tr>
 <tr class="odd">
-<td align="left">data_apache2_ek_drg (median [IQR])</td>
-<td align="left">0.00 [0.00, 1.00]</td>
+<td align="left">data_apache2_ek_drg (mean (sd))</td>
+<td align="left">0.53 (0.63)</td>
 </tr>
 <tr class="even">
-<td align="left">data_apache2_elixhauser (median [IQR])</td>
-<td align="left">0.00 [0.00, 1.00]</td>
+<td align="left">data_apache2_elixhauser (mean (sd))</td>
+<td align="left">0.50 (0.57)</td>
 </tr>
 <tr class="odd">
-<td align="left">data_apache2_elixhauser_drg (median [IQR])</td>
-<td align="left">0.00 [0.00, 1.00]</td>
+<td align="left">data_apache2_elixhauser_drg (mean (sd))</td>
+<td align="left">0.53 (0.63)</td>
 </tr>
 <tr class="even">
-<td align="left">data_apache2_quan (median [IQR])</td>
-<td align="left">0.50 [0.00, 1.00]</td>
+<td align="left">data_apache2_quan (mean (sd))</td>
+<td align="left">0.53 (0.57)</td>
 </tr>
 <tr class="odd">
-<td align="left">data_apache2_quan_drg (median [IQR])</td>
-<td align="left">0.50 [0.00, 1.00]</td>
+<td align="left">data_apache2_quan_drg (mean (sd))</td>
+<td align="left">0.57 (0.63)</td>
 </tr>
 </tbody>
 </table>
@@ -1057,7 +1962,7 @@ knitr::kable(ptbl, caption = &quot;Proportion of Patients with a Differing Prima
 </div>
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogVmFsaWRhdGlvbiBvZiBJQ0QtOS1DTS9JQ0QtMTAtQ00gQ29kZXMgZm9yIEF1dG9tYXRlZCBFbGVjdHJvbmljIFNjb3Jpbmcgb2YNCiAgQVBBQ0hFIElJLCBBUEFDSEUgSUlJLCBhbmQgU0FQUyBJSQ0Kc3VidGl0bGU6IFByZWxpbWluYXJ5IEFuYWx5c2lzIGZvciBBU0hQIEFic3RyYWN0IFN1Ym1pc3Npb24NCm91dHB1dDoNCiAgaHRtbF9ub3RlYm9vazoNCiAgICBjb2RlX2ZvbGRpbmc6IGhpZGUNCiAgICB0b2M6IHllcw0KICAgIHRvY19mbG9hdDogeWVzDQotLS0NCg0KYGBge3Igc2V0dXAsIGluY2x1ZGU9RkFMU0V9DQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkodGFibGVvbmUpDQoNCmRpcnI6OmdldF9yZHMoIi4uL2RhdGEvZmluYWwiKQ0KYGBgDQoNCiMjIFBhdGllbnQgU2VsZWN0aW9uDQoNCiogUGF0aWVudHMgbWVldGluZyBpbmNsdXNpb24gY3JpdGVyaWE6IGByIGV4Y2x1ZGUkc2NyZWVuYA0KKiBSZWFzb25zIGZvciBleGNsdXNpb246DQogICAgLSBQcmVnbmFudDogYHIgZXhjbHVkZSRwcmVnbmFudGANCiAgICAtIFByaXNvbmVyOiBgciBleGNsdWRlJHByaXNvbmVyc2ANCiAgICAtIElDVSBzdGF5IDwgMTIgaG91cnM6IGByIGV4Y2x1ZGUkaWN1X3Nob3J0YA0KICAgIC0gRGlhZ25vc2lzIGNvZGluZyBjb250YWluZWQgYm90aCBJQ0QtOS1DTSBhbmQgSUNELTEwLUNNOiBgciBleGNsdWRlJG11bHRfaWNkX3R5cGVzYA0KICAgIC0gTWlzc2luZyBkYXRhIG5lZWRlZCB0byBjYWxjdWxhdGUgcmlzayBzY29yZXM6IGByIGV4Y2x1ZGUkbGFic19taXNzaW5nYA0KICAgIC0gUmUtZW5jb3VudGVycyAob25seSBpbmNsdWRlZCBlYWNoIHBhdGllbnQgb25jZSkgOiBgciBleGNsdWRlJHJlZW5jb3VudGVyYA0KKiBUb3RhbCBudW1iZXIgb2YgZWxpZ2libGUgcGF0aWVudHMgcmVtYWluaW5nIHRvIHNhbXBsZSBmcm9tOiBgciBmbGF0dGVuX2ludChleGNsdWRlKVsxXSAtIHN1bShmbGF0dGVuX2ludChleGNsdWRlKVstMV0pYA0KDQojIyBPdXRjb21lcw0KDQojIyMgUHJpbWFyeSBlbmRwb2ludA0KDQojIyMjIERpZmZlcmVuY2UgaW4gQVBBQ0hFIElJIHNjb3JlDQoNCmBgYHtyfQ0Kc2NvcmVzIDwtIGxzKHBhdHRlcm4gPSAic2NvcmVfYXBhY2hlMiIpDQoNCmFsbF9zY29yZXMgPC0gbWFwKHNjb3Jlcywgfm11dGF0ZShnZXQoLngpLCBzY29yZSA9IC54KSkgJT4lDQogICAgbWFwKH5zZWxlY3QoLngsIHBpZS5pZCwgc2NvcmUsIGFwYWNoZTIpKSAlPiUNCiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9ICJwaWUuaWQiKSkgJT4lDQogICAgc3ByZWFkKHNjb3JlLCBhcGFjaGUyKSAlPiUNCiAgICBtdXRhdGVfYXQodmFycygtcGllLmlkLCAtc2NvcmVfYXBhY2hlMl9tYW51YWwpLCBmdW5zKGFicyguIC0gc2NvcmVfYXBhY2hlMl9tYW51YWwpKSkgJT4lDQogICAgc2VsZWN0KC1waWUuaWQsIC1zY29yZV9hcGFjaGUyX21hbnVhbCkNCg0KdGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhhbGxfc2NvcmVzKSwgZGF0YSA9IGFsbF9zY29yZXMpDQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSkNCmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gIk1lYW4gRGlmZmVyZW5jZSBpbiBBUEFDSEUgSUkgU2NvcmVzIikNCmBgYA0KDQpgYGB7cn0NCnB0YmwgPC0gcHJpbnQodGJsLCBwcmludFRvZ2dsZSA9IEZBTFNFLCBub25ub3JtYWwgPSBuYW1lcyhhbGxfc2NvcmVzKSkNCmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gIk1lZGlhbiBEaWZmZXJlbmNlIGluIEFQQUNIRSBJSSBTY29yZXMiKQ0KDQpgYGANCg0KIyMjIyBEaWZmZXJlbmNlIGluIEFQQUNIRSBJSUkgc2NvcmUNCg0KYGBge3J9DQpzY29yZXMgPC0gbHMocGF0dGVybiA9ICJzY29yZV9hcGFjaGUzIikNCg0KYWxsX3Njb3JlcyA8LSBtYXAoc2NvcmVzLCB+bXV0YXRlKGdldCgueCksIHNjb3JlID0gLngpKSAlPiUNCiAgICBtYXAofnNlbGVjdCgueCwgcGllLmlkLCBzY29yZSwgYXBhY2hlMykpICU+JQ0KICAgIG1hcF9kZih+c2VtaV9qb2luKC54LCBtYW51YWxfcGF0aWVudHMsIGJ5ID0gInBpZS5pZCIpKSAlPiUNCiAgICBzcHJlYWQoc2NvcmUsIGFwYWNoZTMpICU+JQ0KICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1zY29yZV9hcGFjaGUzX21hbnVhbCksIGZ1bnMoYWJzKC4gLSBzY29yZV9hcGFjaGUzX21hbnVhbCkpKSAlPiUNCiAgICBzZWxlY3QoLXBpZS5pZCwgLXNjb3JlX2FwYWNoZTNfbWFudWFsKQ0KDQp0YmwgPC0gQ3JlYXRlVGFibGVPbmUodmFycyA9IG5hbWVzKGFsbF9zY29yZXMpLCBkYXRhID0gYWxsX3Njb3JlcykNCnB0YmwgPC0gcHJpbnQodGJsLCBwcmludFRvZ2dsZSA9IEZBTFNFKQ0Ka25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSAiTWVhbiBEaWZmZXJlbmNlIGluIEFQQUNIRSBJSUkgU2NvcmVzIikNCmBgYA0KDQpgYGB7cn0NCnB0YmwgPC0gcHJpbnQodGJsLCBwcmludFRvZ2dsZSA9IEZBTFNFLCBub25ub3JtYWwgPSBuYW1lcyhhbGxfc2NvcmVzKSkNCmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gIk1lZGlhbiBEaWZmZXJlbmNlIGluIEFQQUNIRSBJSUkgU2NvcmVzIikNCg0KYGBgDQoNCiMjIyMgRGlmZmVyZW5jZSBpbiBTQVBTIElJIHNjb3JlDQoNCmBgYHtyfQ0Kc2NvcmVzIDwtIGxzKHBhdHRlcm4gPSAic2NvcmVfc2FwczIiKQ0KDQphbGxfc2NvcmVzIDwtIG1hcChzY29yZXMsIH5tdXRhdGUoZ2V0KC54KSwgc2NvcmUgPSAueCkpICU+JQ0KICAgIG1hcCh+c2VsZWN0KC54LCBwaWUuaWQsIHNjb3JlLCBzYXBzMikpICU+JQ0KICAgIG1hcF9kZih+c2VtaV9qb2luKC54LCBtYW51YWxfcGF0aWVudHMsIGJ5ID0gInBpZS5pZCIpKSAlPiUNCiAgICBzcHJlYWQoc2NvcmUsIHNhcHMyKSAlPiUNCiAgICBtdXRhdGVfYXQodmFycygtcGllLmlkLCAtc2NvcmVfc2FwczJfbWFudWFsKSwgZnVucyhhYnMoLiAtIHNjb3JlX3NhcHMyX21hbnVhbCkpKSAlPiUNCiAgICBzZWxlY3QoLXBpZS5pZCwgLXNjb3JlX3NhcHMyX21hbnVhbCkNCg0KdGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhhbGxfc2NvcmVzKSwgZGF0YSA9IGFsbF9zY29yZXMpDQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSkNCmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gIk1lYW4gRGlmZmVyZW5jZSBpbiBTQVBTIElJIFNjb3JlcyIpDQpgYGANCg0KYGBge3J9DQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSwgbm9ubm9ybWFsID0gbmFtZXMoYWxsX3Njb3JlcykpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJNZWRpYW4gRGlmZmVyZW5jZSBpbiBTQVBTIElJIFNjb3JlcyIpDQoNCmBgYA0KDQojIyMgU2Vjb25kYXJ5IGVuZHBvaW50cw0KDQojIyMjIERpZmZlcmVuY2UgaW4gcHJlZGljdGVkIG1vcnRhbGl0eSB1c2luZyBTQVBTIElJDQoNCmBgYHtyfQ0KY29tb3JiaWQgPC0gbHMocGF0dGVybiA9ICJzY29yZV9zYXBzMl8iKQ0KDQphbGxfZGYgPC0gbWFwKGNvbW9yYmlkLCB+bXV0YXRlKGdldCgueCksIHNjb3JlID0gLngpKSAlPiUNCiAgICBtYXAofnNlbGVjdCgueCwgcGllLmlkLCBzY29yZSwgc2FwczIpKSAlPiUNCiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9ICJwaWUuaWQiKSkgJT4lDQogICAgZGlzdGluY3QocGllLmlkLCBzY29yZSwgLmtlZXBfYWxsID0gVFJVRSkgJT4lDQogICAgbXV0YXRlKGxvZ2l0ID0gLTcuNzYzICsgMC4wNzM3ICogc2FwczIgKyAwLjk5NzEgKiBsb2coc2FwczIgKyAxKSwNCiAgICAgICAgICAgbW9ydGFsaXR5ID0gZXhwKGxvZ2l0KSAvICgxICsgZXhwKGxvZ2l0KSkpICU+JQ0KICAgIHNlbGVjdChwaWUuaWQsIHNjb3JlLCBtb3J0YWxpdHkpICU+JQ0KICAgIHNwcmVhZChzY29yZSwgbW9ydGFsaXR5KSAlPiUNCiAgICBtdXRhdGVfYXQodmFycygtcGllLmlkLCAtc2NvcmVfc2FwczJfbWFudWFsKSwgZnVucyhhYnMoLiAtIHNjb3JlX3NhcHMyX21hbnVhbCkpKSAlPiUNCiAgICBzZWxlY3QoLXBpZS5pZCwgLXNjb3JlX3NhcHMyX21hbnVhbCkNCg0KdGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhhbGxfZGYpLCBkYXRhID0gYWxsX2RmKQ0KcHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJNZWFuIERpZmZlcmVuY2UgaW4gUHJlZGljdGVkIE1vcnRhbGl0eSB1c2luZyBTQVBTIElJIikNCmBgYA0KDQojIyMjIERpZmZlcmVuY2UgaW4gbnVtYmVyIG9mIGNvbW9yYmlkaXRpZXMgaWRlbnRpZmllZCB1c2luZyBBUEFDSEUgSUkNCg0KYGBge3J9DQpjb21vcmJpZCA8LSBscyhwYXR0ZXJuID0gImRhdGFfYXBhY2hlMl8iKQ0KDQphbGxfZGYgPC0gbWFwKGNvbW9yYmlkLCB+bXV0YXRlKGdldCgueCksIHNjb3JlID0gLngpKSAlPiUNCiAgICBtYXAofnNlbGVjdCgueCwgcGllLmlkLCBzY29yZSwgbGl2ZXI6Y29tb3JiaWRpdHkpKSAlPiUNCiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9ICJwaWUuaWQiKSkgJT4lDQogICAgZGlzdGluY3QocGllLmlkLCBzY29yZSwgLmtlZXBfYWxsID0gVFJVRSkgJT4lDQogICAgYXJyYW5nZShwaWUuaWQsIHNjb3JlKSAlPiUNCiAgICBtdXRhdGVfaWYoaXMubG9naWNhbCwgYXMubnVtZXJpYykgJT4lDQogICAgYnlfcm93KGZ1bmN0aW9uKHgpIHN1bSh4WywgMzo3XSwgbmEucm0gPSBUUlVFKSwgLmNvbGxhdGUgPSAicm93cyIsIC50byA9ICJudW1fY29tb3JiaWQiKSAlPiUNCiAgICBzZWxlY3QocGllLmlkLCBzY29yZSwgbnVtX2NvbW9yYmlkKSAlPiUNCiAgICBzcHJlYWQoc2NvcmUsIG51bV9jb21vcmJpZCkgJT4lDQogICAgbXV0YXRlX2F0KHZhcnMoLXBpZS5pZCwgLWRhdGFfYXBhY2hlMl9tYW51YWwpLCBmdW5zKGFicyguIC0gZGF0YV9hcGFjaGUyX21hbnVhbCkpKSAlPiUNCiAgICBzZWxlY3QoLXBpZS5pZCwgLWRhdGFfYXBhY2hlMl9tYW51YWwpDQoNCnRibCA8LSBDcmVhdGVUYWJsZU9uZSh2YXJzID0gbmFtZXMoYWxsX2RmKSwgZGF0YSA9IGFsbF9kZikNCnB0YmwgPC0gcHJpbnQodGJsLCBwcmludFRvZ2dsZSA9IEZBTFNFKQ0Ka25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSAiTWVhbiBEaWZmZXJlbmNlIGluIE51bWJlciBvZiBBUEFDSEUgSUkgQ29tb3JiaWRpdGllcyIpDQpgYGANCg0KYGBge3J9DQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSwgbm9ubm9ybWFsID0gbmFtZXMoYWxsX2RmKSkNCmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gIk1lZGlhbiBEaWZmZXJlbmNlIGluIE51bWJlciBvZiBBUEFDSEUgSUkgQ29tb3JiaWRpdGllcyIpDQpgYGANCg0KIyMjIyBQcm9wb3J0aW9uIG9mIHBhdGllbnRzIHdpdGggYSBkaWZmZXJpbmcgcHJpbWFyeSBjb21vcmJpZGl0eSB1c2luZyBBUEFDSEUgSUlJDQoNCmBgYHtyfQ0KY29tb3JiaWQgPC0gbHMocGF0dGVybiA9ICJkYXRhX2FwYWNoZTNfIikNCg0KYWxsX2RmIDwtIG1hcChjb21vcmJpZCwgfm11dGF0ZShnZXQoLngpLCBzY29yZSA9IC54KSkgJT4lDQogICAgbWFwKH5zZWxlY3QoLngsIHBpZS5pZCwgc2NvcmUsIGNvbW9yYmlkaXR5KSkgJT4lDQogICAgbWFwX2RmKH5zZW1pX2pvaW4oLngsIG1hbnVhbF9wYXRpZW50cywgYnkgPSAicGllLmlkIikpICU+JQ0KICAgIGRpc3RpbmN0KHBpZS5pZCwgc2NvcmUsIC5rZWVwX2FsbCA9IFRSVUUpICU+JQ0KICAgIHNwcmVhZChzY29yZSwgY29tb3JiaWRpdHksIGZpbGwgPSAiIikgJT4lDQogICAgbXV0YXRlX2F0KHZhcnMoLXBpZS5pZCwgLWRhdGFfYXBhY2hlM19tYW51YWwpLCBmdW5zKC4gIT0gZGF0YV9hcGFjaGUzX21hbnVhbCkpICU+JQ0KICAgIG11dGF0ZV9pZihpcy5sb2dpY2FsLCBhcy5udW1lcmljKSAlPiUNCiAgICB1bmdyb3VwKCkgJT4lDQogICAgc2VsZWN0KC1waWUuaWQsIC1kYXRhX2FwYWNoZTNfbWFudWFsKQ0KDQp0YmwgPC0gQ3JlYXRlVGFibGVPbmUodmFycyA9IG5hbWVzKGFsbF9kZiksIGRhdGEgPSBhbGxfZGYpDQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSkNCmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gIlByb3BvcnRpb24gb2YgUGF0aWVudHMgd2l0aCBhIERpZmZlcmluZyBQcmltYXJ5IENvbW9yYmlkaXR5IHVzaW5nIEFQQUNIRSBJSUkiKQ0KYGBgDQoNCiMjIyMgUHJvcG9ydGlvbiBvZiBwYXRpZW50cyB3aXRoIGEgZGlmZmVyaW5nIHByaW1hcnkgY29tb3JiaWRpdHkgdXNpbmcgU0FQUyBJSQ0KDQpgYGB7cn0NCmNvbW9yYmlkIDwtIGxzKHBhdHRlcm4gPSAiZGF0YV9zYXBzMl8iKQ0KDQphbGxfZGYgPC0gbWFwKGNvbW9yYmlkLCB+bXV0YXRlKGdldCgueCksIHNjb3JlID0gLngpKSAlPiUNCiAgICBtYXAofnNlbGVjdCgueCwgcGllLmlkLCBzY29yZSwgY29tb3JiaWRpdHkpKSAlPiUNCiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9ICJwaWUuaWQiKSkgJT4lDQogICAgZGlzdGluY3QocGllLmlkLCBzY29yZSwgLmtlZXBfYWxsID0gVFJVRSkgJT4lDQogICAgc3ByZWFkKHNjb3JlLCBjb21vcmJpZGl0eSwgZmlsbCA9ICIiKSAlPiUNCiAgICBtdXRhdGVfYXQodmFycygtcGllLmlkLCAtZGF0YV9zYXBzMl9tYW51YWwpLCBmdW5zKC4gIT0gZGF0YV9zYXBzMl9tYW51YWwpKSAlPiUNCiAgICBtdXRhdGVfaWYoaXMubG9naWNhbCwgYXMubnVtZXJpYykgJT4lDQogICAgdW5ncm91cCgpICU+JQ0KICAgIHNlbGVjdCgtcGllLmlkLCAtZGF0YV9zYXBzMl9tYW51YWwpDQoNCnRibCA8LSBDcmVhdGVUYWJsZU9uZSh2YXJzID0gbmFtZXMoYWxsX2RmKSwgZGF0YSA9IGFsbF9kZikNCnB0YmwgPC0gcHJpbnQodGJsLCBwcmludFRvZ2dsZSA9IEZBTFNFKQ0Ka25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSAiUHJvcG9ydGlvbiBvZiBQYXRpZW50cyB3aXRoIGEgRGlmZmVyaW5nIFByaW1hcnkgQ29tb3JiaWRpdHkgdXNpbmcgU0FQUyBJSSIpDQpgYGANCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogVmFsaWRhdGlvbiBvZiBJQ0QtOS1DTS9JQ0QtMTAtQ00gQ29kZXMgZm9yIEF1dG9tYXRlZCBFbGVjdHJvbmljIFNjb3Jpbmcgb2YNCiAgQVBBQ0hFIElJLCBBUEFDSEUgSUlJLCBhbmQgU0FQUyBJSQ0Kc3VidGl0bGU6IFByZWxpbWluYXJ5IEFuYWx5c2lzIGZvciBBU0hQIEFic3RyYWN0IFN1Ym1pc3Npb24NCm91dHB1dDoNCiAgaHRtbF9ub3RlYm9vazoNCiAgICBjb2RlX2ZvbGRpbmc6IGhpZGUNCiAgICB0b2M6IHllcw0KICAgIHRvY19mbG9hdDogeWVzDQotLS0NCg0KYGBge3Igc2V0dXAsIGluY2x1ZGU9RkFMU0V9DQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkodGFibGVvbmUpDQpsaWJyYXJ5KGJyb29tKQ0KDQpkaXJyOjpnZXRfcmRzKCIuLi9kYXRhL2ZpbmFsIikNCmBgYA0KDQojIyBQYXRpZW50IFNlbGVjdGlvbg0KDQoqIFBhdGllbnRzIG1lZXRpbmcgaW5jbHVzaW9uIGNyaXRlcmlhOiBgciBleGNsdWRlJHNjcmVlbmANCiogUmVhc29ucyBmb3IgZXhjbHVzaW9uOg0KICAgIC0gUHJlZ25hbnQ6IGByIGV4Y2x1ZGUkcHJlZ25hbnRgDQogICAgLSBQcmlzb25lcjogYHIgZXhjbHVkZSRwcmlzb25lcnNgDQogICAgLSBJQ1Ugc3RheSA8IDEyIGhvdXJzOiBgciBleGNsdWRlJGljdV9zaG9ydGANCiAgICAtIERpYWdub3NpcyBjb2RpbmcgY29udGFpbmVkIGJvdGggSUNELTktQ00gYW5kIElDRC0xMC1DTTogYHIgZXhjbHVkZSRtdWx0X2ljZF90eXBlc2ANCiAgICAtIE1pc3NpbmcgZGF0YSBuZWVkZWQgdG8gY2FsY3VsYXRlIHJpc2sgc2NvcmVzOiBgciBleGNsdWRlJGxhYnNfbWlzc2luZ2ANCiAgICAtIFJlLWVuY291bnRlcnMgKG9ubHkgaW5jbHVkZWQgZWFjaCBwYXRpZW50IG9uY2UpIDogYHIgZXhjbHVkZSRyZWVuY291bnRlcmANCiogVG90YWwgbnVtYmVyIG9mIGVsaWdpYmxlIHBhdGllbnRzIHJlbWFpbmluZyB0byBzYW1wbGUgZnJvbTogYHIgZmxhdHRlbl9pbnQoZXhjbHVkZSlbMV0gLSBzdW0oZmxhdHRlbl9pbnQoZXhjbHVkZSlbLTFdKWANCg0KIyMgT3V0Y29tZXMNCg0KIyMjIFByaW1hcnkgZW5kcG9pbnQNCg0KIyMjIyBBUEFDSEUgSUkNCg0KIyMjIyMgQ29tcGFyaXNvbiBvZiBzY29yZXMNCg0KYGBge3J9DQpzY29yZXMgPC0gbHMocGF0dGVybiA9ICJzY29yZV9hcGFjaGUyIikNCg0KYWxsX3Njb3JlcyA8LSBtYXAoc2NvcmVzLCB+bXV0YXRlKGdldCgueCksIHNjb3JlID0gLngpKSAlPiUNCiAgICBtYXAofnNlbGVjdCgueCwgcGllLmlkLCBzY29yZSwgYXBhY2hlMikpICU+JQ0KICAgIG1hcF9kZih+c2VtaV9qb2luKC54LCBtYW51YWxfcGF0aWVudHMsIGJ5ID0gInBpZS5pZCIpKSANCg0KbWFuIDwtIGZpbHRlcihhbGxfc2NvcmVzLCBzY29yZSA9PSAic2NvcmVfYXBhY2hlMl9tYW51YWwiKSRhcGFjaGUyDQoNCnQgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiUNCiAgICBmaWx0ZXIoc2NvcmUgIT0gInNjb3JlX2FwYWNoZTJfbWFudWFsIikgJT4lDQogICAgZ3JvdXBfYnkoc2NvcmUpICU+JQ0KICAgIGRvKHRpZHkodC50ZXN0KC4kYXBhY2hlMiwgbWFuLCBwYWlyZWQgPSBUUlVFKSkpDQoNCmtuaXRyOjprYWJsZSh0KQ0KYGBgDQoNCmBgYHtyfQ0Ka3cgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiUNCiAgICBmaWx0ZXIoc2NvcmUgIT0gInNjb3JlX2FwYWNoZTJfbWFudWFsIikgJT4lDQogICAgZ3JvdXBfYnkoc2NvcmUpICU+JQ0KICAgIGRvKHRpZHkoa3J1c2thbC50ZXN0KC4kYXBhY2hlMiwgbWFuLCBwYWlyZWQgPSBUUlVFKSkpDQoNCmtuaXRyOjprYWJsZShrdykNCmBgYA0KDQojIyMjIyBEaWZmZXJlbmNlIGluIHNjb3JlDQoNCmBgYHtyfQ0KZGlmZiA8LSBhbGxfc2NvcmVzICU+JQ0KICAgIHNwcmVhZChzY29yZSwgYXBhY2hlMikgJT4lDQogICAgbXV0YXRlX2F0KHZhcnMoLXBpZS5pZCwgLXNjb3JlX2FwYWNoZTJfbWFudWFsKSwgZnVucyhhYnMoLiAtIHNjb3JlX2FwYWNoZTJfbWFudWFsKSkpICU+JQ0KICAgIHNlbGVjdCgtcGllLmlkLCAtc2NvcmVfYXBhY2hlMl9tYW51YWwpDQoNCnRibCA8LSBDcmVhdGVUYWJsZU9uZSh2YXJzID0gbmFtZXMoZGlmZiksIGRhdGEgPSBkaWZmKQ0KcHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJNZWFuIERpZmZlcmVuY2UgaW4gQVBBQ0hFIElJIFNjb3JlcyIpDQpgYGANCg0KYGBge3J9DQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSwgbm9ubm9ybWFsID0gbmFtZXMoZGlmZikpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJNZWRpYW4gRGlmZmVyZW5jZSBpbiBBUEFDSEUgSUkgU2NvcmVzIikNCmBgYA0KDQojIyMjIEFQQUNIRSBJSUkNCg0KIyMjIyMgQ29tcGFyaXNvbiBvZiBzY29yZXMNCg0KYGBge3J9DQpzY29yZXMgPC0gbHMocGF0dGVybiA9ICJzY29yZV9hcGFjaGUzIikNCg0KYWxsX3Njb3JlcyA8LSBtYXAoc2NvcmVzLCB+bXV0YXRlKGdldCgueCksIHNjb3JlID0gLngpKSAlPiUNCiAgICBtYXAofnNlbGVjdCgueCwgcGllLmlkLCBzY29yZSwgYXBhY2hlMykpICU+JQ0KICAgIG1hcF9kZih+c2VtaV9qb2luKC54LCBtYW51YWxfcGF0aWVudHMsIGJ5ID0gInBpZS5pZCIpKSANCg0KbWFuIDwtIGZpbHRlcihhbGxfc2NvcmVzLCBzY29yZSA9PSAic2NvcmVfYXBhY2hlM19tYW51YWwiKSRhcGFjaGUzDQoNCnQgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiUNCiAgICBmaWx0ZXIoc2NvcmUgIT0gInNjb3JlX2FwYWNoZTNfbWFudWFsIikgJT4lDQogICAgZ3JvdXBfYnkoc2NvcmUpICU+JQ0KICAgIGRvKHRpZHkodC50ZXN0KC4kYXBhY2hlMywgbWFuLCBwYWlyZWQgPSBUUlVFKSkpDQoNCmtuaXRyOjprYWJsZSh0KQ0KYGBgDQoNCmBgYHtyfQ0Ka3cgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiUNCiAgICBmaWx0ZXIoc2NvcmUgIT0gInNjb3JlX2FwYWNoZTNfbWFudWFsIikgJT4lDQogICAgZ3JvdXBfYnkoc2NvcmUpICU+JQ0KICAgIGRvKHRpZHkoa3J1c2thbC50ZXN0KC4kYXBhY2hlMywgbWFuLCBwYWlyZWQgPSBUUlVFKSkpDQoNCmtuaXRyOjprYWJsZShrdykNCmBgYA0KDQojIyMjIyBEaWZmZXJlbmNlIGluIHNjb3JlDQoNCmBgYHtyfQ0KZGlmZiA8LSBhbGxfc2NvcmVzICU+JQ0KICAgIHNwcmVhZChzY29yZSwgYXBhY2hlMykgJT4lDQogICAgbXV0YXRlX2F0KHZhcnMoLXBpZS5pZCwgLXNjb3JlX2FwYWNoZTNfbWFudWFsKSwgZnVucyhhYnMoLiAtIHNjb3JlX2FwYWNoZTNfbWFudWFsKSkpICU+JQ0KICAgIHNlbGVjdCgtcGllLmlkLCAtc2NvcmVfYXBhY2hlM19tYW51YWwpDQoNCnRibCA8LSBDcmVhdGVUYWJsZU9uZSh2YXJzID0gbmFtZXMoZGlmZiksIGRhdGEgPSBkaWZmKQ0KcHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJNZWFuIERpZmZlcmVuY2UgaW4gQVBBQ0hFIElJSSBTY29yZXMiKQ0KYGBgDQoNCmBgYHtyfQ0KcHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UsIG5vbm5vcm1hbCA9IG5hbWVzKGRpZmYpKQ0Ka25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSAiTWVkaWFuIERpZmZlcmVuY2UgaW4gQVBBQ0hFIElJSSBTY29yZXMiKQ0KDQpgYGANCg0KIyMjIyBTQVBTIElJDQoNCiMjIyMjIENvbXBhcmlzb24gb2Ygc2NvcmVzDQoNCmBgYHtyfQ0Kc2NvcmVzIDwtIGxzKHBhdHRlcm4gPSAic2NvcmVfc2FwczIiKQ0KDQphbGxfc2NvcmVzIDwtIG1hcChzY29yZXMsIH5tdXRhdGUoZ2V0KC54KSwgc2NvcmUgPSAueCkpICU+JQ0KICAgIG1hcCh+c2VsZWN0KC54LCBwaWUuaWQsIHNjb3JlLCBzYXBzMikpICU+JQ0KICAgIG1hcF9kZih+c2VtaV9qb2luKC54LCBtYW51YWxfcGF0aWVudHMsIGJ5ID0gInBpZS5pZCIpKSANCg0KbWFuIDwtIGZpbHRlcihhbGxfc2NvcmVzLCBzY29yZSA9PSAic2NvcmVfc2FwczJfbWFudWFsIikkc2FwczINCg0KdCA8LSBhbGxfc2NvcmVzWywgLTFdICU+JQ0KICAgIGZpbHRlcihzY29yZSAhPSAic2NvcmVfc2FwczJfbWFudWFsIikgJT4lDQogICAgZ3JvdXBfYnkoc2NvcmUpICU+JQ0KICAgIGRvKHRpZHkodC50ZXN0KC4kc2FwczIsIG1hbiwgcGFpcmVkID0gVFJVRSkpKQ0KDQprbml0cjo6a2FibGUodCkNCmBgYA0KDQpgYGB7cn0NCmt3IDwtIGFsbF9zY29yZXNbLCAtMV0gJT4lDQogICAgZmlsdGVyKHNjb3JlICE9ICJzY29yZV9zYXBzMl9tYW51YWwiKSAlPiUNCiAgICBncm91cF9ieShzY29yZSkgJT4lDQogICAgZG8odGlkeShrcnVza2FsLnRlc3QoLiRzYXBzMiwgbWFuLCBwYWlyZWQgPSBUUlVFKSkpDQoNCmtuaXRyOjprYWJsZShrdykNCmBgYA0KDQojIyMjIyBEaWZmZXJlbmNlIGluIHNjb3JlDQoNCmBgYHtyfQ0KZGlmZiA8LSBhbGxfc2NvcmVzICU+JQ0KICAgIHNwcmVhZChzY29yZSwgc2FwczIpICU+JQ0KICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1zY29yZV9zYXBzMl9tYW51YWwpLCBmdW5zKGFicyguIC0gc2NvcmVfc2FwczJfbWFudWFsKSkpICU+JQ0KICAgIHNlbGVjdCgtcGllLmlkLCAtc2NvcmVfc2FwczJfbWFudWFsKQ0KDQp0YmwgPC0gQ3JlYXRlVGFibGVPbmUodmFycyA9IG5hbWVzKGRpZmYpLCBkYXRhID0gZGlmZikNCnB0YmwgPC0gcHJpbnQodGJsLCBwcmludFRvZ2dsZSA9IEZBTFNFKQ0Ka25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSAiTWVhbiBEaWZmZXJlbmNlIGluIFNBUFMgSUkgU2NvcmVzIikNCmBgYA0KDQpgYGB7cn0NCnB0YmwgPC0gcHJpbnQodGJsLCBwcmludFRvZ2dsZSA9IEZBTFNFLCBub25ub3JtYWwgPSBuYW1lcyhkaWZmKSkNCmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gIk1lZGlhbiBEaWZmZXJlbmNlIGluIFNBUFMgSUkgU2NvcmVzIikNCg0KYGBgDQoNCiMjIyBTZWNvbmRhcnkgZW5kcG9pbnRzDQoNCiMjIyMgRGlmZmVyZW5jZSBpbiBwcmVkaWN0ZWQgbW9ydGFsaXR5IHVzaW5nIFNBUFMgSUkNCg0KYGBge3J9DQpjb21vcmJpZCA8LSBscyhwYXR0ZXJuID0gInNjb3JlX3NhcHMyXyIpDQoNCmFsbF9kZiA8LSBtYXAoY29tb3JiaWQsIH5tdXRhdGUoZ2V0KC54KSwgc2NvcmUgPSAueCkpICU+JQ0KICAgIG1hcCh+c2VsZWN0KC54LCBwaWUuaWQsIHNjb3JlLCBzYXBzMikpICU+JQ0KICAgIG1hcF9kZih+c2VtaV9qb2luKC54LCBtYW51YWxfcGF0aWVudHMsIGJ5ID0gInBpZS5pZCIpKSAlPiUNCiAgICBkaXN0aW5jdChwaWUuaWQsIHNjb3JlLCAua2VlcF9hbGwgPSBUUlVFKSAlPiUNCiAgICBtdXRhdGUobG9naXQgPSAtNy43NjMgKyAwLjA3MzcgKiBzYXBzMiArIDAuOTk3MSAqIGxvZyhzYXBzMiArIDEpLA0KICAgICAgICAgICBtb3J0YWxpdHkgPSBleHAobG9naXQpIC8gKDEgKyBleHAobG9naXQpKSkgJT4lDQogICAgc2VsZWN0KHBpZS5pZCwgc2NvcmUsIG1vcnRhbGl0eSkgDQoNCm1hbiA8LSBmaWx0ZXIoYWxsX2RmLCBzY29yZSA9PSAic2NvcmVfc2FwczJfbWFudWFsIikkbW9ydGFsaXR5DQoNCnQgPC0gYWxsX2RmWywgLTFdICU+JQ0KICAgIGZpbHRlcihzY29yZSAhPSAic2NvcmVfc2FwczJfbWFudWFsIikgJT4lDQogICAgZ3JvdXBfYnkoc2NvcmUpICU+JQ0KICAgIGRvKHRpZHkodC50ZXN0KC4kbW9ydGFsaXR5LCBtYW4sIHBhaXJlZCA9IFRSVUUpKSkNCg0Ka25pdHI6OmthYmxlKHRbLCBjKDE6NCwgNjo3KV0pDQpgYGANCg0KYGBge3J9DQpkaWZmIDwtIGFsbF9kZiAlPiUNCiAgICBzcHJlYWQoc2NvcmUsIG1vcnRhbGl0eSkgJT4lDQogICAgbXV0YXRlX2F0KHZhcnMoLXBpZS5pZCwgLXNjb3JlX3NhcHMyX21hbnVhbCksIGZ1bnMoYWJzKC4gLSBzY29yZV9zYXBzMl9tYW51YWwpKSkgJT4lDQogICAgc2VsZWN0KC1waWUuaWQsIC1zY29yZV9zYXBzMl9tYW51YWwpDQoNCnRibCA8LSBDcmVhdGVUYWJsZU9uZSh2YXJzID0gbmFtZXMoZGlmZiksIGRhdGEgPSBkaWZmKQ0KcHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJNZWFuIERpZmZlcmVuY2UgaW4gUHJlZGljdGVkIE1vcnRhbGl0eSB1c2luZyBTQVBTIElJIikNCmBgYA0KDQojIyMjIERpZmZlcmVuY2UgaW4gbnVtYmVyIG9mIGNvbW9yYmlkaXRpZXMgaWRlbnRpZmllZCB1c2luZyBBUEFDSEUgSUkNCg0KYGBge3J9DQpjb21vcmJpZCA8LSBscyhwYXR0ZXJuID0gImRhdGFfYXBhY2hlMl8iKQ0KDQphbGxfZGYgPC0gbWFwKGNvbW9yYmlkLCB+bXV0YXRlKGdldCgueCksIHNjb3JlID0gLngpKSAlPiUNCiAgICBtYXAofnNlbGVjdCgueCwgcGllLmlkLCBzY29yZSwgbGl2ZXI6Y29tb3JiaWRpdHkpKSAlPiUNCiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9ICJwaWUuaWQiKSkgJT4lDQogICAgZGlzdGluY3QocGllLmlkLCBzY29yZSwgLmtlZXBfYWxsID0gVFJVRSkgJT4lDQogICAgYXJyYW5nZShwaWUuaWQsIHNjb3JlKSAlPiUNCiAgICBtdXRhdGVfaWYoaXMubG9naWNhbCwgYXMubnVtZXJpYykgJT4lDQogICAgYnlfcm93KGZ1bmN0aW9uKHgpIHN1bSh4WywgMzo3XSwgbmEucm0gPSBUUlVFKSwgLmNvbGxhdGUgPSAicm93cyIsIC50byA9ICJudW1fY29tb3JiaWQiKSAlPiUNCiAgICBzZWxlY3QocGllLmlkLCBzY29yZSwgbnVtX2NvbW9yYmlkKSANCg0KbWFuIDwtIGZpbHRlcihhbGxfZGYsIHNjb3JlID09ICJkYXRhX2FwYWNoZTJfbWFudWFsIikkbnVtX2NvbW9yYmlkDQoNCnQgPC0gYWxsX2RmWywgLTFdICU+JQ0KICAgIGZpbHRlcihzY29yZSAhPSAiZGF0YV9hcGFjaGUyX21hbnVhbCIpICU+JQ0KICAgIGdyb3VwX2J5KHNjb3JlKSAlPiUNCiAgICBkbyh0aWR5KHQudGVzdCguJG51bV9jb21vcmJpZCwgbWFuLCBwYWlyZWQgPSBUUlVFKSkpDQoNCmtuaXRyOjprYWJsZSh0WywgYygxOjQsIDY6NyldKQ0KYGBgDQoNCmBgYHtyfQ0KZGlmZiA8LSBhbGxfZGYgJT4lDQogICAgc3ByZWFkKHNjb3JlLCBudW1fY29tb3JiaWQpICU+JQ0KICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1kYXRhX2FwYWNoZTJfbWFudWFsKSwgZnVucyhhYnMoLiAtIGRhdGFfYXBhY2hlMl9tYW51YWwpKSkgJT4lDQogICAgc2VsZWN0KC1waWUuaWQsIC1kYXRhX2FwYWNoZTJfbWFudWFsKQ0KDQp0YmwgPC0gQ3JlYXRlVGFibGVPbmUodmFycyA9IG5hbWVzKGRpZmYpLCBkYXRhID0gZGlmZikNCnB0YmwgPC0gcHJpbnQodGJsLCBwcmludFRvZ2dsZSA9IEZBTFNFKQ0Ka25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSAiTWVhbiBEaWZmZXJlbmNlIGluIE51bWJlciBvZiBBUEFDSEUgSUkgQ29tb3JiaWRpdGllcyIpDQpgYGANCg0KYGBge3J9DQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSwgbm9ubm9ybWFsID0gbmFtZXMoYWxsX2RmKSkNCmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gIk1lZGlhbiBEaWZmZXJlbmNlIGluIE51bWJlciBvZiBBUEFDSEUgSUkgQ29tb3JiaWRpdGllcyIpDQpgYGANCg0KIyMjIyBQcm9wb3J0aW9uIG9mIHBhdGllbnRzIHdpdGggYSBkaWZmZXJpbmcgcHJpbWFyeSBjb21vcmJpZGl0eSB1c2luZyBBUEFDSEUgSUlJDQoNCmBgYHtyfQ0KY29tb3JiaWQgPC0gbHMocGF0dGVybiA9ICJkYXRhX2FwYWNoZTNfIikNCg0KYWxsX2RmIDwtIG1hcChjb21vcmJpZCwgfm11dGF0ZShnZXQoLngpLCBzY29yZSA9IC54KSkgJT4lDQogICAgbWFwKH5zZWxlY3QoLngsIHBpZS5pZCwgc2NvcmUsIGNvbW9yYmlkaXR5KSkgJT4lDQogICAgbWFwX2RmKH5zZW1pX2pvaW4oLngsIG1hbnVhbF9wYXRpZW50cywgYnkgPSAicGllLmlkIikpICU+JQ0KICAgIGRpc3RpbmN0KHBpZS5pZCwgc2NvcmUsIC5rZWVwX2FsbCA9IFRSVUUpICU+JQ0KICAgIHNwcmVhZChzY29yZSwgY29tb3JiaWRpdHksIGZpbGwgPSAiIikgJT4lDQogICAgbXV0YXRlX2F0KHZhcnMoLXBpZS5pZCwgLWRhdGFfYXBhY2hlM19tYW51YWwpLCBmdW5zKC4gIT0gZGF0YV9hcGFjaGUzX21hbnVhbCkpICU+JQ0KICAgIG11dGF0ZV9pZihpcy5sb2dpY2FsLCBhcy5udW1lcmljKSAlPiUNCiAgICB1bmdyb3VwKCkgJT4lDQogICAgc2VsZWN0KC1waWUuaWQsIC1kYXRhX2FwYWNoZTNfbWFudWFsKQ0KDQp0YmwgPC0gQ3JlYXRlVGFibGVPbmUodmFycyA9IG5hbWVzKGFsbF9kZiksIGRhdGEgPSBhbGxfZGYpDQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSkNCmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gIlByb3BvcnRpb24gb2YgUGF0aWVudHMgd2l0aCBhIERpZmZlcmluZyBQcmltYXJ5IENvbW9yYmlkaXR5IHVzaW5nIEFQQUNIRSBJSUkiKQ0KYGBgDQoNCiMjIyMgUHJvcG9ydGlvbiBvZiBwYXRpZW50cyB3aXRoIGEgZGlmZmVyaW5nIHByaW1hcnkgY29tb3JiaWRpdHkgdXNpbmcgU0FQUyBJSQ0KDQpgYGB7cn0NCmNvbW9yYmlkIDwtIGxzKHBhdHRlcm4gPSAiZGF0YV9zYXBzMl8iKQ0KDQphbGxfZGYgPC0gbWFwKGNvbW9yYmlkLCB+bXV0YXRlKGdldCgueCksIHNjb3JlID0gLngpKSAlPiUNCiAgICBtYXAofnNlbGVjdCgueCwgcGllLmlkLCBzY29yZSwgY29tb3JiaWRpdHkpKSAlPiUNCiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9ICJwaWUuaWQiKSkgJT4lDQogICAgZGlzdGluY3QocGllLmlkLCBzY29yZSwgLmtlZXBfYWxsID0gVFJVRSkgJT4lDQogICAgc3ByZWFkKHNjb3JlLCBjb21vcmJpZGl0eSwgZmlsbCA9ICIiKSAlPiUNCiAgICBtdXRhdGVfYXQodmFycygtcGllLmlkLCAtZGF0YV9zYXBzMl9tYW51YWwpLCBmdW5zKC4gIT0gZGF0YV9zYXBzMl9tYW51YWwpKSAlPiUNCiAgICBtdXRhdGVfaWYoaXMubG9naWNhbCwgYXMubnVtZXJpYykgJT4lDQogICAgdW5ncm91cCgpICU+JQ0KICAgIHNlbGVjdCgtcGllLmlkLCAtZGF0YV9zYXBzMl9tYW51YWwpDQoNCnRibCA8LSBDcmVhdGVUYWJsZU9uZSh2YXJzID0gbmFtZXMoYWxsX2RmKSwgZGF0YSA9IGFsbF9kZikNCnB0YmwgPC0gcHJpbnQodGJsLCBwcmludFRvZ2dsZSA9IEZBTFNFKQ0Ka25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSAiUHJvcG9ydGlvbiBvZiBQYXRpZW50cyB3aXRoIGEgRGlmZmVyaW5nIFByaW1hcnkgQ29tb3JiaWRpdHkgdXNpbmcgU0FQUyBJSSIpDQpgYGANCg==</div>
 
 
 </div>

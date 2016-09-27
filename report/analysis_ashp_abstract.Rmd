@@ -12,6 +12,7 @@ output:
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(tableone)
+library(broom)
 
 dirr::get_rds("../data/final")
 ```
@@ -32,71 +33,148 @@ dirr::get_rds("../data/final")
 
 ### Primary endpoint
 
-#### Difference in APACHE II score
+#### APACHE II
+
+##### Comparison of scores
 
 ```{r}
 scores <- ls(pattern = "score_apache2")
 
 all_scores <- map(scores, ~mutate(get(.x), score = .x)) %>%
     map(~select(.x, pie.id, score, apache2)) %>%
-    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) 
+
+man <- filter(all_scores, score == "score_apache2_manual")$apache2
+
+t <- all_scores[, -1] %>%
+    filter(score != "score_apache2_manual") %>%
+    group_by(score) %>%
+    do(tidy(t.test(.$apache2, man, paired = TRUE)))
+
+knitr::kable(t)
+```
+
+```{r}
+kw <- all_scores[, -1] %>%
+    filter(score != "score_apache2_manual") %>%
+    group_by(score) %>%
+    do(tidy(kruskal.test(.$apache2, man, paired = TRUE)))
+
+knitr::kable(kw)
+```
+
+##### Difference in score
+
+```{r}
+diff <- all_scores %>%
     spread(score, apache2) %>%
     mutate_at(vars(-pie.id, -score_apache2_manual), funs(abs(. - score_apache2_manual))) %>%
     select(-pie.id, -score_apache2_manual)
 
-tbl <- CreateTableOne(vars = names(all_scores), data = all_scores)
+tbl <- CreateTableOne(vars = names(diff), data = diff)
 ptbl <- print(tbl, printToggle = FALSE)
 knitr::kable(ptbl, caption = "Mean Difference in APACHE II Scores")
 ```
 
 ```{r}
-ptbl <- print(tbl, printToggle = FALSE, nonnormal = names(all_scores))
+ptbl <- print(tbl, printToggle = FALSE, nonnormal = names(diff))
 knitr::kable(ptbl, caption = "Median Difference in APACHE II Scores")
-
 ```
 
-#### Difference in APACHE III score
+#### APACHE III
+
+##### Comparison of scores
 
 ```{r}
 scores <- ls(pattern = "score_apache3")
 
 all_scores <- map(scores, ~mutate(get(.x), score = .x)) %>%
     map(~select(.x, pie.id, score, apache3)) %>%
-    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) 
+
+man <- filter(all_scores, score == "score_apache3_manual")$apache3
+
+t <- all_scores[, -1] %>%
+    filter(score != "score_apache3_manual") %>%
+    group_by(score) %>%
+    do(tidy(t.test(.$apache3, man, paired = TRUE)))
+
+knitr::kable(t)
+```
+
+```{r}
+kw <- all_scores[, -1] %>%
+    filter(score != "score_apache3_manual") %>%
+    group_by(score) %>%
+    do(tidy(kruskal.test(.$apache3, man, paired = TRUE)))
+
+knitr::kable(kw)
+```
+
+##### Difference in score
+
+```{r}
+diff <- all_scores %>%
     spread(score, apache3) %>%
     mutate_at(vars(-pie.id, -score_apache3_manual), funs(abs(. - score_apache3_manual))) %>%
     select(-pie.id, -score_apache3_manual)
 
-tbl <- CreateTableOne(vars = names(all_scores), data = all_scores)
+tbl <- CreateTableOne(vars = names(diff), data = diff)
 ptbl <- print(tbl, printToggle = FALSE)
 knitr::kable(ptbl, caption = "Mean Difference in APACHE III Scores")
 ```
 
 ```{r}
-ptbl <- print(tbl, printToggle = FALSE, nonnormal = names(all_scores))
+ptbl <- print(tbl, printToggle = FALSE, nonnormal = names(diff))
 knitr::kable(ptbl, caption = "Median Difference in APACHE III Scores")
 
 ```
 
-#### Difference in SAPS II score
+#### SAPS II
+
+##### Comparison of scores
 
 ```{r}
 scores <- ls(pattern = "score_saps2")
 
 all_scores <- map(scores, ~mutate(get(.x), score = .x)) %>%
     map(~select(.x, pie.id, score, saps2)) %>%
-    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) 
+
+man <- filter(all_scores, score == "score_saps2_manual")$saps2
+
+t <- all_scores[, -1] %>%
+    filter(score != "score_saps2_manual") %>%
+    group_by(score) %>%
+    do(tidy(t.test(.$saps2, man, paired = TRUE)))
+
+knitr::kable(t)
+```
+
+```{r}
+kw <- all_scores[, -1] %>%
+    filter(score != "score_saps2_manual") %>%
+    group_by(score) %>%
+    do(tidy(kruskal.test(.$saps2, man, paired = TRUE)))
+
+knitr::kable(kw)
+```
+
+##### Difference in score
+
+```{r}
+diff <- all_scores %>%
     spread(score, saps2) %>%
     mutate_at(vars(-pie.id, -score_saps2_manual), funs(abs(. - score_saps2_manual))) %>%
     select(-pie.id, -score_saps2_manual)
 
-tbl <- CreateTableOne(vars = names(all_scores), data = all_scores)
+tbl <- CreateTableOne(vars = names(diff), data = diff)
 ptbl <- print(tbl, printToggle = FALSE)
 knitr::kable(ptbl, caption = "Mean Difference in SAPS II Scores")
 ```
 
 ```{r}
-ptbl <- print(tbl, printToggle = FALSE, nonnormal = names(all_scores))
+ptbl <- print(tbl, printToggle = FALSE, nonnormal = names(diff))
 knitr::kable(ptbl, caption = "Median Difference in SAPS II Scores")
 
 ```
@@ -114,12 +192,25 @@ all_df <- map(comorbid, ~mutate(get(.x), score = .x)) %>%
     distinct(pie.id, score, .keep_all = TRUE) %>%
     mutate(logit = -7.763 + 0.0737 * saps2 + 0.9971 * log(saps2 + 1),
            mortality = exp(logit) / (1 + exp(logit))) %>%
-    select(pie.id, score, mortality) %>%
+    select(pie.id, score, mortality) 
+
+man <- filter(all_df, score == "score_saps2_manual")$mortality
+
+t <- all_df[, -1] %>%
+    filter(score != "score_saps2_manual") %>%
+    group_by(score) %>%
+    do(tidy(t.test(.$mortality, man, paired = TRUE)))
+
+knitr::kable(t[, c(1:4, 6:7)])
+```
+
+```{r}
+diff <- all_df %>%
     spread(score, mortality) %>%
     mutate_at(vars(-pie.id, -score_saps2_manual), funs(abs(. - score_saps2_manual))) %>%
     select(-pie.id, -score_saps2_manual)
 
-tbl <- CreateTableOne(vars = names(all_df), data = all_df)
+tbl <- CreateTableOne(vars = names(diff), data = diff)
 ptbl <- print(tbl, printToggle = FALSE)
 knitr::kable(ptbl, caption = "Mean Difference in Predicted Mortality using SAPS II")
 ```
@@ -136,12 +227,25 @@ all_df <- map(comorbid, ~mutate(get(.x), score = .x)) %>%
     arrange(pie.id, score) %>%
     mutate_if(is.logical, as.numeric) %>%
     by_row(function(x) sum(x[, 3:7], na.rm = TRUE), .collate = "rows", .to = "num_comorbid") %>%
-    select(pie.id, score, num_comorbid) %>%
+    select(pie.id, score, num_comorbid) 
+
+man <- filter(all_df, score == "data_apache2_manual")$num_comorbid
+
+t <- all_df[, -1] %>%
+    filter(score != "data_apache2_manual") %>%
+    group_by(score) %>%
+    do(tidy(t.test(.$num_comorbid, man, paired = TRUE)))
+
+knitr::kable(t[, c(1:4, 6:7)])
+```
+
+```{r}
+diff <- all_df %>%
     spread(score, num_comorbid) %>%
     mutate_at(vars(-pie.id, -data_apache2_manual), funs(abs(. - data_apache2_manual))) %>%
     select(-pie.id, -data_apache2_manual)
 
-tbl <- CreateTableOne(vars = names(all_df), data = all_df)
+tbl <- CreateTableOne(vars = names(diff), data = diff)
 ptbl <- print(tbl, printToggle = FALSE)
 knitr::kable(ptbl, caption = "Mean Difference in Number of APACHE II Comorbidities")
 ```
