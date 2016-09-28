@@ -58,7 +58,7 @@ knitr::kable(t)
 kw <- all_scores[, -1] %>%
     filter(score != "score_apache2_manual") %>%
     group_by(score) %>%
-    do(tidy(kruskal.test(.$apache2, man, paired = TRUE)))
+    do(tidy(wilcox.test(.$apache2, man, paired = TRUE, conf.int = TRUE, exact = FALSE)))
 
 knitr::kable(kw)
 ```
@@ -106,7 +106,7 @@ knitr::kable(t)
 kw <- all_scores[, -1] %>%
     filter(score != "score_apache3_manual") %>%
     group_by(score) %>%
-    do(tidy(kruskal.test(.$apache3, man, paired = TRUE)))
+    do(tidy(wilcox.test(.$apache3, man, paired = TRUE, conf.int = TRUE, exact = FALSE)))
 
 knitr::kable(kw)
 ```
@@ -155,10 +155,11 @@ knitr::kable(t)
 kw <- all_scores[, -1] %>%
     filter(score != "score_saps2_manual") %>%
     group_by(score) %>%
-    do(tidy(kruskal.test(.$saps2, man, paired = TRUE)))
+    do(tidy(wilcox.test(.$saps2, man, paired = TRUE, exact = FALSE)))
 
 knitr::kable(kw)
 ```
+* This was unable to calculate a confidence interval
 
 ##### Difference in score
 

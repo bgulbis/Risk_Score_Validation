@@ -434,11 +434,11 @@ knitr::kable(t)</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua3cgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiVcbiAgICBmaWx0ZXIoc2NvcmUgIT0gXCJzY29yZV9hcGFjaGUyX21hbnVhbFwiKSAlPiVcbiAgICBncm91cF9ieShzY29yZSkgJT4lXG4gICAgZG8odGlkeShrcnVza2FsLnRlc3QoLiRhcGFjaGUyLCBtYW4sIHBhaXJlZCA9IFRSVUUpKSlcbmtuaXRyOjprYWJsZShrdylcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua3cgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiVcbiAgICBmaWx0ZXIoc2NvcmUgIT0gXCJzY29yZV9hcGFjaGUyX21hbnVhbFwiKSAlPiVcbiAgICBncm91cF9ieShzY29yZSkgJT4lXG4gICAgZG8odGlkeSh3aWxjb3gudGVzdCguJGFwYWNoZTIsIG1hbiwgcGFpcmVkID0gVFJVRSwgY29uZi5pbnQgPSBUUlVFLCBleGFjdCA9IEZBTFNFKSkpXG5rbml0cjo6a2FibGUoa3cpXG5gYGAifQ== -->
 <pre class="r"><code>kw &lt;- all_scores[, -1] %&gt;%
     filter(score != &quot;score_apache2_manual&quot;) %&gt;%
     group_by(score) %&gt;%
-    do(tidy(kruskal.test(.$apache2, man, paired = TRUE)))
+    do(tidy(wilcox.test(.$apache2, man, paired = TRUE, conf.int = TRUE, exact = FALSE)))
 knitr::kable(kw)</code></pre>
 <!-- rnb-source-end -->
 
@@ -446,77 +446,107 @@ knitr::kable(kw)</code></pre>
 
 <table>
 <colgroup>
-<col width="32%" />
-<col width="11%" />
-<col width="11%" />
-<col width="11%" />
-<col width="32%" />
+<col width="19%" />
+<col width="7%" />
+<col width="7%" />
+<col width="7%" />
+<col width="7%" />
+<col width="7%" />
+<col width="35%" />
+<col width="8%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th align="left">score</th>
+<th align="right">estimate</th>
 <th align="right">statistic</th>
 <th align="right">p.value</th>
-<th align="right">parameter</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
 <th align="left">method</th>
+<th align="left">alternative</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">score_apache2_ahrq</td>
-<td align="right">55.33668</td>
-<td align="right">0.0001751</td>
-<td align="right">23</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">2.0000007</td>
+<td align="right">117.0</td>
+<td align="right">0.1639934</td>
+<td align="right">-1.499960</td>
+<td align="right">3.500034</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="even">
 <td align="left">score_apache2_ahrq_drg</td>
-<td align="right">56.31555</td>
-<td align="right">0.0001279</td>
-<td align="right">23</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">0.0000427</td>
+<td align="right">78.0</td>
+<td align="right">0.9610189</td>
+<td align="right">-1.500066</td>
+<td align="right">3.499924</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="odd">
 <td align="left">score_apache2_ek</td>
-<td align="right">55.26242</td>
-<td align="right">0.0001793</td>
-<td align="right">23</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">1.9999973</td>
+<td align="right">112.5</td>
+<td align="right">0.2341505</td>
+<td align="right">-1.499999</td>
+<td align="right">3.500062</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="even">
 <td align="left">score_apache2_ek_drg</td>
-<td align="right">56.21526</td>
-<td align="right">0.0001321</td>
-<td align="right">23</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">-0.0000623</td>
+<td align="right">85.5</td>
+<td align="right">1.0000000</td>
+<td align="right">-1.500016</td>
+<td align="right">2.000013</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="odd">
 <td align="left">score_apache2_elixhauser</td>
-<td align="right">55.12603</td>
-<td align="right">0.0001873</td>
-<td align="right">23</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">1.9999404</td>
+<td align="right">127.0</td>
+<td align="right">0.1916011</td>
+<td align="right">-1.499995</td>
+<td align="right">3.499992</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="even">
 <td align="left">score_apache2_elixhauser_drg</td>
-<td align="right">56.21526</td>
-<td align="right">0.0001321</td>
-<td align="right">23</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">-0.0000623</td>
+<td align="right">85.5</td>
+<td align="right">1.0000000</td>
+<td align="right">-1.500016</td>
+<td align="right">2.000013</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="odd">
 <td align="left">score_apache2_quan</td>
-<td align="right">55.12603</td>
-<td align="right">0.0001873</td>
-<td align="right">23</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">1.9999404</td>
+<td align="right">127.0</td>
+<td align="right">0.1916011</td>
+<td align="right">-1.499995</td>
+<td align="right">3.499992</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="even">
 <td align="left">score_apache2_quan_drg</td>
-<td align="right">56.12784</td>
-<td align="right">0.0001358</td>
-<td align="right">23</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">0.0000360</td>
+<td align="right">98.0</td>
+<td align="right">0.9174555</td>
+<td align="right">-1.500032</td>
+<td align="right">2.000026</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 </tbody>
 </table>
@@ -803,89 +833,124 @@ knitr::kable(t)</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua3cgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiVcbiAgICBmaWx0ZXIoc2NvcmUgIT0gXCJzY29yZV9hcGFjaGUzX21hbnVhbFwiKSAlPiVcbiAgICBncm91cF9ieShzY29yZSkgJT4lXG4gICAgZG8odGlkeShrcnVza2FsLnRlc3QoLiRhcGFjaGUzLCBtYW4sIHBhaXJlZCA9IFRSVUUpKSlcbmtuaXRyOjprYWJsZShrdylcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua3cgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiVcbiAgICBmaWx0ZXIoc2NvcmUgIT0gXCJzY29yZV9hcGFjaGUzX21hbnVhbFwiKSAlPiVcbiAgICBncm91cF9ieShzY29yZSkgJT4lXG4gICAgZG8odGlkeSh3aWxjb3gudGVzdCguJGFwYWNoZTMsIG1hbiwgcGFpcmVkID0gVFJVRSwgY29uZi5pbnQgPSBUUlVFLCBleGFjdCA9IEZBTFNFKSkpXG5gYGAifQ== -->
 <pre class="r"><code>kw &lt;- all_scores[, -1] %&gt;%
     filter(score != &quot;score_apache3_manual&quot;) %&gt;%
     group_by(score) %&gt;%
-    do(tidy(kruskal.test(.$apache3, man, paired = TRUE)))
-knitr::kable(kw)</code></pre>
+    do(tidy(wilcox.test(.$apache3, man, paired = TRUE, conf.int = TRUE, exact = FALSE)))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoicmVxdWVzdGVkIGNvbmYubGV2ZWwgbm90IGFjaGlldmFibGVyZXF1ZXN0ZWQgY29uZi5sZXZlbCBub3QgYWNoaWV2YWJsZXJlcXVlc3RlZCBjb25mLmxldmVsIG5vdCBhY2hpZXZhYmxlcmVxdWVzdGVkIGNvbmYubGV2ZWwgbm90IGFjaGlldmFibGVcbiJ9 -->
+<pre><code>requested conf.level not achievablerequested conf.level not achievablerequested conf.level not achievablerequested conf.level not achievable</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua25pdHI6OmthYmxlKGt3KVxuYGBgIn0= -->
+<pre class="r"><code>knitr::kable(kw)</code></pre>
 <!-- rnb-source-end -->
 
 <!-- rnb-html-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImtuaXRfYXNpcyJdfX0= -->
 
-<table>
+<table style="width:100%;">
 <colgroup>
-<col width="32%" />
-<col width="11%" />
-<col width="11%" />
-<col width="11%" />
-<col width="32%" />
+<col width="19%" />
+<col width="7%" />
+<col width="7%" />
+<col width="7%" />
+<col width="6%" />
+<col width="7%" />
+<col width="35%" />
+<col width="8%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th align="left">score</th>
+<th align="right">estimate</th>
 <th align="right">statistic</th>
 <th align="right">p.value</th>
-<th align="right">parameter</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
 <th align="left">method</th>
+<th align="left">alternative</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">score_apache3_ahrq</td>
-<td align="right">58.16957</td>
-<td align="right">0.1075505</td>
-<td align="right">46</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">10.999959</td>
+<td align="right">28</td>
+<td align="right">0.0220149</td>
+<td align="right">6.999939</td>
+<td align="right">13.99999</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="even">
 <td align="left">score_apache3_ahrq_drg</td>
-<td align="right">58.16957</td>
-<td align="right">0.1075505</td>
-<td align="right">46</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">8.999983</td>
+<td align="right">34</td>
+<td align="right">0.0289728</td>
+<td align="right">2.999910</td>
+<td align="right">13.99996</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="odd">
 <td align="left">score_apache3_ek</td>
-<td align="right">58.16957</td>
-<td align="right">0.1075505</td>
-<td align="right">46</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">10.999959</td>
+<td align="right">28</td>
+<td align="right">0.0220149</td>
+<td align="right">6.999939</td>
+<td align="right">13.99999</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="even">
 <td align="left">score_apache3_ek_drg</td>
-<td align="right">58.16957</td>
-<td align="right">0.1075505</td>
-<td align="right">46</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">8.999983</td>
+<td align="right">34</td>
+<td align="right">0.0289728</td>
+<td align="right">2.999910</td>
+<td align="right">13.99996</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="odd">
 <td align="left">score_apache3_elixhauser</td>
-<td align="right">58.16957</td>
-<td align="right">0.1075505</td>
-<td align="right">46</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">10.999959</td>
+<td align="right">28</td>
+<td align="right">0.0220149</td>
+<td align="right">6.999939</td>
+<td align="right">13.99999</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="even">
 <td align="left">score_apache3_elixhauser_drg</td>
-<td align="right">58.16957</td>
-<td align="right">0.1075505</td>
-<td align="right">46</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">8.999983</td>
+<td align="right">34</td>
+<td align="right">0.0289728</td>
+<td align="right">2.999910</td>
+<td align="right">13.99996</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="odd">
 <td align="left">score_apache3_quan</td>
-<td align="right">58.16957</td>
-<td align="right">0.1075505</td>
-<td align="right">46</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">10.999959</td>
+<td align="right">28</td>
+<td align="right">0.0220149</td>
+<td align="right">6.999939</td>
+<td align="right">13.99999</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="even">
 <td align="left">score_apache3_quan_drg</td>
-<td align="right">58.16957</td>
-<td align="right">0.1075505</td>
-<td align="right">46</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">8.999983</td>
+<td align="right">34</td>
+<td align="right">0.0289728</td>
+<td align="right">2.999910</td>
+<td align="right">13.99996</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 </tbody>
 </table>
@@ -1172,89 +1237,89 @@ knitr::kable(t)</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua3cgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiVcbiAgICBmaWx0ZXIoc2NvcmUgIT0gXCJzY29yZV9zYXBzMl9tYW51YWxcIikgJT4lXG4gICAgZ3JvdXBfYnkoc2NvcmUpICU+JVxuICAgIGRvKHRpZHkoa3J1c2thbC50ZXN0KC4kc2FwczIsIG1hbiwgcGFpcmVkID0gVFJVRSkpKVxua25pdHI6OmthYmxlKGt3KVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua3cgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiVcbiAgICBmaWx0ZXIoc2NvcmUgIT0gXCJzY29yZV9zYXBzMl9tYW51YWxcIikgJT4lXG4gICAgZ3JvdXBfYnkoc2NvcmUpICU+JVxuICAgIGRvKHRpZHkod2lsY294LnRlc3QoLiRzYXBzMiwgbWFuLCBwYWlyZWQgPSBUUlVFLCBleGFjdCA9IEZBTFNFKSkpXG5rbml0cjo6a2FibGUoa3cpXG5gYGAifQ== -->
 <pre class="r"><code>kw &lt;- all_scores[, -1] %&gt;%
     filter(score != &quot;score_saps2_manual&quot;) %&gt;%
     group_by(score) %&gt;%
-    do(tidy(kruskal.test(.$saps2, man, paired = TRUE)))
+    do(tidy(wilcox.test(.$saps2, man, paired = TRUE, exact = FALSE)))
 knitr::kable(kw)</code></pre>
 <!-- rnb-source-end -->
 
 <!-- rnb-html-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImtuaXRfYXNpcyJdfX0= -->
 
-<table>
+<table style="width:100%;">
 <colgroup>
-<col width="30%" />
-<col width="12%" />
-<col width="12%" />
-<col width="12%" />
-<col width="32%" />
+<col width="23%" />
+<col width="9%" />
+<col width="9%" />
+<col width="46%" />
+<col width="11%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th align="left">score</th>
 <th align="right">statistic</th>
 <th align="right">p.value</th>
-<th align="right">parameter</th>
 <th align="left">method</th>
+<th align="left">alternative</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">score_saps2_ahrq</td>
-<td align="right">57.45001</td>
-<td align="right">0.0052509</td>
-<td align="right">33</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">6</td>
+<td align="right">0.1735682</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="even">
 <td align="left">score_saps2_ahrq_drg</td>
-<td align="right">57.45001</td>
-<td align="right">0.0052509</td>
-<td align="right">33</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">6</td>
+<td align="right">0.1735682</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="odd">
 <td align="left">score_saps2_ek</td>
-<td align="right">57.45001</td>
-<td align="right">0.0052509</td>
-<td align="right">33</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">6</td>
+<td align="right">0.1735682</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="even">
 <td align="left">score_saps2_ek_drg</td>
-<td align="right">57.45001</td>
-<td align="right">0.0052509</td>
-<td align="right">33</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">6</td>
+<td align="right">0.1735682</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="odd">
 <td align="left">score_saps2_elixhauser</td>
-<td align="right">57.45001</td>
-<td align="right">0.0052509</td>
-<td align="right">33</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">6</td>
+<td align="right">0.1735682</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="even">
 <td align="left">score_saps2_elixhauser_drg</td>
-<td align="right">57.45001</td>
-<td align="right">0.0052509</td>
-<td align="right">33</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">6</td>
+<td align="right">0.1735682</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="odd">
 <td align="left">score_saps2_quan</td>
-<td align="right">57.45001</td>
-<td align="right">0.0052509</td>
-<td align="right">33</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">6</td>
+<td align="right">0.1735682</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 <tr class="even">
 <td align="left">score_saps2_quan_drg</td>
-<td align="right">57.45001</td>
-<td align="right">0.0052509</td>
-<td align="right">33</td>
-<td align="left">Kruskal-Wallis rank sum test</td>
+<td align="right">6</td>
+<td align="right">0.1735682</td>
+<td align="left">Wilcoxon signed rank test with continuity correction</td>
+<td align="left">two.sided</td>
 </tr>
 </tbody>
 </table>
@@ -1264,6 +1329,9 @@ knitr::kable(kw)</code></pre>
 
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<ul>
+<li>This was unable to calculate a confidence interval</li>
+</ul>
 </div>
 <div id="difference-in-score-2" class="section level5">
 <h5>Difference in score</h5>
@@ -1969,7 +2037,7 @@ knitr::kable(ptbl, caption = &quot;Proportion of Patients with a Differing Prima
 </div>
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogVmFsaWRhdGlvbiBvZiBJQ0QtOS1DTS9JQ0QtMTAtQ00gQ29kZXMgZm9yIEF1dG9tYXRlZCBFbGVjdHJvbmljIFNjb3Jpbmcgb2YNCiAgQVBBQ0hFIElJLCBBUEFDSEUgSUlJLCBhbmQgU0FQUyBJSQ0Kc3VidGl0bGU6IFByZWxpbWluYXJ5IEFuYWx5c2lzIGZvciBBU0hQIEFic3RyYWN0IFN1Ym1pc3Npb24NCm91dHB1dDoNCiAgaHRtbF9ub3RlYm9vazoNCiAgICBjb2RlX2ZvbGRpbmc6IGhpZGUNCiAgICB0b2M6IHllcw0KICAgIHRvY19mbG9hdDogeWVzDQotLS0NCg0KYGBge3Igc2V0dXAsIGluY2x1ZGU9RkFMU0V9DQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkodGFibGVvbmUpDQpsaWJyYXJ5KGJyb29tKQ0KDQpkaXJyOjpnZXRfcmRzKCIuLi9kYXRhL2ZpbmFsIikNCmBgYA0KDQojIyBQYXRpZW50IFNlbGVjdGlvbg0KDQoqIFBhdGllbnRzIG1lZXRpbmcgaW5jbHVzaW9uIGNyaXRlcmlhOiBgciBleGNsdWRlJHNjcmVlbmANCiogUmVhc29ucyBmb3IgZXhjbHVzaW9uOg0KICAgIC0gUHJlZ25hbnQ6IGByIGV4Y2x1ZGUkcHJlZ25hbnRgDQogICAgLSBQcmlzb25lcjogYHIgZXhjbHVkZSRwcmlzb25lcnNgDQogICAgLSBJQ1Ugc3RheSA8IDEyIGhvdXJzOiBgciBleGNsdWRlJGljdV9zaG9ydGANCiAgICAtIERpYWdub3NpcyBjb2RpbmcgY29udGFpbmVkIGJvdGggSUNELTktQ00gYW5kIElDRC0xMC1DTTogYHIgZXhjbHVkZSRtdWx0X2ljZF90eXBlc2ANCiAgICAtIE1pc3NpbmcgZGF0YSBuZWVkZWQgdG8gY2FsY3VsYXRlIHJpc2sgc2NvcmVzOiBgciBleGNsdWRlJGxhYnNfbWlzc2luZ2ANCiAgICAtIFJlLWVuY291bnRlcnMgKG9ubHkgaW5jbHVkZWQgZWFjaCBwYXRpZW50IG9uY2UpIDogYHIgZXhjbHVkZSRyZWVuY291bnRlcmANCiogVG90YWwgbnVtYmVyIG9mIGVsaWdpYmxlIHBhdGllbnRzIHJlbWFpbmluZyB0byBzYW1wbGUgZnJvbTogYHIgZmxhdHRlbl9pbnQoZXhjbHVkZSlbMV0gLSBzdW0oZmxhdHRlbl9pbnQoZXhjbHVkZSlbLTFdKWANCg0KIyMgT3V0Y29tZXMNCg0KIyMjIFByaW1hcnkgZW5kcG9pbnQNCg0KIyMjIyBBUEFDSEUgSUkNCg0KIyMjIyMgQ29tcGFyaXNvbiBvZiBzY29yZXMNCg0KYGBge3J9DQpzY29yZXMgPC0gbHMocGF0dGVybiA9ICJzY29yZV9hcGFjaGUyIikNCg0KYWxsX3Njb3JlcyA8LSBtYXAoc2NvcmVzLCB+bXV0YXRlKGdldCgueCksIHNjb3JlID0gLngpKSAlPiUNCiAgICBtYXAofnNlbGVjdCgueCwgcGllLmlkLCBzY29yZSwgYXBhY2hlMikpICU+JQ0KICAgIG1hcF9kZih+c2VtaV9qb2luKC54LCBtYW51YWxfcGF0aWVudHMsIGJ5ID0gInBpZS5pZCIpKSANCg0KbWFuIDwtIGZpbHRlcihhbGxfc2NvcmVzLCBzY29yZSA9PSAic2NvcmVfYXBhY2hlMl9tYW51YWwiKSRhcGFjaGUyDQoNCnQgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiUNCiAgICBmaWx0ZXIoc2NvcmUgIT0gInNjb3JlX2FwYWNoZTJfbWFudWFsIikgJT4lDQogICAgZ3JvdXBfYnkoc2NvcmUpICU+JQ0KICAgIGRvKHRpZHkodC50ZXN0KC4kYXBhY2hlMiwgbWFuLCBwYWlyZWQgPSBUUlVFKSkpDQoNCmtuaXRyOjprYWJsZSh0KQ0KYGBgDQoNCmBgYHtyfQ0Ka3cgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiUNCiAgICBmaWx0ZXIoc2NvcmUgIT0gInNjb3JlX2FwYWNoZTJfbWFudWFsIikgJT4lDQogICAgZ3JvdXBfYnkoc2NvcmUpICU+JQ0KICAgIGRvKHRpZHkoa3J1c2thbC50ZXN0KC4kYXBhY2hlMiwgbWFuLCBwYWlyZWQgPSBUUlVFKSkpDQoNCmtuaXRyOjprYWJsZShrdykNCmBgYA0KDQojIyMjIyBEaWZmZXJlbmNlIGluIHNjb3JlDQoNCmBgYHtyfQ0KZGlmZiA8LSBhbGxfc2NvcmVzICU+JQ0KICAgIHNwcmVhZChzY29yZSwgYXBhY2hlMikgJT4lDQogICAgbXV0YXRlX2F0KHZhcnMoLXBpZS5pZCwgLXNjb3JlX2FwYWNoZTJfbWFudWFsKSwgZnVucyhhYnMoLiAtIHNjb3JlX2FwYWNoZTJfbWFudWFsKSkpICU+JQ0KICAgIHNlbGVjdCgtcGllLmlkLCAtc2NvcmVfYXBhY2hlMl9tYW51YWwpDQoNCnRibCA8LSBDcmVhdGVUYWJsZU9uZSh2YXJzID0gbmFtZXMoZGlmZiksIGRhdGEgPSBkaWZmKQ0KcHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJNZWFuIERpZmZlcmVuY2UgaW4gQVBBQ0hFIElJIFNjb3JlcyIpDQpgYGANCg0KYGBge3J9DQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSwgbm9ubm9ybWFsID0gbmFtZXMoZGlmZikpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJNZWRpYW4gRGlmZmVyZW5jZSBpbiBBUEFDSEUgSUkgU2NvcmVzIikNCmBgYA0KDQojIyMjIEFQQUNIRSBJSUkNCg0KIyMjIyMgQ29tcGFyaXNvbiBvZiBzY29yZXMNCg0KYGBge3J9DQpzY29yZXMgPC0gbHMocGF0dGVybiA9ICJzY29yZV9hcGFjaGUzIikNCg0KYWxsX3Njb3JlcyA8LSBtYXAoc2NvcmVzLCB+bXV0YXRlKGdldCgueCksIHNjb3JlID0gLngpKSAlPiUNCiAgICBtYXAofnNlbGVjdCgueCwgcGllLmlkLCBzY29yZSwgYXBhY2hlMykpICU+JQ0KICAgIG1hcF9kZih+c2VtaV9qb2luKC54LCBtYW51YWxfcGF0aWVudHMsIGJ5ID0gInBpZS5pZCIpKSANCg0KbWFuIDwtIGZpbHRlcihhbGxfc2NvcmVzLCBzY29yZSA9PSAic2NvcmVfYXBhY2hlM19tYW51YWwiKSRhcGFjaGUzDQoNCnQgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiUNCiAgICBmaWx0ZXIoc2NvcmUgIT0gInNjb3JlX2FwYWNoZTNfbWFudWFsIikgJT4lDQogICAgZ3JvdXBfYnkoc2NvcmUpICU+JQ0KICAgIGRvKHRpZHkodC50ZXN0KC4kYXBhY2hlMywgbWFuLCBwYWlyZWQgPSBUUlVFKSkpDQoNCmtuaXRyOjprYWJsZSh0KQ0KYGBgDQoNCmBgYHtyfQ0Ka3cgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiUNCiAgICBmaWx0ZXIoc2NvcmUgIT0gInNjb3JlX2FwYWNoZTNfbWFudWFsIikgJT4lDQogICAgZ3JvdXBfYnkoc2NvcmUpICU+JQ0KICAgIGRvKHRpZHkoa3J1c2thbC50ZXN0KC4kYXBhY2hlMywgbWFuLCBwYWlyZWQgPSBUUlVFKSkpDQoNCmtuaXRyOjprYWJsZShrdykNCmBgYA0KDQojIyMjIyBEaWZmZXJlbmNlIGluIHNjb3JlDQoNCmBgYHtyfQ0KZGlmZiA8LSBhbGxfc2NvcmVzICU+JQ0KICAgIHNwcmVhZChzY29yZSwgYXBhY2hlMykgJT4lDQogICAgbXV0YXRlX2F0KHZhcnMoLXBpZS5pZCwgLXNjb3JlX2FwYWNoZTNfbWFudWFsKSwgZnVucyhhYnMoLiAtIHNjb3JlX2FwYWNoZTNfbWFudWFsKSkpICU+JQ0KICAgIHNlbGVjdCgtcGllLmlkLCAtc2NvcmVfYXBhY2hlM19tYW51YWwpDQoNCnRibCA8LSBDcmVhdGVUYWJsZU9uZSh2YXJzID0gbmFtZXMoZGlmZiksIGRhdGEgPSBkaWZmKQ0KcHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJNZWFuIERpZmZlcmVuY2UgaW4gQVBBQ0hFIElJSSBTY29yZXMiKQ0KYGBgDQoNCmBgYHtyfQ0KcHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UsIG5vbm5vcm1hbCA9IG5hbWVzKGRpZmYpKQ0Ka25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSAiTWVkaWFuIERpZmZlcmVuY2UgaW4gQVBBQ0hFIElJSSBTY29yZXMiKQ0KDQpgYGANCg0KIyMjIyBTQVBTIElJDQoNCiMjIyMjIENvbXBhcmlzb24gb2Ygc2NvcmVzDQoNCmBgYHtyfQ0Kc2NvcmVzIDwtIGxzKHBhdHRlcm4gPSAic2NvcmVfc2FwczIiKQ0KDQphbGxfc2NvcmVzIDwtIG1hcChzY29yZXMsIH5tdXRhdGUoZ2V0KC54KSwgc2NvcmUgPSAueCkpICU+JQ0KICAgIG1hcCh+c2VsZWN0KC54LCBwaWUuaWQsIHNjb3JlLCBzYXBzMikpICU+JQ0KICAgIG1hcF9kZih+c2VtaV9qb2luKC54LCBtYW51YWxfcGF0aWVudHMsIGJ5ID0gInBpZS5pZCIpKSANCg0KbWFuIDwtIGZpbHRlcihhbGxfc2NvcmVzLCBzY29yZSA9PSAic2NvcmVfc2FwczJfbWFudWFsIikkc2FwczINCg0KdCA8LSBhbGxfc2NvcmVzWywgLTFdICU+JQ0KICAgIGZpbHRlcihzY29yZSAhPSAic2NvcmVfc2FwczJfbWFudWFsIikgJT4lDQogICAgZ3JvdXBfYnkoc2NvcmUpICU+JQ0KICAgIGRvKHRpZHkodC50ZXN0KC4kc2FwczIsIG1hbiwgcGFpcmVkID0gVFJVRSkpKQ0KDQprbml0cjo6a2FibGUodCkNCmBgYA0KDQpgYGB7cn0NCmt3IDwtIGFsbF9zY29yZXNbLCAtMV0gJT4lDQogICAgZmlsdGVyKHNjb3JlICE9ICJzY29yZV9zYXBzMl9tYW51YWwiKSAlPiUNCiAgICBncm91cF9ieShzY29yZSkgJT4lDQogICAgZG8odGlkeShrcnVza2FsLnRlc3QoLiRzYXBzMiwgbWFuLCBwYWlyZWQgPSBUUlVFKSkpDQoNCmtuaXRyOjprYWJsZShrdykNCmBgYA0KDQojIyMjIyBEaWZmZXJlbmNlIGluIHNjb3JlDQoNCmBgYHtyfQ0KZGlmZiA8LSBhbGxfc2NvcmVzICU+JQ0KICAgIHNwcmVhZChzY29yZSwgc2FwczIpICU+JQ0KICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1zY29yZV9zYXBzMl9tYW51YWwpLCBmdW5zKGFicyguIC0gc2NvcmVfc2FwczJfbWFudWFsKSkpICU+JQ0KICAgIHNlbGVjdCgtcGllLmlkLCAtc2NvcmVfc2FwczJfbWFudWFsKQ0KDQp0YmwgPC0gQ3JlYXRlVGFibGVPbmUodmFycyA9IG5hbWVzKGRpZmYpLCBkYXRhID0gZGlmZikNCnB0YmwgPC0gcHJpbnQodGJsLCBwcmludFRvZ2dsZSA9IEZBTFNFKQ0Ka25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSAiTWVhbiBEaWZmZXJlbmNlIGluIFNBUFMgSUkgU2NvcmVzIikNCmBgYA0KDQpgYGB7cn0NCnB0YmwgPC0gcHJpbnQodGJsLCBwcmludFRvZ2dsZSA9IEZBTFNFLCBub25ub3JtYWwgPSBuYW1lcyhkaWZmKSkNCmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gIk1lZGlhbiBEaWZmZXJlbmNlIGluIFNBUFMgSUkgU2NvcmVzIikNCg0KYGBgDQoNCiMjIyBTZWNvbmRhcnkgZW5kcG9pbnRzDQoNCiMjIyMgRGlmZmVyZW5jZSBpbiBwcmVkaWN0ZWQgbW9ydGFsaXR5IHVzaW5nIFNBUFMgSUkNCg0KYGBge3J9DQpjb21vcmJpZCA8LSBscyhwYXR0ZXJuID0gInNjb3JlX3NhcHMyXyIpDQoNCmFsbF9kZiA8LSBtYXAoY29tb3JiaWQsIH5tdXRhdGUoZ2V0KC54KSwgc2NvcmUgPSAueCkpICU+JQ0KICAgIG1hcCh+c2VsZWN0KC54LCBwaWUuaWQsIHNjb3JlLCBzYXBzMikpICU+JQ0KICAgIG1hcF9kZih+c2VtaV9qb2luKC54LCBtYW51YWxfcGF0aWVudHMsIGJ5ID0gInBpZS5pZCIpKSAlPiUNCiAgICBkaXN0aW5jdChwaWUuaWQsIHNjb3JlLCAua2VlcF9hbGwgPSBUUlVFKSAlPiUNCiAgICBtdXRhdGUobG9naXQgPSAtNy43NjMgKyAwLjA3MzcgKiBzYXBzMiArIDAuOTk3MSAqIGxvZyhzYXBzMiArIDEpLA0KICAgICAgICAgICBtb3J0YWxpdHkgPSBleHAobG9naXQpIC8gKDEgKyBleHAobG9naXQpKSkgJT4lDQogICAgc2VsZWN0KHBpZS5pZCwgc2NvcmUsIG1vcnRhbGl0eSkgDQoNCm1hbiA8LSBmaWx0ZXIoYWxsX2RmLCBzY29yZSA9PSAic2NvcmVfc2FwczJfbWFudWFsIikkbW9ydGFsaXR5DQoNCnQgPC0gYWxsX2RmWywgLTFdICU+JQ0KICAgIGZpbHRlcihzY29yZSAhPSAic2NvcmVfc2FwczJfbWFudWFsIikgJT4lDQogICAgZ3JvdXBfYnkoc2NvcmUpICU+JQ0KICAgIGRvKHRpZHkodC50ZXN0KC4kbW9ydGFsaXR5LCBtYW4sIHBhaXJlZCA9IFRSVUUpKSkNCg0Ka25pdHI6OmthYmxlKHRbLCBjKDE6NCwgNjo3KV0pDQpgYGANCg0KYGBge3J9DQpkaWZmIDwtIGFsbF9kZiAlPiUNCiAgICBzcHJlYWQoc2NvcmUsIG1vcnRhbGl0eSkgJT4lDQogICAgbXV0YXRlX2F0KHZhcnMoLXBpZS5pZCwgLXNjb3JlX3NhcHMyX21hbnVhbCksIGZ1bnMoYWJzKC4gLSBzY29yZV9zYXBzMl9tYW51YWwpKSkgJT4lDQogICAgc2VsZWN0KC1waWUuaWQsIC1zY29yZV9zYXBzMl9tYW51YWwpDQoNCnRibCA8LSBDcmVhdGVUYWJsZU9uZSh2YXJzID0gbmFtZXMoZGlmZiksIGRhdGEgPSBkaWZmKQ0KcHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJNZWFuIERpZmZlcmVuY2UgaW4gUHJlZGljdGVkIE1vcnRhbGl0eSB1c2luZyBTQVBTIElJIikNCmBgYA0KDQojIyMjIERpZmZlcmVuY2UgaW4gbnVtYmVyIG9mIGNvbW9yYmlkaXRpZXMgaWRlbnRpZmllZCB1c2luZyBBUEFDSEUgSUkNCg0KYGBge3J9DQpjb21vcmJpZCA8LSBscyhwYXR0ZXJuID0gImRhdGFfYXBhY2hlMl8iKQ0KDQphbGxfZGYgPC0gbWFwKGNvbW9yYmlkLCB+bXV0YXRlKGdldCgueCksIHNjb3JlID0gLngpKSAlPiUNCiAgICBtYXAofnNlbGVjdCgueCwgcGllLmlkLCBzY29yZSwgbGl2ZXI6Y29tb3JiaWRpdHkpKSAlPiUNCiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9ICJwaWUuaWQiKSkgJT4lDQogICAgZGlzdGluY3QocGllLmlkLCBzY29yZSwgLmtlZXBfYWxsID0gVFJVRSkgJT4lDQogICAgYXJyYW5nZShwaWUuaWQsIHNjb3JlKSAlPiUNCiAgICBtdXRhdGVfaWYoaXMubG9naWNhbCwgYXMubnVtZXJpYykgJT4lDQogICAgYnlfcm93KGZ1bmN0aW9uKHgpIHN1bSh4WywgMzo3XSwgbmEucm0gPSBUUlVFKSwgLmNvbGxhdGUgPSAicm93cyIsIC50byA9ICJudW1fY29tb3JiaWQiKSAlPiUNCiAgICBzZWxlY3QocGllLmlkLCBzY29yZSwgbnVtX2NvbW9yYmlkKSANCg0KbWFuIDwtIGZpbHRlcihhbGxfZGYsIHNjb3JlID09ICJkYXRhX2FwYWNoZTJfbWFudWFsIikkbnVtX2NvbW9yYmlkDQoNCnQgPC0gYWxsX2RmWywgLTFdICU+JQ0KICAgIGZpbHRlcihzY29yZSAhPSAiZGF0YV9hcGFjaGUyX21hbnVhbCIpICU+JQ0KICAgIGdyb3VwX2J5KHNjb3JlKSAlPiUNCiAgICBkbyh0aWR5KHQudGVzdCguJG51bV9jb21vcmJpZCwgbWFuLCBwYWlyZWQgPSBUUlVFKSkpDQoNCmtuaXRyOjprYWJsZSh0WywgYygxOjQsIDY6NyldKQ0KYGBgDQoNCmBgYHtyfQ0KZGlmZiA8LSBhbGxfZGYgJT4lDQogICAgc3ByZWFkKHNjb3JlLCBudW1fY29tb3JiaWQpICU+JQ0KICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1kYXRhX2FwYWNoZTJfbWFudWFsKSwgZnVucyhhYnMoLiAtIGRhdGFfYXBhY2hlMl9tYW51YWwpKSkgJT4lDQogICAgc2VsZWN0KC1waWUuaWQsIC1kYXRhX2FwYWNoZTJfbWFudWFsKQ0KDQp0YmwgPC0gQ3JlYXRlVGFibGVPbmUodmFycyA9IG5hbWVzKGRpZmYpLCBkYXRhID0gZGlmZikNCnB0YmwgPC0gcHJpbnQodGJsLCBwcmludFRvZ2dsZSA9IEZBTFNFKQ0Ka25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSAiTWVhbiBEaWZmZXJlbmNlIGluIE51bWJlciBvZiBBUEFDSEUgSUkgQ29tb3JiaWRpdGllcyIpDQpgYGANCg0KYGBge3J9DQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSwgbm9ubm9ybWFsID0gbmFtZXMoYWxsX2RmKSkNCmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gIk1lZGlhbiBEaWZmZXJlbmNlIGluIE51bWJlciBvZiBBUEFDSEUgSUkgQ29tb3JiaWRpdGllcyIpDQpgYGANCg0KIyMjIyBQcm9wb3J0aW9uIG9mIHBhdGllbnRzIHdpdGggYSBkaWZmZXJpbmcgcHJpbWFyeSBjb21vcmJpZGl0eSB1c2luZyBBUEFDSEUgSUlJDQoNCmBgYHtyfQ0KY29tb3JiaWQgPC0gbHMocGF0dGVybiA9ICJkYXRhX2FwYWNoZTNfIikNCg0KYWxsX2RmIDwtIG1hcChjb21vcmJpZCwgfm11dGF0ZShnZXQoLngpLCBzY29yZSA9IC54KSkgJT4lDQogICAgbWFwKH5zZWxlY3QoLngsIHBpZS5pZCwgc2NvcmUsIGNvbW9yYmlkaXR5KSkgJT4lDQogICAgbWFwX2RmKH5zZW1pX2pvaW4oLngsIG1hbnVhbF9wYXRpZW50cywgYnkgPSAicGllLmlkIikpICU+JQ0KICAgIGRpc3RpbmN0KHBpZS5pZCwgc2NvcmUsIC5rZWVwX2FsbCA9IFRSVUUpICU+JQ0KICAgIHNwcmVhZChzY29yZSwgY29tb3JiaWRpdHksIGZpbGwgPSAiIikgJT4lDQogICAgbXV0YXRlX2F0KHZhcnMoLXBpZS5pZCwgLWRhdGFfYXBhY2hlM19tYW51YWwpLCBmdW5zKC4gIT0gZGF0YV9hcGFjaGUzX21hbnVhbCkpICU+JQ0KICAgIG11dGF0ZV9pZihpcy5sb2dpY2FsLCBhcy5udW1lcmljKSAlPiUNCiAgICB1bmdyb3VwKCkgJT4lDQogICAgc2VsZWN0KC1waWUuaWQsIC1kYXRhX2FwYWNoZTNfbWFudWFsKQ0KDQp0YmwgPC0gQ3JlYXRlVGFibGVPbmUodmFycyA9IG5hbWVzKGFsbF9kZiksIGRhdGEgPSBhbGxfZGYpDQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSkNCmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gIlByb3BvcnRpb24gb2YgUGF0aWVudHMgd2l0aCBhIERpZmZlcmluZyBQcmltYXJ5IENvbW9yYmlkaXR5IHVzaW5nIEFQQUNIRSBJSUkiKQ0KYGBgDQoNCiMjIyMgUHJvcG9ydGlvbiBvZiBwYXRpZW50cyB3aXRoIGEgZGlmZmVyaW5nIHByaW1hcnkgY29tb3JiaWRpdHkgdXNpbmcgU0FQUyBJSQ0KDQpgYGB7cn0NCmNvbW9yYmlkIDwtIGxzKHBhdHRlcm4gPSAiZGF0YV9zYXBzMl8iKQ0KDQphbGxfZGYgPC0gbWFwKGNvbW9yYmlkLCB+bXV0YXRlKGdldCgueCksIHNjb3JlID0gLngpKSAlPiUNCiAgICBtYXAofnNlbGVjdCgueCwgcGllLmlkLCBzY29yZSwgY29tb3JiaWRpdHkpKSAlPiUNCiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9ICJwaWUuaWQiKSkgJT4lDQogICAgZGlzdGluY3QocGllLmlkLCBzY29yZSwgLmtlZXBfYWxsID0gVFJVRSkgJT4lDQogICAgc3ByZWFkKHNjb3JlLCBjb21vcmJpZGl0eSwgZmlsbCA9ICIiKSAlPiUNCiAgICBtdXRhdGVfYXQodmFycygtcGllLmlkLCAtZGF0YV9zYXBzMl9tYW51YWwpLCBmdW5zKC4gIT0gZGF0YV9zYXBzMl9tYW51YWwpKSAlPiUNCiAgICBtdXRhdGVfaWYoaXMubG9naWNhbCwgYXMubnVtZXJpYykgJT4lDQogICAgdW5ncm91cCgpICU+JQ0KICAgIHNlbGVjdCgtcGllLmlkLCAtZGF0YV9zYXBzMl9tYW51YWwpDQoNCnRibCA8LSBDcmVhdGVUYWJsZU9uZSh2YXJzID0gbmFtZXMoYWxsX2RmKSwgZGF0YSA9IGFsbF9kZikNCnB0YmwgPC0gcHJpbnQodGJsLCBwcmludFRvZ2dsZSA9IEZBTFNFKQ0Ka25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSAiUHJvcG9ydGlvbiBvZiBQYXRpZW50cyB3aXRoIGEgRGlmZmVyaW5nIFByaW1hcnkgQ29tb3JiaWRpdHkgdXNpbmcgU0FQUyBJSSIpDQpgYGANCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogVmFsaWRhdGlvbiBvZiBJQ0QtOS1DTS9JQ0QtMTAtQ00gQ29kZXMgZm9yIEF1dG9tYXRlZCBFbGVjdHJvbmljIFNjb3Jpbmcgb2YNCiAgQVBBQ0hFIElJLCBBUEFDSEUgSUlJLCBhbmQgU0FQUyBJSQ0Kc3VidGl0bGU6IFByZWxpbWluYXJ5IEFuYWx5c2lzIGZvciBBU0hQIEFic3RyYWN0IFN1Ym1pc3Npb24NCm91dHB1dDoNCiAgaHRtbF9ub3RlYm9vazoNCiAgICBjb2RlX2ZvbGRpbmc6IGhpZGUNCiAgICB0b2M6IHllcw0KICAgIHRvY19mbG9hdDogeWVzDQotLS0NCg0KYGBge3Igc2V0dXAsIGluY2x1ZGU9RkFMU0V9DQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkodGFibGVvbmUpDQpsaWJyYXJ5KGJyb29tKQ0KDQpkaXJyOjpnZXRfcmRzKCIuLi9kYXRhL2ZpbmFsIikNCmBgYA0KDQojIyBQYXRpZW50IFNlbGVjdGlvbg0KDQoqIFBhdGllbnRzIG1lZXRpbmcgaW5jbHVzaW9uIGNyaXRlcmlhOiBgciBleGNsdWRlJHNjcmVlbmANCiogUmVhc29ucyBmb3IgZXhjbHVzaW9uOg0KICAgIC0gUHJlZ25hbnQ6IGByIGV4Y2x1ZGUkcHJlZ25hbnRgDQogICAgLSBQcmlzb25lcjogYHIgZXhjbHVkZSRwcmlzb25lcnNgDQogICAgLSBJQ1Ugc3RheSA8IDEyIGhvdXJzOiBgciBleGNsdWRlJGljdV9zaG9ydGANCiAgICAtIERpYWdub3NpcyBjb2RpbmcgY29udGFpbmVkIGJvdGggSUNELTktQ00gYW5kIElDRC0xMC1DTTogYHIgZXhjbHVkZSRtdWx0X2ljZF90eXBlc2ANCiAgICAtIE1pc3NpbmcgZGF0YSBuZWVkZWQgdG8gY2FsY3VsYXRlIHJpc2sgc2NvcmVzOiBgciBleGNsdWRlJGxhYnNfbWlzc2luZ2ANCiAgICAtIFJlLWVuY291bnRlcnMgKG9ubHkgaW5jbHVkZWQgZWFjaCBwYXRpZW50IG9uY2UpIDogYHIgZXhjbHVkZSRyZWVuY291bnRlcmANCiogVG90YWwgbnVtYmVyIG9mIGVsaWdpYmxlIHBhdGllbnRzIHJlbWFpbmluZyB0byBzYW1wbGUgZnJvbTogYHIgZmxhdHRlbl9pbnQoZXhjbHVkZSlbMV0gLSBzdW0oZmxhdHRlbl9pbnQoZXhjbHVkZSlbLTFdKWANCg0KIyMgT3V0Y29tZXMNCg0KIyMjIFByaW1hcnkgZW5kcG9pbnQNCg0KIyMjIyBBUEFDSEUgSUkNCg0KIyMjIyMgQ29tcGFyaXNvbiBvZiBzY29yZXMNCg0KYGBge3J9DQpzY29yZXMgPC0gbHMocGF0dGVybiA9ICJzY29yZV9hcGFjaGUyIikNCg0KYWxsX3Njb3JlcyA8LSBtYXAoc2NvcmVzLCB+bXV0YXRlKGdldCgueCksIHNjb3JlID0gLngpKSAlPiUNCiAgICBtYXAofnNlbGVjdCgueCwgcGllLmlkLCBzY29yZSwgYXBhY2hlMikpICU+JQ0KICAgIG1hcF9kZih+c2VtaV9qb2luKC54LCBtYW51YWxfcGF0aWVudHMsIGJ5ID0gInBpZS5pZCIpKSANCg0KbWFuIDwtIGZpbHRlcihhbGxfc2NvcmVzLCBzY29yZSA9PSAic2NvcmVfYXBhY2hlMl9tYW51YWwiKSRhcGFjaGUyDQoNCnQgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiUNCiAgICBmaWx0ZXIoc2NvcmUgIT0gInNjb3JlX2FwYWNoZTJfbWFudWFsIikgJT4lDQogICAgZ3JvdXBfYnkoc2NvcmUpICU+JQ0KICAgIGRvKHRpZHkodC50ZXN0KC4kYXBhY2hlMiwgbWFuLCBwYWlyZWQgPSBUUlVFKSkpDQoNCmtuaXRyOjprYWJsZSh0KQ0KYGBgDQoNCmBgYHtyfQ0Ka3cgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiUNCiAgICBmaWx0ZXIoc2NvcmUgIT0gInNjb3JlX2FwYWNoZTJfbWFudWFsIikgJT4lDQogICAgZ3JvdXBfYnkoc2NvcmUpICU+JQ0KICAgIGRvKHRpZHkod2lsY294LnRlc3QoLiRhcGFjaGUyLCBtYW4sIHBhaXJlZCA9IFRSVUUsIGNvbmYuaW50ID0gVFJVRSwgZXhhY3QgPSBGQUxTRSkpKQ0KDQprbml0cjo6a2FibGUoa3cpDQpgYGANCg0KIyMjIyMgRGlmZmVyZW5jZSBpbiBzY29yZQ0KDQpgYGB7cn0NCmRpZmYgPC0gYWxsX3Njb3JlcyAlPiUNCiAgICBzcHJlYWQoc2NvcmUsIGFwYWNoZTIpICU+JQ0KICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1zY29yZV9hcGFjaGUyX21hbnVhbCksIGZ1bnMoYWJzKC4gLSBzY29yZV9hcGFjaGUyX21hbnVhbCkpKSAlPiUNCiAgICBzZWxlY3QoLXBpZS5pZCwgLXNjb3JlX2FwYWNoZTJfbWFudWFsKQ0KDQp0YmwgPC0gQ3JlYXRlVGFibGVPbmUodmFycyA9IG5hbWVzKGRpZmYpLCBkYXRhID0gZGlmZikNCnB0YmwgPC0gcHJpbnQodGJsLCBwcmludFRvZ2dsZSA9IEZBTFNFKQ0Ka25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSAiTWVhbiBEaWZmZXJlbmNlIGluIEFQQUNIRSBJSSBTY29yZXMiKQ0KYGBgDQoNCmBgYHtyfQ0KcHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UsIG5vbm5vcm1hbCA9IG5hbWVzKGRpZmYpKQ0Ka25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSAiTWVkaWFuIERpZmZlcmVuY2UgaW4gQVBBQ0hFIElJIFNjb3JlcyIpDQpgYGANCg0KIyMjIyBBUEFDSEUgSUlJDQoNCiMjIyMjIENvbXBhcmlzb24gb2Ygc2NvcmVzDQoNCmBgYHtyfQ0Kc2NvcmVzIDwtIGxzKHBhdHRlcm4gPSAic2NvcmVfYXBhY2hlMyIpDQoNCmFsbF9zY29yZXMgPC0gbWFwKHNjb3Jlcywgfm11dGF0ZShnZXQoLngpLCBzY29yZSA9IC54KSkgJT4lDQogICAgbWFwKH5zZWxlY3QoLngsIHBpZS5pZCwgc2NvcmUsIGFwYWNoZTMpKSAlPiUNCiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9ICJwaWUuaWQiKSkgDQoNCm1hbiA8LSBmaWx0ZXIoYWxsX3Njb3Jlcywgc2NvcmUgPT0gInNjb3JlX2FwYWNoZTNfbWFudWFsIikkYXBhY2hlMw0KDQp0IDwtIGFsbF9zY29yZXNbLCAtMV0gJT4lDQogICAgZmlsdGVyKHNjb3JlICE9ICJzY29yZV9hcGFjaGUzX21hbnVhbCIpICU+JQ0KICAgIGdyb3VwX2J5KHNjb3JlKSAlPiUNCiAgICBkbyh0aWR5KHQudGVzdCguJGFwYWNoZTMsIG1hbiwgcGFpcmVkID0gVFJVRSkpKQ0KDQprbml0cjo6a2FibGUodCkNCmBgYA0KDQpgYGB7cn0NCmt3IDwtIGFsbF9zY29yZXNbLCAtMV0gJT4lDQogICAgZmlsdGVyKHNjb3JlICE9ICJzY29yZV9hcGFjaGUzX21hbnVhbCIpICU+JQ0KICAgIGdyb3VwX2J5KHNjb3JlKSAlPiUNCiAgICBkbyh0aWR5KHdpbGNveC50ZXN0KC4kYXBhY2hlMywgbWFuLCBwYWlyZWQgPSBUUlVFLCBjb25mLmludCA9IFRSVUUsIGV4YWN0ID0gRkFMU0UpKSkNCg0Ka25pdHI6OmthYmxlKGt3KQ0KYGBgDQoNCiMjIyMjIERpZmZlcmVuY2UgaW4gc2NvcmUNCg0KYGBge3J9DQpkaWZmIDwtIGFsbF9zY29yZXMgJT4lDQogICAgc3ByZWFkKHNjb3JlLCBhcGFjaGUzKSAlPiUNCiAgICBtdXRhdGVfYXQodmFycygtcGllLmlkLCAtc2NvcmVfYXBhY2hlM19tYW51YWwpLCBmdW5zKGFicyguIC0gc2NvcmVfYXBhY2hlM19tYW51YWwpKSkgJT4lDQogICAgc2VsZWN0KC1waWUuaWQsIC1zY29yZV9hcGFjaGUzX21hbnVhbCkNCg0KdGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhkaWZmKSwgZGF0YSA9IGRpZmYpDQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSkNCmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gIk1lYW4gRGlmZmVyZW5jZSBpbiBBUEFDSEUgSUlJIFNjb3JlcyIpDQpgYGANCg0KYGBge3J9DQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSwgbm9ubm9ybWFsID0gbmFtZXMoZGlmZikpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJNZWRpYW4gRGlmZmVyZW5jZSBpbiBBUEFDSEUgSUlJIFNjb3JlcyIpDQoNCmBgYA0KDQojIyMjIFNBUFMgSUkNCg0KIyMjIyMgQ29tcGFyaXNvbiBvZiBzY29yZXMNCg0KYGBge3J9DQpzY29yZXMgPC0gbHMocGF0dGVybiA9ICJzY29yZV9zYXBzMiIpDQoNCmFsbF9zY29yZXMgPC0gbWFwKHNjb3Jlcywgfm11dGF0ZShnZXQoLngpLCBzY29yZSA9IC54KSkgJT4lDQogICAgbWFwKH5zZWxlY3QoLngsIHBpZS5pZCwgc2NvcmUsIHNhcHMyKSkgJT4lDQogICAgbWFwX2RmKH5zZW1pX2pvaW4oLngsIG1hbnVhbF9wYXRpZW50cywgYnkgPSAicGllLmlkIikpIA0KDQptYW4gPC0gZmlsdGVyKGFsbF9zY29yZXMsIHNjb3JlID09ICJzY29yZV9zYXBzMl9tYW51YWwiKSRzYXBzMg0KDQp0IDwtIGFsbF9zY29yZXNbLCAtMV0gJT4lDQogICAgZmlsdGVyKHNjb3JlICE9ICJzY29yZV9zYXBzMl9tYW51YWwiKSAlPiUNCiAgICBncm91cF9ieShzY29yZSkgJT4lDQogICAgZG8odGlkeSh0LnRlc3QoLiRzYXBzMiwgbWFuLCBwYWlyZWQgPSBUUlVFKSkpDQoNCmtuaXRyOjprYWJsZSh0KQ0KYGBgDQoNCmBgYHtyfQ0Ka3cgPC0gYWxsX3Njb3Jlc1ssIC0xXSAlPiUNCiAgICBmaWx0ZXIoc2NvcmUgIT0gInNjb3JlX3NhcHMyX21hbnVhbCIpICU+JQ0KICAgIGdyb3VwX2J5KHNjb3JlKSAlPiUNCiAgICBkbyh0aWR5KHdpbGNveC50ZXN0KC4kc2FwczIsIG1hbiwgcGFpcmVkID0gVFJVRSwgZXhhY3QgPSBGQUxTRSkpKQ0KDQprbml0cjo6a2FibGUoa3cpDQpgYGANCiogVGhpcyB3YXMgdW5hYmxlIHRvIGNhbGN1bGF0ZSBhIGNvbmZpZGVuY2UgaW50ZXJ2YWwNCg0KIyMjIyMgRGlmZmVyZW5jZSBpbiBzY29yZQ0KDQpgYGB7cn0NCmRpZmYgPC0gYWxsX3Njb3JlcyAlPiUNCiAgICBzcHJlYWQoc2NvcmUsIHNhcHMyKSAlPiUNCiAgICBtdXRhdGVfYXQodmFycygtcGllLmlkLCAtc2NvcmVfc2FwczJfbWFudWFsKSwgZnVucyhhYnMoLiAtIHNjb3JlX3NhcHMyX21hbnVhbCkpKSAlPiUNCiAgICBzZWxlY3QoLXBpZS5pZCwgLXNjb3JlX3NhcHMyX21hbnVhbCkNCg0KdGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhkaWZmKSwgZGF0YSA9IGRpZmYpDQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSkNCmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gIk1lYW4gRGlmZmVyZW5jZSBpbiBTQVBTIElJIFNjb3JlcyIpDQpgYGANCg0KYGBge3J9DQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSwgbm9ubm9ybWFsID0gbmFtZXMoZGlmZikpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJNZWRpYW4gRGlmZmVyZW5jZSBpbiBTQVBTIElJIFNjb3JlcyIpDQoNCmBgYA0KDQojIyMgU2Vjb25kYXJ5IGVuZHBvaW50cw0KDQojIyMjIERpZmZlcmVuY2UgaW4gcHJlZGljdGVkIG1vcnRhbGl0eSB1c2luZyBTQVBTIElJDQoNCmBgYHtyfQ0KY29tb3JiaWQgPC0gbHMocGF0dGVybiA9ICJzY29yZV9zYXBzMl8iKQ0KDQphbGxfZGYgPC0gbWFwKGNvbW9yYmlkLCB+bXV0YXRlKGdldCgueCksIHNjb3JlID0gLngpKSAlPiUNCiAgICBtYXAofnNlbGVjdCgueCwgcGllLmlkLCBzY29yZSwgc2FwczIpKSAlPiUNCiAgICBtYXBfZGYofnNlbWlfam9pbigueCwgbWFudWFsX3BhdGllbnRzLCBieSA9ICJwaWUuaWQiKSkgJT4lDQogICAgZGlzdGluY3QocGllLmlkLCBzY29yZSwgLmtlZXBfYWxsID0gVFJVRSkgJT4lDQogICAgbXV0YXRlKGxvZ2l0ID0gLTcuNzYzICsgMC4wNzM3ICogc2FwczIgKyAwLjk5NzEgKiBsb2coc2FwczIgKyAxKSwNCiAgICAgICAgICAgbW9ydGFsaXR5ID0gZXhwKGxvZ2l0KSAvICgxICsgZXhwKGxvZ2l0KSkpICU+JQ0KICAgIHNlbGVjdChwaWUuaWQsIHNjb3JlLCBtb3J0YWxpdHkpIA0KDQptYW4gPC0gZmlsdGVyKGFsbF9kZiwgc2NvcmUgPT0gInNjb3JlX3NhcHMyX21hbnVhbCIpJG1vcnRhbGl0eQ0KDQp0IDwtIGFsbF9kZlssIC0xXSAlPiUNCiAgICBmaWx0ZXIoc2NvcmUgIT0gInNjb3JlX3NhcHMyX21hbnVhbCIpICU+JQ0KICAgIGdyb3VwX2J5KHNjb3JlKSAlPiUNCiAgICBkbyh0aWR5KHQudGVzdCguJG1vcnRhbGl0eSwgbWFuLCBwYWlyZWQgPSBUUlVFKSkpDQoNCmtuaXRyOjprYWJsZSh0WywgYygxOjQsIDY6NyldKQ0KYGBgDQoNCmBgYHtyfQ0KZGlmZiA8LSBhbGxfZGYgJT4lDQogICAgc3ByZWFkKHNjb3JlLCBtb3J0YWxpdHkpICU+JQ0KICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1zY29yZV9zYXBzMl9tYW51YWwpLCBmdW5zKGFicyguIC0gc2NvcmVfc2FwczJfbWFudWFsKSkpICU+JQ0KICAgIHNlbGVjdCgtcGllLmlkLCAtc2NvcmVfc2FwczJfbWFudWFsKQ0KDQp0YmwgPC0gQ3JlYXRlVGFibGVPbmUodmFycyA9IG5hbWVzKGRpZmYpLCBkYXRhID0gZGlmZikNCnB0YmwgPC0gcHJpbnQodGJsLCBwcmludFRvZ2dsZSA9IEZBTFNFKQ0Ka25pdHI6OmthYmxlKHB0YmwsIGNhcHRpb24gPSAiTWVhbiBEaWZmZXJlbmNlIGluIFByZWRpY3RlZCBNb3J0YWxpdHkgdXNpbmcgU0FQUyBJSSIpDQpgYGANCg0KIyMjIyBEaWZmZXJlbmNlIGluIG51bWJlciBvZiBjb21vcmJpZGl0aWVzIGlkZW50aWZpZWQgdXNpbmcgQVBBQ0hFIElJDQoNCmBgYHtyfQ0KY29tb3JiaWQgPC0gbHMocGF0dGVybiA9ICJkYXRhX2FwYWNoZTJfIikNCg0KYWxsX2RmIDwtIG1hcChjb21vcmJpZCwgfm11dGF0ZShnZXQoLngpLCBzY29yZSA9IC54KSkgJT4lDQogICAgbWFwKH5zZWxlY3QoLngsIHBpZS5pZCwgc2NvcmUsIGxpdmVyOmNvbW9yYmlkaXR5KSkgJT4lDQogICAgbWFwX2RmKH5zZW1pX2pvaW4oLngsIG1hbnVhbF9wYXRpZW50cywgYnkgPSAicGllLmlkIikpICU+JQ0KICAgIGRpc3RpbmN0KHBpZS5pZCwgc2NvcmUsIC5rZWVwX2FsbCA9IFRSVUUpICU+JQ0KICAgIGFycmFuZ2UocGllLmlkLCBzY29yZSkgJT4lDQogICAgbXV0YXRlX2lmKGlzLmxvZ2ljYWwsIGFzLm51bWVyaWMpICU+JQ0KICAgIGJ5X3JvdyhmdW5jdGlvbih4KSBzdW0oeFssIDM6N10sIG5hLnJtID0gVFJVRSksIC5jb2xsYXRlID0gInJvd3MiLCAudG8gPSAibnVtX2NvbW9yYmlkIikgJT4lDQogICAgc2VsZWN0KHBpZS5pZCwgc2NvcmUsIG51bV9jb21vcmJpZCkgDQoNCm1hbiA8LSBmaWx0ZXIoYWxsX2RmLCBzY29yZSA9PSAiZGF0YV9hcGFjaGUyX21hbnVhbCIpJG51bV9jb21vcmJpZA0KDQp0IDwtIGFsbF9kZlssIC0xXSAlPiUNCiAgICBmaWx0ZXIoc2NvcmUgIT0gImRhdGFfYXBhY2hlMl9tYW51YWwiKSAlPiUNCiAgICBncm91cF9ieShzY29yZSkgJT4lDQogICAgZG8odGlkeSh0LnRlc3QoLiRudW1fY29tb3JiaWQsIG1hbiwgcGFpcmVkID0gVFJVRSkpKQ0KDQprbml0cjo6a2FibGUodFssIGMoMTo0LCA2OjcpXSkNCmBgYA0KDQpgYGB7cn0NCmRpZmYgPC0gYWxsX2RmICU+JQ0KICAgIHNwcmVhZChzY29yZSwgbnVtX2NvbW9yYmlkKSAlPiUNCiAgICBtdXRhdGVfYXQodmFycygtcGllLmlkLCAtZGF0YV9hcGFjaGUyX21hbnVhbCksIGZ1bnMoYWJzKC4gLSBkYXRhX2FwYWNoZTJfbWFudWFsKSkpICU+JQ0KICAgIHNlbGVjdCgtcGllLmlkLCAtZGF0YV9hcGFjaGUyX21hbnVhbCkNCg0KdGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhkaWZmKSwgZGF0YSA9IGRpZmYpDQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSkNCmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gIk1lYW4gRGlmZmVyZW5jZSBpbiBOdW1iZXIgb2YgQVBBQ0hFIElJIENvbW9yYmlkaXRpZXMiKQ0KYGBgDQoNCmBgYHtyfQ0KcHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UsIG5vbm5vcm1hbCA9IG5hbWVzKGFsbF9kZikpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJNZWRpYW4gRGlmZmVyZW5jZSBpbiBOdW1iZXIgb2YgQVBBQ0hFIElJIENvbW9yYmlkaXRpZXMiKQ0KYGBgDQoNCiMjIyMgUHJvcG9ydGlvbiBvZiBwYXRpZW50cyB3aXRoIGEgZGlmZmVyaW5nIHByaW1hcnkgY29tb3JiaWRpdHkgdXNpbmcgQVBBQ0hFIElJSQ0KDQpgYGB7cn0NCmNvbW9yYmlkIDwtIGxzKHBhdHRlcm4gPSAiZGF0YV9hcGFjaGUzXyIpDQoNCmFsbF9kZiA8LSBtYXAoY29tb3JiaWQsIH5tdXRhdGUoZ2V0KC54KSwgc2NvcmUgPSAueCkpICU+JQ0KICAgIG1hcCh+c2VsZWN0KC54LCBwaWUuaWQsIHNjb3JlLCBjb21vcmJpZGl0eSkpICU+JQ0KICAgIG1hcF9kZih+c2VtaV9qb2luKC54LCBtYW51YWxfcGF0aWVudHMsIGJ5ID0gInBpZS5pZCIpKSAlPiUNCiAgICBkaXN0aW5jdChwaWUuaWQsIHNjb3JlLCAua2VlcF9hbGwgPSBUUlVFKSAlPiUNCiAgICBzcHJlYWQoc2NvcmUsIGNvbW9yYmlkaXR5LCBmaWxsID0gIiIpICU+JQ0KICAgIG11dGF0ZV9hdCh2YXJzKC1waWUuaWQsIC1kYXRhX2FwYWNoZTNfbWFudWFsKSwgZnVucyguICE9IGRhdGFfYXBhY2hlM19tYW51YWwpKSAlPiUNCiAgICBtdXRhdGVfaWYoaXMubG9naWNhbCwgYXMubnVtZXJpYykgJT4lDQogICAgdW5ncm91cCgpICU+JQ0KICAgIHNlbGVjdCgtcGllLmlkLCAtZGF0YV9hcGFjaGUzX21hbnVhbCkNCg0KdGJsIDwtIENyZWF0ZVRhYmxlT25lKHZhcnMgPSBuYW1lcyhhbGxfZGYpLCBkYXRhID0gYWxsX2RmKQ0KcHRibCA8LSBwcmludCh0YmwsIHByaW50VG9nZ2xlID0gRkFMU0UpDQprbml0cjo6a2FibGUocHRibCwgY2FwdGlvbiA9ICJQcm9wb3J0aW9uIG9mIFBhdGllbnRzIHdpdGggYSBEaWZmZXJpbmcgUHJpbWFyeSBDb21vcmJpZGl0eSB1c2luZyBBUEFDSEUgSUlJIikNCmBgYA0KDQojIyMjIFByb3BvcnRpb24gb2YgcGF0aWVudHMgd2l0aCBhIGRpZmZlcmluZyBwcmltYXJ5IGNvbW9yYmlkaXR5IHVzaW5nIFNBUFMgSUkNCg0KYGBge3J9DQpjb21vcmJpZCA8LSBscyhwYXR0ZXJuID0gImRhdGFfc2FwczJfIikNCg0KYWxsX2RmIDwtIG1hcChjb21vcmJpZCwgfm11dGF0ZShnZXQoLngpLCBzY29yZSA9IC54KSkgJT4lDQogICAgbWFwKH5zZWxlY3QoLngsIHBpZS5pZCwgc2NvcmUsIGNvbW9yYmlkaXR5KSkgJT4lDQogICAgbWFwX2RmKH5zZW1pX2pvaW4oLngsIG1hbnVhbF9wYXRpZW50cywgYnkgPSAicGllLmlkIikpICU+JQ0KICAgIGRpc3RpbmN0KHBpZS5pZCwgc2NvcmUsIC5rZWVwX2FsbCA9IFRSVUUpICU+JQ0KICAgIHNwcmVhZChzY29yZSwgY29tb3JiaWRpdHksIGZpbGwgPSAiIikgJT4lDQogICAgbXV0YXRlX2F0KHZhcnMoLXBpZS5pZCwgLWRhdGFfc2FwczJfbWFudWFsKSwgZnVucyguICE9IGRhdGFfc2FwczJfbWFudWFsKSkgJT4lDQogICAgbXV0YXRlX2lmKGlzLmxvZ2ljYWwsIGFzLm51bWVyaWMpICU+JQ0KICAgIHVuZ3JvdXAoKSAlPiUNCiAgICBzZWxlY3QoLXBpZS5pZCwgLWRhdGFfc2FwczJfbWFudWFsKQ0KDQp0YmwgPC0gQ3JlYXRlVGFibGVPbmUodmFycyA9IG5hbWVzKGFsbF9kZiksIGRhdGEgPSBhbGxfZGYpDQpwdGJsIDwtIHByaW50KHRibCwgcHJpbnRUb2dnbGUgPSBGQUxTRSkNCmtuaXRyOjprYWJsZShwdGJsLCBjYXB0aW9uID0gIlByb3BvcnRpb24gb2YgUGF0aWVudHMgd2l0aCBhIERpZmZlcmluZyBQcmltYXJ5IENvbW9yYmlkaXR5IHVzaW5nIFNBUFMgSUkiKQ0KYGBgDQo=</div>
 
 
 </div>
