@@ -44,7 +44,8 @@ scores <- ls(pattern = "score_apache2")
 all_scores <- map(scores, ~mutate(get(.x), score = .x)) %>%
     map(~select(.x, pie.id, score, apache2)) %>%
     map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
-    dmap_at("score", str_replace_all, pattern = "score_apache2_", replacement = "") 
+    dmap_at("score", str_replace_all, pattern = "score_apache2_", replacement = "") %>%
+    arrange(pie.id, score)
 
 result <- all_scores %>%
     select(-pie.id) %>%
@@ -85,12 +86,13 @@ knitr::kable(mw)
 
 ```{r}
 diff <- all_scores %>%
-    select(-pie.id) %>%
-    filter(score != "manual") %>%
-    group_by(score) %>%
-    dmap_at("apache2", ~ abs(.x - man)) %>%
+    spread(score, apache2) %>%
+    mutate_at(vars(-pie.id, -manual), funs(abs(. - manual))) %>%
+    gather(score, apache2, -pie.id, -manual) %>%
+    select(-pie.id, -manual) %>%
     filter(apache2 > 0) %>%
-    summarize_all(funs(num_diff = sum(. > 0), mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
+    group_by(score) %>%
+    summarize_all(funs(num_diff = length, mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
 
 knitr::kable(diff, caption = "Differences in APACHE II Scores")
 ```
@@ -103,7 +105,8 @@ scores <- ls(pattern = "score_apache3")
 all_scores <- map(scores, ~mutate(get(.x), score = .x)) %>%
     map(~select(.x, pie.id, score, apache3)) %>%
     map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
-    dmap_at("score", str_replace_all, pattern = "score_apache3_", replacement = "") 
+    dmap_at("score", str_replace_all, pattern = "score_apache3_", replacement = "") %>%
+    arrange(pie.id, score)
 
 result <- all_scores %>%
     select(-pie.id) %>%
@@ -139,12 +142,13 @@ knitr::kable(mw)
 
 ```{r}
 diff <- all_scores %>%
-    select(-pie.id) %>%
-    filter(score != "manual") %>%
-    group_by(score) %>%
-    dmap_at("apache3", ~ abs(.x - man)) %>%
+    spread(score, apache3) %>%
+    mutate_at(vars(-pie.id, -manual), funs(abs(. - manual))) %>%
+    gather(score, apache3, -pie.id, -manual) %>%
+    select(-pie.id, -manual) %>%
     filter(apache3 > 0) %>%
-    summarize_all(funs(num_diff = sum(. > 0), mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
+    group_by(score) %>%
+    summarize_all(funs(num_diff = length, mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
 
 knitr::kable(diff, caption = "Difference in APACHE III Scores")
 ```
@@ -157,7 +161,8 @@ scores <- ls(pattern = "score_saps2")
 all_scores <- map(scores, ~mutate(get(.x), score = .x)) %>%
     map(~select(.x, pie.id, score, saps2)) %>%
     map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
-    dmap_at("score", str_replace_all, pattern = "score_saps2_", replacement = "") 
+    dmap_at("score", str_replace_all, pattern = "score_saps2_", replacement = "") %>%
+    arrange(pie.id, score)
 
 result <- all_scores %>%
     select(-pie.id) %>%
@@ -195,12 +200,13 @@ knitr::kable(mw)
 
 ```{r}
 diff <- all_scores %>%
-    select(-pie.id) %>%
-    filter(score != "manual") %>%
-    group_by(score) %>%
-    dmap_at("saps2", ~ abs(.x - man)) %>%
+    spread(score, saps2) %>%
+    mutate_at(vars(-pie.id, -manual), funs(abs(. - manual))) %>%
+    gather(score, saps2, -pie.id, -manual) %>%
+    select(-pie.id, -manual) %>%
     filter(saps2 > 0) %>%
-    summarize_all(funs(num_diff = sum(. > 0), mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
+    group_by(score) %>%
+    summarize_all(funs(num_diff = length, mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
 
 knitr::kable(diff, caption = "Difference in SAPS II Scores")
 ```
@@ -218,6 +224,7 @@ all_df <- map(comorbid, ~mutate(get(.x), score = .x)) %>%
     map(~select(.x, pie.id, score, saps2)) %>%
     map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
     dmap_at("score", str_replace_all, pattern = "score_saps2_", replacement = "") %>%
+    arrange(pie.id, score) %>%
     distinct(pie.id, score, .keep_all = TRUE) %>%
     mutate(logit = -7.763 + 0.0737 * saps2 + 0.9971 * log(saps2 + 1),
            mortality = exp(logit) / (1 + exp(logit))) %>%
@@ -256,12 +263,13 @@ knitr::kable(mw)
     
 ```{r}
 diff <- all_df %>%
-    select(-pie.id) %>%
-    filter(score != "manual") %>%
+    spread(score, mortality) %>%
+    mutate_at(vars(-pie.id, -manual), funs(abs(. - manual))) %>%
+    gather(score, saps2, -pie.id, -manual) %>%
+    select(-pie.id, -manual) %>%
+    filter(saps2 > 0) %>%
     group_by(score) %>%
-    dmap_at("mortality", ~ abs(.x - man)) %>%
-    filter(mortality > 0) %>%
-    summarize_all(funs(num_diff = sum(. > 0), mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
+    summarize_all(funs(num_diff = length, mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
 
 knitr::kable(diff, caption = "Difference in Predicted Mortality using SAPS II")
 ```
@@ -275,8 +283,8 @@ all_df <- map(comorbid, ~mutate(get(.x), score = .x)) %>%
     map(~select(.x, pie.id, score, liver:comorbidity)) %>%
     map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
     dmap_at("score", str_replace_all, pattern = "data_apache2_", replacement = "") %>%
-    distinct(pie.id, score, .keep_all = TRUE) %>%
     arrange(pie.id, score) %>%
+    distinct(pie.id, score, .keep_all = TRUE) %>%
     mutate_if(is.logical, as.numeric) %>%
     by_row(function(x) sum(x[, 3:7], na.rm = TRUE), .collate = "rows", .to = "num_comorbid") %>%
     select(pie.id, score, num_comorbid) 
@@ -323,6 +331,31 @@ diff <- all_df %>%
 knitr::kable(diff)
 ```
 
+#### Proportion of patients with differing identification of any comorbidity using APACHE II
+
+```{r}
+comorbid <- ls(pattern = "data_apache2_")
+
+all_df <- map(comorbid, ~mutate(get(.x), score = .x)) %>%
+    map(~select(.x, pie.id, score, comorbidity)) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    dmap_at("score", str_replace_all, pattern = "data_apache2_", replacement = "") %>%
+    arrange(pie.id, score) %>%
+    distinct(pie.id, score, .keep_all = TRUE) %>%
+    spread(score, comorbidity, fill = FALSE) %>%
+    # dmap(str_replace_all, pattern = "none", replacement = "") %>%
+    mutate_at(vars(-pie.id, -manual), funs(. != manual)) %>%
+    mutate_if(is.logical, as.numeric) %>%
+    ungroup() %>%
+    gather(score, comorbidity, -pie.id, -manual) %>%
+    select(-pie.id, -manual) %>%
+    group_by(score) %>%
+    summarize_all(funs(num_diff = sum(. > 0), proportion = mean))
+
+knitr::kable(all_df)
+```
+
+
 #### Proportion of patients with a differing primary comorbidity using APACHE III
 
 ```{r}
@@ -332,6 +365,7 @@ all_df <- map(comorbid, ~mutate(get(.x), score = .x)) %>%
     map(~select(.x, pie.id, score, comorbidity)) %>%
     map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
     dmap_at("score", str_replace_all, pattern = "data_apache3_", replacement = "") %>%
+    arrange(pie.id, score) %>%
     distinct(pie.id, score, .keep_all = TRUE) %>%
     spread(score, comorbidity, fill = "") %>%
     dmap(str_replace_all, pattern = "none", replacement = "") %>%
@@ -355,6 +389,7 @@ all_df <- map(comorbid, ~mutate(get(.x), score = .x)) %>%
     map(~select(.x, pie.id, score, comorbidity)) %>%
     map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
     dmap_at("score", str_replace_all, pattern = "data_saps2_", replacement = "") %>%
+    arrange(pie.id, score) %>%
     distinct(pie.id, score, .keep_all = TRUE) %>%
     spread(score, comorbidity, fill = "") %>%
     dmap(str_replace_all, pattern = "none", replacement = "") %>%
