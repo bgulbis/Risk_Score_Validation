@@ -98,6 +98,10 @@ knitr::kable(diff, caption = "Differences in APACHE II Scores")
 
 ### APACHE III
 
+* There were 10 patients with different comorbidities identified by ICD code vs. manual
+    - Of these, only 6 had a different APACHE III score; the other 4 were all "elective" admissions where comorbidity score is ignored
+    - 1 person was identified as being chronic HD by ICD code but not by manual review, accounting for the 7 patients where the APACHE III score by ICD varied from manual
+
 ```{r}
 scores <- ls(pattern = "score_apache3")
 
