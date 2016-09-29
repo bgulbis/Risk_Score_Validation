@@ -329,6 +329,8 @@ knitr::kable(mw)
 
 #### APACHE II
 
+* Proportion of patients where a comorbidity was identified by ICD or by manual, but not both
+
 ```{r}
 comorbid <- ls(pattern = "data_apache2_")
 
@@ -351,6 +353,8 @@ knitr::kable(all_df)
 
 #### APACHE III
 
+* Proportion of patients where the primary comorbidity identified by ICD varied from primary comorbidity identified by manual
+
 ```{r}
 comorbid <- ls(pattern = "data_apache3_")
 
@@ -372,6 +376,8 @@ knitr::kable(all_df)
 ```
 
 #### SAPS II
+
+* Proportion of patients where the primary comorbidity identified by ICD varied from primary comorbidity identified by manual
 
 ```{r}
 comorbid <- ls(pattern = "data_saps2_")
