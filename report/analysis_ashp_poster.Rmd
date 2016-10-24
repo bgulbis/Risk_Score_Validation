@@ -1,0 +1,401 @@
+---
+title: Validation of ICD-9-CM/ICD-10-CM Codes for Automated Electronic Scoring of
+  APACHE II, APACHE III, and SAPS II
+subtitle: Analysis for ASHP Poster
+author: Eric Kao, Brian Gulbis
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output:
+  html_notebook:
+    code_folding: hide
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(stringr)
+# library(tableone)
+library(broom)
+
+dirr::get_rds("../data/final")
+```
+
+## Patient Selection
+
+* Patients meeting inclusion criteria: `r exclude$screen`
+* Reasons for exclusion:
+    - Pregnant: `r exclude$pregnant`
+    - Prisoner: `r exclude$prisoners`
+    - ICU stay < 12 hours: `r exclude$icu_short`
+    - Diagnosis coding contained both ICD-9-CM and ICD-10-CM: `r exclude$mult_icd_types`
+    - Missing data needed to calculate risk scores: `r exclude$labs_missing`
+    - Re-encounters (only included each patient once) : `r exclude$reencounter`
+* Total number of eligible patients remaining to sample from: `r flatten_int(exclude)[1] - sum(flatten_int(exclude)[-1])`
+
+## Primary endpoint
+
+### APACHE II
+
+* Mean and median score for each comorbidity set
+
+```{r}
+scores <- ls(pattern = "score_apache2")
+
+all_scores <- map(scores, ~mutate(get(.x), score = .x)) %>%
+    map(~select(.x, pie.id, score, apache2)) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    arrange(pie.id, score) %>%
+    dmap_at("score", str_replace_all, pattern = "score_apache2_", replacement = "") 
+
+man <- filter(all_scores, score == "manual")$apache2
+
+result <- all_scores %>%
+    select(-pie.id) %>%
+    group_by(score) %>%
+    summarize_all(funs(mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
+
+knitr::kable(result)
+```
+
+* Comparison of scores
+    - Results run using both the t-test and Wilcoxon signed rank test (assumes non-parametric data, is more difficult to achieve significance)
+
+```{r}
+t <- all_scores[, -1] %>%
+    filter(score != "manual") %>%
+    group_by(score) %>%
+    do(tidy(t.test(.$apache2, man, paired = TRUE)))
+
+knitr::kable(t)
+```
+
+```{r}
+mw <- all_scores[, -1] %>%
+    filter(score != "manual") %>%
+    group_by(score) %>%
+    do(tidy(wilcox.test(.$apache2, man, paired = TRUE, conf.int = TRUE, exact = FALSE)))
+
+knitr::kable(mw)
+```
+
+* Compare differences in score from comorbidity sets vs. manual
+    - Column *num_diff* indicates the number of patients with a score that differed from manual
+    - Mean and median indicate the difference from the manual score
+        + These were only calculated for those patients whose score was different from manual
+        + If all patients were included, the number is skewed towards 0 by all the patients with the same scores
+
+```{r}
+diff <- all_scores %>%
+    spread(score, apache2) %>%
+    mutate_at(vars(-pie.id, -manual), funs(abs(. - manual))) %>%
+    gather(score, apache2, -pie.id, -manual) %>%
+    select(-pie.id, -manual) %>%
+    filter(apache2 > 0) %>%
+    group_by(score) %>%
+    summarize_all(funs(num_diff = length, mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
+
+knitr::kable(diff, caption = "Differences in APACHE II Scores")
+```
+
+### APACHE III
+
+* There were 10 patients with different comorbidities identified by ICD code vs. manual
+    - Of these, only 6 had a different APACHE III score; the other 4 were all "elective" admissions where comorbidity score is ignored
+    - 1 person was identified as being chronic HD by ICD code but not by manual review, accounting for the 7 patients where the APACHE III score by ICD varied from manual
+
+```{r}
+scores <- ls(pattern = "score_apache3")
+
+all_scores <- map(scores, ~mutate(get(.x), score = .x)) %>%
+    map(~select(.x, pie.id, score, apache3)) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    arrange(pie.id, score) %>%
+    dmap_at("score", str_replace_all, pattern = "score_apache3_", replacement = "") 
+
+man <- filter(all_scores, score == "manual")$apache3
+
+result <- all_scores %>%
+    select(-pie.id) %>%
+    group_by(score) %>%
+    summarize_all(funs(mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
+
+knitr::kable(result)
+```
+
+* Comparison of scores
+
+```{r}
+t <- all_scores[, -1] %>%
+    filter(score != "manual") %>%
+    group_by(score) %>%
+    do(tidy(t.test(.$apache3, man, paired = TRUE)))
+
+knitr::kable(t)
+```
+
+```{r}
+mw <- all_scores[, -1] %>%
+    filter(score != "manual") %>%
+    group_by(score) %>%
+    do(tidy(wilcox.test(.$apache3, man, paired = TRUE, conf.int = TRUE, exact = FALSE)))
+
+knitr::kable(mw)
+```
+
+* Differences in score
+
+```{r}
+diff <- all_scores %>%
+    spread(score, apache3) %>%
+    mutate_at(vars(-pie.id, -manual), funs(abs(. - manual))) %>%
+    gather(score, apache3, -pie.id, -manual) %>%
+    select(-pie.id, -manual) %>%
+    filter(apache3 > 0) %>%
+    group_by(score) %>%
+    summarize_all(funs(num_diff = length, mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
+
+knitr::kable(diff, caption = "Difference in APACHE III Scores")
+```
+
+### SAPS II
+
+```{r}
+scores <- ls(pattern = "score_saps2")
+
+all_scores <- map(scores, ~mutate(get(.x), score = .x)) %>%
+    map(~select(.x, pie.id, score, saps2)) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    arrange(pie.id, score) %>%
+    dmap_at("score", str_replace_all, pattern = "score_saps2_", replacement = "") 
+
+man <- filter(all_scores, score == "manual")$saps2
+
+result <- all_scores %>%
+    select(-pie.id) %>%
+    group_by(score) %>%
+    summarize_all(funs(mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
+
+knitr::kable(result)
+```
+
+* Comparison of scores
+
+```{r}
+t <- all_scores[, -1] %>%
+    filter(score != "manual") %>%
+    group_by(score) %>%
+    do(tidy(t.test(.$saps2, man, paired = TRUE)))
+
+knitr::kable(t)
+```
+
+* Confidence interval was unable to be calculated for Wilcoxon analysis here
+
+```{r}
+mw <- all_scores[, -1] %>%
+    filter(score != "manual") %>%
+    group_by(score) %>%
+    do(tidy(wilcox.test(.$saps2, man, paired = TRUE, exact = FALSE)))
+
+knitr::kable(mw)
+```
+
+* Differences in score
+
+```{r}
+diff <- all_scores %>%
+    spread(score, saps2) %>%
+    mutate_at(vars(-pie.id, -manual), funs(abs(. - manual))) %>%
+    gather(score, saps2, -pie.id, -manual) %>%
+    select(-pie.id, -manual) %>%
+    filter(saps2 > 0) %>%
+    group_by(score) %>%
+    summarize_all(funs(num_diff = length, mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
+
+knitr::kable(diff, caption = "Difference in SAPS II Scores")
+```
+
+## Secondary endpoints
+
+### Predicted mortality
+
+#### SAPS II
+
+* Mean and median risk of mortality (as a percent) for each comorbidity set
+
+```{r}
+comorbid <- ls(pattern = "score_saps2_")
+
+all_df <- map(comorbid, ~mutate(get(.x), score = .x)) %>%
+    map(~select(.x, pie.id, score, saps2)) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    arrange(pie.id, score) %>%
+    dmap_at("score", str_replace_all, pattern = "score_saps2_", replacement = "") %>%
+    distinct(pie.id, score, .keep_all = TRUE) %>%
+    mutate(logit = -7.763 + 0.0737 * saps2 + 0.9971 * log(saps2 + 1),
+           mortality = exp(logit) / (1 + exp(logit))) %>%
+    select(pie.id, score, mortality) 
+
+man <- filter(all_df, score == "manual")$mortality
+
+result <- all_df %>%
+    select(-pie.id) %>%
+    group_by(score) %>%
+    summarize_all(funs(mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
+
+knitr::kable(result)
+```
+
+```{r}
+t <- all_df[, -1] %>%
+    filter(score != "manual") %>%
+    group_by(score) %>%
+    do(tidy(t.test(.$mortality, man, paired = TRUE)))
+
+knitr::kable(t)
+```
+
+```{r}
+mw <- all_df[, -1] %>%
+    filter(score != "manual") %>%
+    group_by(score) %>%
+    do(tidy(wilcox.test(.$mortality, man, paired = TRUE, conf.int = TRUE, exact = FALSE)))
+
+knitr::kable(mw)
+```
+
+* Difference in risk of mortality
+    - Mean and median calculated using only those patients whose predicted mortality score was different from manual
+    
+```{r}
+diff <- all_df %>%
+    spread(score, mortality) %>%
+    mutate_at(vars(-pie.id, -manual), funs(abs(. - manual))) %>%
+    gather(score, saps2, -pie.id, -manual) %>%
+    select(-pie.id, -manual) %>%
+    filter(saps2 > 0) %>%
+    group_by(score) %>%
+    summarize_all(funs(num_diff = length, mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
+
+knitr::kable(diff, caption = "Difference in Predicted Mortality using SAPS II")
+```
+
+### Number of comorbidities
+
+#### APACHE II
+
+* Mean represents the average number of comorbidities per patient
+
+```{r}
+comorbid <- ls(pattern = "data_apache2_")
+
+all_df <- map(comorbid, ~mutate(get(.x), score = .x)) %>%
+    map(~distinct(.x, pie.id, score, liver, cardiovasc, respiratory, renal, immunocomp, comorbidity)) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    arrange(pie.id, score) %>%
+    dmap_at("score", str_replace_all, pattern = "data_apache2_", replacement = "") %>%
+    mutate_if(is.logical, as.numeric) %>%
+    by_row(function(x) sum(x[, 3:7], na.rm = TRUE), .collate = "rows", .to = "num_comorbid") %>%
+    select(pie.id, score, num_comorbid) 
+
+man <- filter(all_df, score == "manual")$num_comorbid
+
+result <- all_df %>%
+    select(-pie.id) %>%
+    group_by(score) %>%
+    summarize_all(funs(mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
+
+knitr::kable(result)
+```
+
+```{r}
+t <- all_df[, -1] %>%
+    filter(score != "manual") %>%
+    group_by(score) %>%
+    do(tidy(t.test(.$num_comorbid, man, paired = TRUE)))
+
+knitr::kable(t)
+```
+
+```{r}
+mw <- all_df[, -1] %>%
+    filter(score != "manual") %>%
+    group_by(score) %>%
+    do(tidy(wilcox.test(.$num_comorbid, man, paired = TRUE, conf.int = TRUE, exact = FALSE)))
+
+knitr::kable(mw)
+```
+
+### Proportion with differing comorbidity
+
+#### APACHE II
+
+* Proportion of patients where a comorbidity was identified by ICD or by manual, but not both
+
+```{r}
+comorbid <- ls(pattern = "data_apache2_")
+
+all_df <- map(comorbid, ~mutate(get(.x), score = .x)) %>%
+    map(~distinct(.x, pie.id, score, comorbidity)) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    arrange(pie.id, score) %>%
+    dmap_at("score", str_replace_all, pattern = "data_apache2_", replacement = "") %>%
+    spread(score, comorbidity) %>%
+    mutate_at(vars(-pie.id, -manual), funs(. != manual)) %>%
+    mutate_if(is.logical, as.numeric) %>%
+    ungroup() %>%
+    gather(score, comorbidity, -pie.id, -manual) %>%
+    select(-pie.id, -manual) %>%
+    group_by(score) %>%
+    summarize_all(funs(num_diff = sum(. > 0), proportion = mean))
+
+knitr::kable(all_df)
+```
+
+#### APACHE III
+
+* Proportion of patients where the primary comorbidity identified by ICD varied from primary comorbidity identified by manual
+
+```{r}
+comorbid <- ls(pattern = "data_apache3_")
+
+all_df <- map(comorbid, ~mutate(get(.x), score = .x)) %>%
+    map(~distinct(.x, pie.id, score, comorbidity)) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    arrange(pie.id, score) %>%
+    dmap_at("score", str_replace_all, pattern = "data_apache3_", replacement = "") %>%
+    spread(score, comorbidity, fill = "") %>%
+    dmap(str_replace_all, pattern = "none", replacement = "") %>%
+    mutate_at(vars(-pie.id, -manual), funs(. != manual)) %>%
+    mutate_if(is.logical, as.numeric) %>%
+    gather(score, comorbidity, -pie.id, -manual) %>%
+    select(-pie.id, -manual) %>%
+    group_by(score) %>%
+    summarize_all(funs(num_diff = sum(. > 0), proportion = mean))
+
+knitr::kable(all_df)
+```
+
+#### SAPS II
+
+* Proportion of patients where the primary comorbidity identified by ICD varied from primary comorbidity identified by manual
+
+```{r}
+comorbid <- ls(pattern = "data_saps2_")
+
+all_df <- map(comorbid, ~mutate(get(.x), score = .x)) %>%
+    map(~distinct(.x, pie.id, score, comorbidity)) %>%
+    map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
+    arrange(pie.id, score) %>%
+    dmap_at("score", str_replace_all, pattern = "data_saps2_", replacement = "") %>%
+    spread(score, comorbidity, fill = "") %>%
+    dmap(str_replace_all, pattern = "none", replacement = "") %>%
+    mutate_at(vars(-pie.id, -manual), funs(. != manual)) %>%
+    mutate_if(is.logical, as.numeric) %>%
+    gather(score, comorbidity, -pie.id, -manual) %>%
+    select(-pie.id, -manual) %>%
+    group_by(score) %>%
+    summarize_all(funs(num_diff = sum(. > 0), proportion = mean))
+
+knitr::kable(all_df)
+```
