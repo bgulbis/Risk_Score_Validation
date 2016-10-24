@@ -130,3 +130,4 @@ Analysis
 --------
 
 1.  [Analysis for ASHP abstract submission](https://bgulbis.github.io/Risk_Score_Validation/report/analysis_ashp_abstract.nb.html)
+2.  [Analysis for ASHP poster](https://bgulbis.github.io/Risk_Score_Validation/report/analysis_ashp_poster.nb.html)
