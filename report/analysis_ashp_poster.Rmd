@@ -14,7 +14,7 @@ output:
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(stringr)
-# library(tableone)
+library(tableone)
 library(broom)
 
 dirr::get_rds("../data/final")
@@ -31,6 +31,40 @@ dirr::get_rds("../data/final")
     - Missing data needed to calculate risk scores: `r exclude$labs_missing`
     - Re-encounters (only included each patient once) : `r exclude$reencounter`
 * Total number of eligible patients remaining to sample from: `r flatten_int(exclude)[1] - sum(flatten_int(exclude)[-1])`
+
+## Patient Demographics
+
+```{r results='asis'}
+deceased <- "Deceased/Hospice"
+home <- "Home"
+transfer <- "Transferred"
+
+dispos <- list("Deceased" = deceased,
+               "Expired/Donor" = deceased, 
+               "Hospice-Home" = deceased, 
+               "Hospice-Medical Facility" = deceased,
+               "Home Care with Home Health" = home,
+               "Home or Self Care" = home,
+               "Left Against Medical Advise" = home,
+               "Skilled Nursing Facility" = transfer,
+               "DC/DISC TO REHAB" = transfer,
+               "Long Term Care" = transfer,
+               "Intermediate Care" = transfer,
+               "Acute Care" = transfer,
+               "Federal Healthcare Facility" = transfer,
+               "DC/TF To Psych Hosp" = transfer)
+
+df <- data_demographics %>%
+    mutate(disposition = str_replace_all(disposition, dispos)) %>%
+    select(-pie.id, Age = age, Sex = sex, Race = race, Disposition = disposition, `Hospital Length of Stay (days)` = length.stay, `ICU Location` = location) 
+
+vars <- names(df)
+tbl <- CreateTableOne(vars, data = df)
+ptbl <- print(tbl, printToggle = FALSE)
+rownames(ptbl) <- str_replace_all(rownames(ptbl), "   ", "- ")
+knitr::kable(ptbl, caption = "Demographics")
+```
+
 
 ## Primary endpoint
 
