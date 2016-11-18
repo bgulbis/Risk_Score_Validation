@@ -100,6 +100,7 @@ ggplot(all_scores, aes(x = score, y = apache2)) +
 * Comparison of scores
     - Results run using both the t-test and Wilcoxon signed rank test (assumes non-parametric data, is more difficult to achieve significance)
     - To account for performing multiple comparisons, a BH (Benjamini and Hochberg) correction is applied to the p-values; **use the bh.adjust value as the p-value**
+        + Reference: http://ies.ed.gov/ncee/pubs/20084018/app_b.asp
 
 ```{r}
 t <- all_scores[, -1] %>%
@@ -146,11 +147,6 @@ knitr::kable(diff, caption = "Differences in APACHE II Scores")
 
 ### APACHE III
 
-** IGNORE **
-* There were 10 patients with different comorbidities identified by ICD code vs. manual
-    - Of these, only 6 had a different APACHE III score; the other 4 were all "elective" admissions where comorbidity score is ignored
-    - 1 person was identified as being chronic HD by ICD code but not by manual review, accounting for the 7 patients where the APACHE III score by ICD varied from manual
-
 ```{r}
 scores <- ls(pattern = "score_apache3")
 
@@ -168,6 +164,11 @@ result <- all_scores %>%
     summarize_all(funs(mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
 
 knitr::kable(result)
+```
+
+```{r}
+ggplot(all_scores, aes(x = score, y = apache3)) +
+    geom_boxplot()
 ```
 
 * Comparison of scores
@@ -230,6 +231,11 @@ result <- all_scores %>%
     summarize_all(funs(mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
 
 knitr::kable(result)
+```
+
+```{r}
+ggplot(all_scores, aes(x = score, y = saps2)) +
+    geom_boxplot()
 ```
 
 * Comparison of scores
@@ -303,25 +309,31 @@ result <- all_df %>%
     group_by(score) %>%
     summarize_all(funs(mean, sd, median, IQR_low = quantile(., 0.25), IQR_high = quantile(., 0.75)))
 
-knitr::kable(result)
+knitr::kable(result, digits = 4)
 ```
 
 ```{r}
 t <- all_df[, -1] %>%
     filter(score != "manual") %>%
-    group_by(score) %>%
-    do(tidy(t.test(.$mortality, man, paired = TRUE)))
+    group_by(score) %>% 
+    do(tidy(t.test(.$mortality, man, paired = TRUE))) %>%
+    ungroup() %>%
+    mutate(bh.adjust = p.adjust(p.value, "BH")) %>%
+    select(score:p.value, bh.adjust, everything())
 
-knitr::kable(t)
+knitr::kable(t, digits = 4)
 ```
 
 ```{r}
 mw <- all_df[, -1] %>%
     filter(score != "manual") %>%
     group_by(score) %>%
-    do(tidy(wilcox.test(.$mortality, man, paired = TRUE, conf.int = TRUE, exact = FALSE)))
+    do(tidy(wilcox.test(.$mortality, man, paired = TRUE, conf.int = TRUE, exact = FALSE))) %>%
+    ungroup() %>%
+    mutate(bh.adjust = p.adjust(p.value, "BH")) %>%
+    select(score:p.value, bh.adjust, everything())
 
-knitr::kable(mw)
+knitr::kable(mw, digits = 4)
 ```
 
 * Difference in risk of mortality
@@ -372,18 +384,24 @@ knitr::kable(result)
 t <- all_df[, -1] %>%
     filter(score != "manual") %>%
     group_by(score) %>%
-    do(tidy(t.test(.$num_comorbid, man, paired = TRUE)))
+    do(tidy(t.test(.$num_comorbid, man, paired = TRUE))) %>%
+    ungroup() %>%
+    mutate(bh.adjust = p.adjust(p.value, "BH")) %>%
+    select(score:p.value, bh.adjust, everything())
 
-knitr::kable(t)
+knitr::kable(t, digits = 4)
 ```
 
 ```{r}
 mw <- all_df[, -1] %>%
     filter(score != "manual") %>%
     group_by(score) %>%
-    do(tidy(wilcox.test(.$num_comorbid, man, paired = TRUE, conf.int = TRUE, exact = FALSE)))
+    do(tidy(wilcox.test(.$num_comorbid, man, paired = TRUE, conf.int = TRUE, exact = FALSE))) %>%
+    ungroup() %>%
+    mutate(bh.adjust = p.adjust(p.value, "BH")) %>%
+    select(score:p.value, bh.adjust, everything())
 
-knitr::kable(mw)
+knitr::kable(mw, digits = 4)
 ```
 
 ### Proportion with differing comorbidity
