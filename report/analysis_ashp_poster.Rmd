@@ -14,6 +14,7 @@ output:
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(stringr)
+library(forcats)
 library(tableone)
 library(broom)
 
@@ -55,7 +56,9 @@ dispos <- list("Deceased" = deceased,
                "DC/TF To Psych Hosp" = transfer)
 
 df <- data_demographics %>%
-    mutate(disposition = str_replace_all(disposition, dispos)) %>%
+    dmap_at("disposition", str_replace_all, pattern = dispos) %>%
+    dmap_at("race", factor) %>%
+    dmap_at("race", fct_lump, n = 4) %>%
     select(-pie.id, Age = age, Sex = sex, Race = race, Disposition = disposition, `Hospital Length of Stay (days)` = length.stay, `ICU Location` = location) 
 
 vars <- names(df)
