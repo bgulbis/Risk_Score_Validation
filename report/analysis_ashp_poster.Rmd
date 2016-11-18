@@ -96,7 +96,19 @@ knitr::kable(result)
 
 ```{r}
 ggplot(all_scores, aes(x = score, y = apache2)) +
-    geom_boxplot()
+    geom_boxplot() 
+    # geom_jitter(color = "light blue", alpha = 0.6)
+```
+
+```{r, fig.height=6, fig.width=6}
+df <- all_scores %>%
+    spread(score, apache2) %>%
+    gather(score, apache2, -pie.id, -manual)
+
+ggplot(df, aes(x = apache2, y = manual)) +
+    geom_point() +
+    # geom_smooth() +
+    facet_wrap(~ score)
 ```
 
 
@@ -174,6 +186,17 @@ ggplot(all_scores, aes(x = score, y = apache3)) +
     geom_boxplot()
 ```
 
+```{r, fig.height=6, fig.width=6}
+df <- all_scores %>%
+    spread(score, apache3) %>%
+    gather(score, apache3, -pie.id, -manual)
+
+ggplot(df, aes(x = apache3, y = manual)) +
+    geom_point() +
+    # geom_smooth() +
+    facet_wrap(~ score)
+```
+
 * Comparison of scores
 
 ```{r}
@@ -239,6 +262,17 @@ knitr::kable(result)
 ```{r}
 ggplot(all_scores, aes(x = score, y = saps2)) +
     geom_boxplot()
+```
+
+```{r, fig.height=6, fig.width=6}
+df <- all_scores %>%
+    spread(score, saps2) %>%
+    gather(score, saps2, -pie.id, -manual)
+
+ggplot(df, aes(x = saps2, y = manual)) +
+    geom_point() +
+    # geom_smooth() +
+    facet_wrap(~ score)
 ```
 
 * Comparison of scores
