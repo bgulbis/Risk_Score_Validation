@@ -41,17 +41,16 @@ graph <- ggplot(risk_scores, aes(x = comorbidity, y = risk_score)) +
     geom_boxplot() +
     facet_grid(type ~ ., scales = "free_y")
 
-mydoc <- pptx()
-mydoc <- addSlide(mydoc, slide.layout = "Blank")
-mydoc <- addPlot(mydoc,
-                 fun = print,
-                 x = graph,
-                 offx = 1,
-                 offy = 1,
-                 width = 5.5,
-                 height = 5*5.5/7,
-                 vector.graphic = TRUE,
-                 fontname_sans = "Calibri")
+mydoc <- pptx() %>%
+    addSlide(slide.layout = "Blank") %>%
+    addPlot(fun = print,
+            x = graph,
+            offx = 1,
+            offy = 1,
+            width = 5.5,
+            height = 5*5.5/7,
+            vector.graphic = TRUE,
+            fontname_sans = "Calibri")
 
 # mydoc <- addSlide(mydoc, slide.layout = "Blank")
 
