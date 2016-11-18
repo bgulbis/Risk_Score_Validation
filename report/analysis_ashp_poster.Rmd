@@ -34,7 +34,7 @@ dirr::get_rds("../data/final")
 
 ## Patient Demographics
 
-```{r results='asis'}
+```{r}
 deceased <- "Deceased/Hospice"
 home <- "Home"
 transfer <- "Transferred"
@@ -91,25 +91,57 @@ result <- all_scores %>%
 knitr::kable(result)
 ```
 
+```{r}
+ggplot(all_scores, aes(x = score, y = apache2)) +
+    geom_boxplot()
+```
+
+
 * Comparison of scores
     - Results run using both the t-test and Wilcoxon signed rank test (assumes non-parametric data, is more difficult to achieve significance)
+    - To account for performing multiple comparisons, a BH (Benjamini and Hochberg) correction is applied to the p-values
+
+```{r}
+pt <- all_scores %>%
+    do(tidy(pairwise.t.test(.$apache2, .$score, paired = TRUE, p.adj = "BH")))
+
+pairwise.t.test(all_scores$apache2, all_scores$score, paired = TRUE, p.adj = "BH")
+
+library(forcats)
+x <- all_scores %>%
+    dmap_at("score", factor) %>%
+    dmap_at("score", ~ fct_relevel(.x, "manual"))
+    
+
+mod <- lm(apache2 ~ score, x)
+summary(mod)
+anova(mod)
+```
+
 
 ```{r}
 t <- all_scores[, -1] %>%
     filter(score != "manual") %>%
     group_by(score) %>%
-    do(tidy(t.test(.$apache2, man, paired = TRUE)))
+    do(tidy(t.test(.$apache2, man, paired = TRUE))) %>%
+    ungroup() %>%
+    mutate(bh.adjust = p.adjust(p.value, "BH")) %>%
+    select(score:p.value, bh.adjust, everything())
 
-knitr::kable(t)
+knitr::kable(t, digits = 4)
 ```
 
 ```{r}
 mw <- all_scores[, -1] %>%
     filter(score != "manual") %>%
     group_by(score) %>%
-    do(tidy(wilcox.test(.$apache2, man, paired = TRUE, conf.int = TRUE, exact = FALSE)))
+    do(tidy(wilcox.test(.$apache2, man, paired = TRUE, conf.int = TRUE, exact = FALSE))) %>%
+    ungroup() %>%
+    mutate(bonf.adj = p.adjust(p.value, "bonferroni"),
+           bh.adj = p.adjust(p.value, "BH")) %>%
+    select(score:p.value, bonf.adj, bh.adj, everything())
 
-knitr::kable(mw)
+knitr::kable(mw, digits = 4)
 ```
 
 * Compare differences in score from comorbidity sets vs. manual
