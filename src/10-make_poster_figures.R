@@ -1,9 +1,10 @@
 # make_poster_figures
 
 library(tidyverse)
+library(stringr)
 library(ReporteRs)
 
-dirr::get_rds("../data/final")
+dirr::get_rds("data/final")
 
 scores <- ls(pattern = "score_apache2")
 
