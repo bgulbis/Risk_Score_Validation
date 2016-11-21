@@ -105,6 +105,9 @@ df <- all_scores %>%
     spread(score, apache2) %>%
     gather(score, apache2, -pie.id, -manual)
 
+# ggplot(df, aes(x = apache2, y = manual)) +
+#     geom_jitter(aes(color = score), alpha = 0.6) 
+
 ggplot(df, aes(x = apache2, y = manual)) +
     geom_point() +
     # geom_smooth() +
@@ -140,6 +143,24 @@ mw <- all_scores[, -1] %>%
 
 knitr::kable(mw, digits = 4)
 ```
+
+#### Linear Regression Model
+
+```{r}
+lm <- df %>%
+    group_by(score) %>%
+    do(fit = lm(manual ~ apache2, data = .))
+
+knitr::kable(glance(lm, fit), digits = 4)
+```
+
+```{r}
+augment(lm, fit) %>%
+    ggplot(aes(x = .fitted, y = .resid)) + 
+    geom_point() +
+    facet_wrap(~ score)
+```
+
 
 * Compare differences in score from comorbidity sets vs. manual
     - Column *num_diff* indicates the number of patients with a score that differed from manual
@@ -223,6 +244,23 @@ mw <- all_scores[, -1] %>%
 knitr::kable(mw, digits = 4)
 ```
 
+#### Linear Regression Model
+
+```{r}
+lm <- df %>%
+    group_by(score) %>%
+    do(fit = lm(manual ~ apache3, data = .))
+
+knitr::kable(glance(lm, fit), digits = 4)
+```
+
+```{r}
+augment(lm, fit) %>%
+    ggplot(aes(x = .fitted, y = .resid)) + 
+    geom_point() +
+    facet_wrap(~ score)
+```
+
 * Differences in score
 
 ```{r}
@@ -301,6 +339,23 @@ mw <- all_scores[, -1] %>%
     select(score:p.value, bh.adjust, everything())
 
 knitr::kable(mw, digits = 4)
+```
+
+#### Linear Regression Model
+
+```{r}
+lm <- df %>%
+    group_by(score) %>%
+    do(fit = lm(manual ~ saps2, data = .))
+
+knitr::kable(glance(lm, fit), digits = 4)
+```
+
+```{r}
+augment(lm, fit) %>%
+    ggplot(aes(x = .fitted, y = .resid)) + 
+    geom_point() +
+    facet_wrap(~ score)
 ```
 
 * Differences in score
