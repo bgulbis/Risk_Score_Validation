@@ -2,6 +2,7 @@
 
 library(tidyverse)
 library(stringr)
+library(forcats)
 library(broom)
 library(ReporteRs)
 
@@ -22,6 +23,8 @@ apache2_scores <- map(scores, ~mutate(get(.x), score = .x)) %>%
     arrange(pie.id, score) %>%
     dmap_at("score", str_replace_all, pattern = "score_apache2_", replacement = "") %>%
     dmap_at("score", str_replace_all, pattern = score_type) %>%
+    dmap_at("score", factor) %>%
+    dmap_at("score", ~ fct_relevel(.x, c("Manual", "Authors", "Authors with DRG"))) %>%
     mutate(type = "apache2") %>%
     rename(comorbidity = score, risk_score = apache2)
 
@@ -38,12 +41,12 @@ scatter1 <- apache2_scores %>%
     rename(authors = `Authors with DRG`, manual = Manual) %>%
     select(authors, manual) %>%
     ggplot(aes(x = authors, y = manual)) +
+    geom_point(alpha = 0.7) +
     geom_smooth(method = "lm") +
-    geom_point(shape = 1) +
     ggtitle("Comparison of APACHE II Scores") +
-    xlab("Score from Comorbidity Set*") +
+    xlab("Score from Author-Defined Set with DRG") +
     ylab("Score from Manual Review of EMR") +
-    labs(caption = "*Author-Defined Comorbidity Set Using DRG Codes") +
+    # labs(caption = "*Author-Defined Comorbidity Set Using DRG Codes") +
     theme_bw() +
     theme(plot.title = element_text(hjust = 0.5))
 
@@ -58,12 +61,12 @@ mod_drg1 <- lm(manual ~ ek_drg, apache2_mod)
 
 mod1 <- augment(mod_drg1) %>%
     ggplot(aes(x = .fitted, y = .resid)) +
-    geom_smooth(se = FALSE) +
-    geom_point(shape = 1) +
+    geom_point() +
+    geom_smooth(method = "lm", se = FALSE) +
     ggtitle("APACHE II Linear Regression Model") +
     xlab("Fitted values") +
     ylab("Residuals") +
-    labs(caption = "Author-Defined Comorbidity Set Using DRG Codes") +
+    # labs(caption = "Author-Defined Comorbidity Set Using DRG Codes") +
     theme_bw() +
     theme(plot.title = element_text(hjust = 0.5))
 
@@ -75,6 +78,8 @@ apache3_scores <- map(scores, ~mutate(get(.x), score = .x)) %>%
     arrange(pie.id, score) %>%
     dmap_at("score", str_replace_all, pattern = "score_apache3_", replacement = "") %>%
     dmap_at("score", str_replace_all, pattern = score_type) %>%
+    dmap_at("score", factor) %>%
+    dmap_at("score", ~ fct_relevel(.x, "Manual")) %>%
     mutate(type = "apache3") %>%
     rename(comorbidity = score, risk_score = apache3)
 
@@ -104,12 +109,12 @@ scatter2 <- apache3_scores %>%
     rename(authors = `Authors with DRG`, manual = Manual) %>%
     select(authors, manual) %>%
     ggplot(aes(x = authors, y = manual)) +
+    geom_point(alpha = 0.7) +
     geom_smooth(method = "lm") +
-    geom_point(shape = 1) +
     ggtitle("Comparison of APACHE III Scores") +
-    xlab("Score from Comorbidity Set*") +
+    xlab("Score from Author-Defined Set with DRG") +
     ylab("Score from Manual Review of EMR") +
-    labs(caption = "*Author-Defined Comorbidity Set Using DRG Codes") +
+    # labs(caption = "*Author-Defined Comorbidity Set Using DRG Codes") +
     theme_bw() +
     theme(plot.title = element_text(hjust = 0.5))
 
@@ -124,12 +129,12 @@ mod_drg2 <- lm(manual ~ ek_drg, apache3_mod)
 
 mod2 <- augment(mod_drg2) %>%
     ggplot(aes(x = .fitted, y = .resid)) +
-    geom_smooth(se = FALSE) +
-    geom_point(shape = 1) +
+    geom_point() +
+    geom_smooth(method = "lm", se = FALSE) +
     ggtitle("APACHE III Linear Regression Model") +
     xlab("Fitted values") +
     ylab("Residuals") +
-    labs(caption = "Author-Defined Comorbidity Set Using DRG Codes") +
+    # labs(caption = "Author-Defined Comorbidity Set Using DRG Codes") +
     theme_bw() +
     theme(plot.title = element_text(hjust = 0.5))
 
@@ -170,12 +175,12 @@ scatter3 <- saps2_scores %>%
     rename(authors = `Authors with DRG`, manual = Manual) %>%
     select(authors, manual) %>%
     ggplot(aes(x = authors, y = manual)) +
+    geom_point(alpha = 0.7) +
     geom_smooth(method = "lm") +
-    geom_point(shape = 1) +
     ggtitle("Comparison of SAPS II Scores") +
-    xlab("Score from Comorbidity Set*") +
+    xlab("Score from Author-Defined Set with DRG") +
     ylab("Score from Manual Review of EMR") +
-    labs(caption = "*Author-Defined Comorbidity Set Using DRG Codes") +
+    # labs(caption = "*Author-Defined Comorbidity Set Using DRG Codes") +
     theme_bw() +
     theme(plot.title = element_text(hjust = 0.5))
 
@@ -190,12 +195,12 @@ mod_drg3 <- lm(manual ~ ek_drg, saps2_mod)
 
 mod3 <- augment(mod_drg3) %>%
     ggplot(aes(x = .fitted, y = .resid)) +
-    geom_smooth(se = FALSE) +
-    geom_point(shape = 1) +
+    geom_point() +
+    geom_smooth(method = "lm", se = FALSE) +
     ggtitle("SAPS II Linear Regression Model") +
     xlab("Fitted values") +
     ylab("Residuals") +
-    labs(caption = "Author-Defined Comorbidity Set Using DRG Codes") +
+    # labs(caption = "Author-Defined Comorbidity Set Using DRG Codes") +
     theme_bw() +
     theme(plot.title = element_text(hjust = 0.5))
 
@@ -214,8 +219,8 @@ mydoc <- pptx() %>%
             x = scatter1,
             offx = 1,
             offy = 1,
-            width = 5,
-            height = 5,
+            width = 2.75,
+            height = 2.75,
             vector.graphic = TRUE,
             fontname_sans = "Calibri") %>%
     addSlide(slide.layout = "Blank") %>%
@@ -223,17 +228,8 @@ mydoc <- pptx() %>%
             x = mod1,
             offx = 1,
             offy = 1,
-            width = 5.5,
-            height = 5*5.5/7,
-            vector.graphic = TRUE,
-            fontname_sans = "Calibri") %>%
-    addSlide(slide.layout = "Blank") %>%
-    addPlot(fun = print,
-            x = mod1,
-            offx = 1,
-            offy = 1,
-            width = 5,
-            height = 5,
+            width = 2.75,
+            height = 2.75,
             vector.graphic = TRUE,
             fontname_sans = "Calibri") %>%
     addSlide(slide.layout = "Blank") %>%
@@ -250,7 +246,7 @@ mydoc <- pptx() %>%
             x = alt_g2,
             offx = 1,
             offy = 1,
-            width = 3,
+            width = 2.75,
             height = 5*5.5/7,
             vector.graphic = TRUE,
             fontname_sans = "Calibri") %>%
@@ -259,8 +255,8 @@ mydoc <- pptx() %>%
             x = scatter2,
             offx = 1,
             offy = 1,
-            width = 5,
-            height = 5,
+            width = 2.75,
+            height = 2.75,
             vector.graphic = TRUE,
             fontname_sans = "Calibri") %>%
     addSlide(slide.layout = "Blank") %>%
@@ -268,17 +264,8 @@ mydoc <- pptx() %>%
             x = mod2,
             offx = 1,
             offy = 1,
-            width = 5.5,
-            height = 5*5.5/7,
-            vector.graphic = TRUE,
-            fontname_sans = "Calibri") %>%
-    addSlide(slide.layout = "Blank") %>%
-    addPlot(fun = print,
-            x = mod2,
-            offx = 1,
-            offy = 1,
-            width = 5,
-            height = 5,
+            width = 2.75,
+            height = 2.75,
             vector.graphic = TRUE,
             fontname_sans = "Calibri") %>%
     addSlide(slide.layout = "Blank") %>%
@@ -295,7 +282,7 @@ mydoc <- pptx() %>%
             x = alt_g3,
             offx = 1,
             offy = 1,
-            width = 3,
+            width = 2.75,
             height = 5*5.5/7,
             vector.graphic = TRUE,
             fontname_sans = "Calibri") %>%
@@ -304,8 +291,8 @@ mydoc <- pptx() %>%
             x = scatter3,
             offx = 1,
             offy = 1,
-            width = 5,
-            height = 5,
+            width = 2.75,
+            height = 2.75,
             vector.graphic = TRUE,
             fontname_sans = "Calibri") %>%
     addSlide(slide.layout = "Blank") %>%
@@ -313,22 +300,10 @@ mydoc <- pptx() %>%
             x = mod3,
             offx = 1,
             offy = 1,
-            width = 5.5,
-            height = 5*5.5/7,
-            vector.graphic = TRUE,
-            fontname_sans = "Calibri") %>%
-    addSlide(slide.layout = "Blank") %>%
-    addPlot(fun = print,
-            x = mod3,
-            offx = 1,
-            offy = 1,
-            width = 5,
-            height = 5,
+            width = 2.75,
+            height = 2.75,
             vector.graphic = TRUE,
             fontname_sans = "Calibri")
-
-
-
 
 # mydoc <- addSlide(mydoc, slide.layout = "Blank")
 
