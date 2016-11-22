@@ -229,6 +229,15 @@ mydoc <- pptx() %>%
             fontname_sans = "Calibri") %>%
     addSlide(slide.layout = "Blank") %>%
     addPlot(fun = print,
+            x = mod1,
+            offx = 1,
+            offy = 1,
+            width = 5,
+            height = 5,
+            vector.graphic = TRUE,
+            fontname_sans = "Calibri") %>%
+    addSlide(slide.layout = "Blank") %>%
+    addPlot(fun = print,
             x = g2,
             offx = 1,
             offy = 1,
@@ -241,7 +250,7 @@ mydoc <- pptx() %>%
             x = alt_g2,
             offx = 1,
             offy = 1,
-            width = 5.5,
+            width = 3,
             height = 5*5.5/7,
             vector.graphic = TRUE,
             fontname_sans = "Calibri") %>%
@@ -265,6 +274,15 @@ mydoc <- pptx() %>%
             fontname_sans = "Calibri") %>%
     addSlide(slide.layout = "Blank") %>%
     addPlot(fun = print,
+            x = mod2,
+            offx = 1,
+            offy = 1,
+            width = 5,
+            height = 5,
+            vector.graphic = TRUE,
+            fontname_sans = "Calibri") %>%
+    addSlide(slide.layout = "Blank") %>%
+    addPlot(fun = print,
             x = g3,
             offx = 1,
             offy = 1,
@@ -277,7 +295,7 @@ mydoc <- pptx() %>%
             x = alt_g3,
             offx = 1,
             offy = 1,
-            width = 5.5,
+            width = 3,
             height = 5*5.5/7,
             vector.graphic = TRUE,
             fontname_sans = "Calibri") %>%
@@ -298,7 +316,18 @@ mydoc <- pptx() %>%
             width = 5.5,
             height = 5*5.5/7,
             vector.graphic = TRUE,
+            fontname_sans = "Calibri") %>%
+    addSlide(slide.layout = "Blank") %>%
+    addPlot(fun = print,
+            x = mod3,
+            offx = 1,
+            offy = 1,
+            width = 5,
+            height = 5,
+            vector.graphic = TRUE,
             fontname_sans = "Calibri")
+
+
 
 
 # mydoc <- addSlide(mydoc, slide.layout = "Blank")
