@@ -162,7 +162,7 @@ alt_saps2 <- saps2_scores %>%
     dmap_at("comorbidity", str_replace_all, pattern = "AHRQ with DRG", replacement = "Sets with DRG") %>%
     dmap_at("comorbidity", str_replace_all, pattern = "AHRQ", replacement = "Sets without DRG")
 
-alt_g3 <- ggplot(alt_apache3, aes(x = comorbidity, y = risk_score)) +
+alt_g3 <- ggplot(alt_saps2, aes(x = comorbidity, y = risk_score)) +
     geom_boxplot() +
     xlab("Comorbidity Set") +
     ylab("SAPS II Score") +
