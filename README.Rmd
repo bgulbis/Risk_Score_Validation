@@ -128,4 +128,5 @@ This will be a retrospective observational study. Patients will be identified by
 
 1. [Analysis for ASHP abstract submission](https://bgulbis.github.io/Risk_Score_Validation/report/analysis_ashp_abstract.nb.html)
 1. [Analysis for ASHP poster](https://bgulbis.github.io/Risk_Score_Validation/report/analysis_ashp_poster.nb.html)
+1. [Supplemental Material for ASHP Poster](http://rpubs.com/bgulbis/ashp_poster_supplement)
 
