@@ -5,8 +5,8 @@ author: "Eric Kao, Brian Gulbis"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output:
   tufte::tufte_html: default
-  bibliography: skeleton.bib
-  link-citations: yes
+bibliography: skeleton.bib
+link-citations: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -39,6 +39,7 @@ This left a total of `r format(flatten_int(exclude)[1] - sum(flatten_int(exclude
 
 # Statistical Methods
 
+Data processing, risk score calculations, and statistical analysis were performed using `r R.Version()$version.string` (@R-base). The `icd` package (@R-icd) was used to cross patient diagnosis codes with comorbidity set diagnosis codes.
 
 # Supplemental Results
 
