@@ -12,7 +12,7 @@
 
 <meta name="author" content="Eric Kao, Brian Gulbis" />
 
-<meta name="date" content="2016-11-28" />
+<meta name="date" content="2016-11-29" />
 
 <title>Validation of ICD-9-CM/ICD-10-CM Codes for Automated Electronic Scoring of APACHE II, APACHE III, and SAPS II</title>
 
@@ -43,7 +43,7 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <h1 class="title toc-ignore">Validation of ICD-9-CM/ICD-10-CM Codes for Automated Electronic Scoring of APACHE II, APACHE III, and SAPS II</h1>
 <h3 class="subtitle"><em>Supplemental Material</em></h3>
 <h4 class="author"><em>Eric Kao, Brian Gulbis</em></h4>
-<h4 class="date"><em>November 28, 2016</em></h4>
+<h4 class="date"><em>November 29, 2016</em></h4>
 
 
 
@@ -54,16 +54,257 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <li>Pregnant: 203</li>
 <li>Prisoner: 77</li>
 <li>Missing data needed to calculate risk scores: 10,790</li>
-<li>Re-encounters (only included each patient once) : 1,782</li>
+<li>Re-encounters (each patient once) : 1,782</li>
 </ul>
 <p>This left a total of 3,390 eligible patients remaining. From these, a random sample of 200 patients were selected for inclusion in the study.</p>
 </div>
 <div id="comorbidity-definitions" class="section level1">
 <h1>Comorbidity Definitions</h1>
+<p>The following tables contain the list of ICD-9-CM and ICD-10-CM codes which were included in the author-defined comorbidity set.<label for="tufte-sn-1" class="margin-toggle sidenote-number">1</label><input type="checkbox" id="tufte-sn-1" class="margin-toggle"><span class="sidenote"><span class="sidenote-number">1</span> All child-codes of the codes listed were also included (i.e., 196 includes 196.0, 196.1, etc.)</span></p>
+<p><!--
+<caption>--><span class="marginnote shownote">ICD-9-CM Codes Used in Author-Defined Comorbidity Set</span><!--</caption>--></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Comorbidity</th>
+<th align="left">ICD-9-CM</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">AIDS illness: Kaposi’s sarcoma</td>
+<td align="left">176</td>
+</tr>
+<tr class="even">
+<td align="left">AIDS illness: Pneumocytosis</td>
+<td align="left">136.3</td>
+</tr>
+<tr class="odd">
+<td align="left">AIDS illness: Toxoplasmosis</td>
+<td align="left">130</td>
+</tr>
+<tr class="even">
+<td align="left">AIDS illness: Tuberculosis</td>
+<td align="left">010, 011, 012, 013, 014, 015, 016, 017, 018</td>
+</tr>
+<tr class="odd">
+<td align="left">AIDS: HIV with AIDS-defining illness</td>
+<td align="left">042</td>
+</tr>
+<tr class="even">
+<td align="left">Cancer, metastatic)</td>
+<td align="left">196, 197, 198, 199.0, 199.1</td>
+</tr>
+<tr class="odd">
+<td align="left">Chemotherapy</td>
+<td align="left">V58.1, V87.41, E933.1</td>
+</tr>
+<tr class="even">
+<td align="left">Chronic hypoxia</td>
+<td align="left">518.83, 799.02</td>
+</tr>
+<tr class="odd">
+<td align="left">Chronic restrictive, obstructive, or vascular disease</td>
+<td align="left">490, 491, 492.0, 492.1, 492.2, 492.3, 492.4, 492.5, 492.6, 492.7, 492.8, 493.0, 493.1, 493.2, 493.3, 493.4, 493.5, 493.6, 493.7, 493.8, 493.90, 493.91, 494, 495, 496, 497, 498, 499, 500, 501, 502, 503, 504, 505, 506.4</td>
+</tr>
+<tr class="even">
+<td align="left">Chronic restrictive, obstructive, or vascular disease</td>
+<td align="left">440, 441.2, 441.4, 441.7, 441.9, 443.1, 443.2, 443.3, 443.4, 443.5, 443.6, 443.7, 443.8, 443.9, 447.1, 557.1, 557.9, V43.4</td>
+</tr>
+<tr class="odd">
+<td align="left">Cirrhosis</td>
+<td align="left">456, 567.23, 571.2, 571.5, 572.2, 572.4, 789.59</td>
+</tr>
+<tr class="even">
+<td align="left">Heart failure (NYHA stage IV)</td>
+<td align="left">428</td>
+</tr>
+<tr class="odd">
+<td align="left">Hematoligic malignancy (leukemia)</td>
+<td align="left">204, 205, 206, 207, 208</td>
+</tr>
+<tr class="even">
+<td align="left">Hematoligic malignancy (lymphoma)</td>
+<td align="left">200, 201, 202.0, 202.1, 202.2, 202.30, 202.31, 202.32, 202.33, 202.34, 202.35, 202.36, 202.37, 202.38, 202.5, 202.6, 202.7, 202.8, 202.9, 203.00, 203.01, 203.80, 203.81, 238.6, 273.3, V10.71, V10.72, V10.79</td>
+</tr>
+<tr class="odd">
+<td align="left">Hematoligic malignancy (multiple myeloma)</td>
+<td align="left">203</td>
+</tr>
+<tr class="even">
+<td align="left">Hepatic encephalopathy or coma</td>
+<td align="left">572.2</td>
+</tr>
+<tr class="odd">
+<td align="left">Hepatic failure</td>
+<td align="left">070.2, 070.3, 070.41, 070.44, 070.51, 070.54, 070.7, 155, 275, 571, 573.3</td>
+</tr>
+<tr class="even">
+<td align="left">Hypercapnia</td>
+<td align="left">786.09</td>
+</tr>
+<tr class="odd">
+<td align="left">Long-term or high-dose steroids</td>
+<td align="left">V58.65</td>
+</tr>
+<tr class="even">
+<td align="left">Portal hypertenstion</td>
+<td align="left">572.3</td>
+</tr>
+<tr class="odd">
+<td align="left">Radiation</td>
+<td align="left">E926</td>
+</tr>
+<tr class="even">
+<td align="left">Received therapy that causes immunosuppression</td>
+<td align="left">V87.46</td>
+</tr>
+<tr class="odd">
+<td align="left">Receiving chronic dialysis</td>
+<td align="left">585.6</td>
+</tr>
+<tr class="even">
+<td align="left">Respiratory dependency</td>
+<td align="left">V46.11</td>
+</tr>
+<tr class="odd">
+<td align="left">Secondary polycythemia</td>
+<td align="left">289.0</td>
+</tr>
+<tr class="even">
+<td align="left">Severe pulmonary hypertension</td>
+<td align="left">416</td>
+</tr>
+<tr class="odd">
+<td align="left">Upper GI bleed, due to portal hypertension</td>
+<td align="left">530.82, 578.9</td>
+</tr>
+</tbody>
+</table>
+<p><!--
+<caption>--><span class="marginnote shownote">ICD-10-CM Codes Used in Author-Defined Comorbidity Set</span><!--</caption>--></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Comorbidity</th>
+<th align="left">ICD-10-CM</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">AIDS illness: Kaposi’s sarcoma</td>
+<td align="left">C46.0</td>
+</tr>
+<tr class="even">
+<td align="left">AIDS illness: Pneumocytosis</td>
+<td align="left">B59</td>
+</tr>
+<tr class="odd">
+<td align="left">AIDS illness: Toxoplasmosis</td>
+<td align="left">B58.01, B58.09, B58.1, B58.2, B58.3, B58.81, B58.89, B58.89, B58.9</td>
+</tr>
+<tr class="even">
+<td align="left">AIDS illness: Tuberculosis</td>
+<td align="left">A15.0, A15.4, A15.5, A15.6, A15.7, A15.8, A17.0, A17.1, A17.81, A17.82, A17.89, A17.9, A18.01, A18.02, A18.03, A18.10, A18.11, A18.12, A18.13, A18.14, A18.15, A18.16, A18.17, A18.18, A18.2, A18.31, A18.32, A18.39, A18.4, A18.50, A18.51, A18.52, A18.53, A18.54, A18.59, A18.6, A18.7, A18.81, A18.84, A18.85, A18.89, A19.2, A19.8, A19.9</td>
+</tr>
+<tr class="odd">
+<td align="left">AIDS: HIV with AIDS-defining illness</td>
+<td align="left">B20</td>
+</tr>
+<tr class="even">
+<td align="left">Cancer, metastatic)</td>
+<td align="left">C77, C78, C79, C80</td>
+</tr>
+<tr class="odd">
+<td align="left">Chemotherapy</td>
+<td align="left">Z51.11, Z51.12, Z92.21</td>
+</tr>
+<tr class="even">
+<td align="left">Chronic hypoxia</td>
+<td align="left">J96.10, R09.02</td>
+</tr>
+<tr class="odd">
+<td align="left">Chronic restrictive, obstructive, or vascular disease</td>
+<td align="left">I70, I71, I73.1, I73.8, I73.9, I77.1, I79.0, I79.2, K55.1, K55.8, K55.9, Z95.8, Z95.9</td>
+</tr>
+<tr class="even">
+<td align="left">Chronic restrictive, obstructive, or vascular disease</td>
+<td align="left">I27.8, I27.9, J40, J41, J42, J43, J44, J45, J46, J47, J60, J61, J62, J63, J64, J65, J66, J67, J68.4, J70.1, J70.3</td>
+</tr>
+<tr class="odd">
+<td align="left">Cirrhosis</td>
+<td align="left">I85.00, I85.01, I85.10, I85.11, K65.2, K70.30, K72.90, K72.91, K74.0, K74.60, K74.69, K76.7, R18.8</td>
+</tr>
+<tr class="even">
+<td align="left">Heart failure (NYHA stage IV)</td>
+<td align="left">I50.1, I50.20, I50.21, I50.22, I50.23, I50.30, I50.31, I50.32, I50.33, I50.40, I50.41, I50.42, I50.43, I50.9, I50.9</td>
+</tr>
+<tr class="odd">
+<td align="left">Hematoligic malignancy (leukemia)</td>
+<td align="left">C95.00, C95.01, C95.02, C95.10, C95.11, C95.12, C95.90, C95.90, C95.90, C95.91, C95.91, C95.91, C95.92, C95.92, C95.92</td>
+</tr>
+<tr class="even">
+<td align="left">Hematoligic malignancy (lymphoma)</td>
+<td align="left">C81, C82, C83, C84, C85, C88, C90.0, C90.2, C96</td>
+</tr>
+<tr class="odd">
+<td align="left">Hematoligic malignancy (multiple myeloma)</td>
+<td align="left">C90.00, C90.00, C90.01, C90.02</td>
+</tr>
+<tr class="even">
+<td align="left">Hepatic encephalopathy or coma</td>
+<td align="left">K72.90, K72.91</td>
+</tr>
+<tr class="odd">
+<td align="left">Hepatic failure</td>
+<td align="left">B16.0, B16.1, B16.2, B16.9, B17.10, B17.11, B18.0, B18.0, B18.1, B18.1, B18.2, B18.2, B19.10, B19.11, B19.20, B19.21, C22.0, C22.1, C22.2, C22.7, C22.8, K70.0, K70.10, K70.30, K70.9, K71.6, K73.0, K73.2, K73.8, K73.9, K74.0, K74.1, K74.3, K74.4, K74.5, K74.60, K74.69, K75.4, K75.9, K76.0, K76.89, K76.9</td>
+</tr>
+<tr class="even">
+<td align="left">Hypercapnia</td>
+<td align="left">R06.00, R06.09, R06.3, R06.83, R06.89</td>
+</tr>
+<tr class="odd">
+<td align="left">Long-term or high-dose steroids</td>
+<td align="left">Z79.51, Z79.52</td>
+</tr>
+<tr class="even">
+<td align="left">Portal hypertenstion</td>
+<td align="left">K76.6</td>
+</tr>
+<tr class="odd">
+<td align="left">Radiation</td>
+<td align="left">W90.0X</td>
+</tr>
+<tr class="even">
+<td align="left">Received therapy that causes immunosuppression</td>
+<td align="left">Z92.25</td>
+</tr>
+<tr class="odd">
+<td align="left">Receiving chronic dialysis</td>
+<td align="left">N18.6</td>
+</tr>
+<tr class="even">
+<td align="left">Respiratory dependency</td>
+<td align="left">Z99.11</td>
+</tr>
+<tr class="odd">
+<td align="left">Secondary polycythemia</td>
+<td align="left">D75.1</td>
+</tr>
+<tr class="even">
+<td align="left">Severe pulmonary hypertension</td>
+<td align="left">I27.0</td>
+</tr>
+<tr class="odd">
+<td align="left">Upper GI bleed, due to portal hypertension</td>
+<td align="left">K22.8, K92.2</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="statistical-methods" class="section level1">
 <h1>Statistical Methods</h1>
-<p>Data processing, risk score calculations, and statistical analysis were performed using R version 3.3.2 (2016-10-31) (<span class="citation">R Core Team (<label for="tufte-mn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="tufte-mn-1" class="margin-toggle">2016<span class="marginnote">R Core Team. 2016. <em>R: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/" class="uri">https://www.R-project.org/</a>.</span>)</span>). The <code>icd</code> package (<span class="citation">Wasey (<label for="tufte-mn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="tufte-mn-2" class="margin-toggle">2016<span class="marginnote">Wasey, Jack O. 2016. <em>Icd: Tools for Working with Icd-9 and Icd-10 Codes, and Finding Comorbidities</em>. <a href="https://CRAN.R-project.org/package=icd" class="uri">https://CRAN.R-project.org/package=icd</a>.</span>)</span>) was used to cross patient diagnosis codes with comorbidity set diagnosis codes.</p>
+<p>Data processing, risk score calculations, and statistical analysis were performed using R version 3.3.2 (2016-10-31) (<span class="citation">R Core Team (<label for="tufte-mn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="tufte-mn-1" class="margin-toggle">2016<span class="marginnote">R Core Team. 2016. <em>R: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/" class="uri">https://www.R-project.org/</a>.</span>)</span>). The <code>icd</code> package (<span class="citation">Wasey (<label for="tufte-mn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="tufte-mn-2" class="margin-toggle">2016<span class="marginnote">Wasey, Jack O. 2016. <em>Icd: Tools for Working with Icd-9 and Icd-10 Codes, and Finding Comorbidities</em>. <a href="https://CRAN.R-project.org/package=icd" class="uri">https://CRAN.R-project.org/package=icd</a>.</span>)</span>) was used to cross-reference patient diagnosis codes with comorbidity set diagnosis codes.</p>
 </div>
 <div id="supplemental-results" class="section level1">
 <h1>Supplemental Results</h1>

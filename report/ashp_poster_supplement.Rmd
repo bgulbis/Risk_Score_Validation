@@ -12,7 +12,7 @@ link-citations: yes
 ```{r setup, include=FALSE}
 library(tufte)
 # invalidate cache when the tufte version changes
-knitr::opts_chunk$set(tidy = FALSE, cache.extra = packageVersion('tufte'))
+knitr::opts_chunk$set(tidy = FALSE, cache.extra = packageVersion('tufte'), echo = FALSE)
 options(htmltools.dir.version = FALSE)
 
 library(tidyverse)
@@ -20,6 +20,8 @@ library(stringr)
 library(forcats)
 library(tableone)
 library(broom)
+library(icd)
+library(icuriskr)
 
 dirr::get_rds("../data/final")
 ```
@@ -31,15 +33,79 @@ There were `r format(exclude$screen, big.mark = ",")` patient encounters identif
 * Pregnant: `r format(exclude$pregnant, big.mark = ",")`
 * Prisoner: `r format(exclude$prisoners, big.mark = ",")`
 * Missing data needed to calculate risk scores: `r format(exclude$labs_missing + exclude$mult_icd_types + exclude$icu_short, big.mark = ",")`
-* Re-encounters (only included each patient once) : `r format(exclude$reencounter, big.mark = ",")`
+* Re-encounters (each patient  once) : `r format(exclude$reencounter, big.mark = ",")`
 
 This left a total of `r format(flatten_int(exclude)[1] - sum(flatten_int(exclude)[-1]), big.mark = ",")` eligible patients remaining. From these, a random sample of 200 patients were selected for inclusion in the study. 
 
 # Comorbidity Definitions
 
+The following tables contain the list of ICD-9-CM and ICD-10-CM codes which were included in the author-defined comorbidity set.^[All child-codes of the codes listed were also included (i.e., 196 includes 196.0, 196.1, etc.)] 
+
+
+```{r, message=FALSE, warning=FALSE}
+comorb <- list(cancer_mets = "Cancer, metastatic)",
+               chemo = "Chemotherapy",
+               chf = "Heart failure (NYHA stage IV)",
+               chronic_hd = "Receiving chronic dialysis",
+               cirrhosis = "Cirrhosis",
+               encephalopathy_coma = "Hepatic encephalopathy or coma",
+               hepatic_failure = "Hepatic failure",
+               hiv = "AIDS: HIV with AIDS-defining illness",
+               hypercapnia = "Hypercapnia",
+               hypoxia = "Chronic hypoxia",
+               immunosuppress = "Received therapy that causes immunosuppression",
+               kaposi = "AIDS illness: Kaposi's sarcoma",
+               leukemia = "Hematoligic malignancy (leukemia)",
+               lymphoma = "Hematoligic malignancy (lymphoma)",
+               mult_myeloma = "Hematoligic malignancy (multiple myeloma)",
+               pneumocytosis = "AIDS illness: Pneumocytosis",
+               polycythemia = "Secondary polycythemia",
+               portal_htn = "Portal hypertenstion",
+               pulmonary = "Chronic restrictive, obstructive, or vascular disease",
+               pulm_htn = "Severe pulmonary hypertension",
+               pvd = "Chronic restrictive, obstructive, or vascular disease",
+               radiation = "Radiation",
+               resp_depend = "Respiratory dependency",
+               steroids = "Long-term or high-dose steroids",
+               toxoplasmosis = "AIDS illness: Toxoplasmosis",
+               tuberculosis = "AIDS illness: Tuberculosis",
+               upper_gi_bleed = "Upper GI bleed, due to portal hypertension")
+
+icd9 <- comorbidity_map_icd9_ek %>%
+    map(sort) %>%
+    map(icd_condense, warn = FALSE) %>%
+    map(icd_short_to_decimal) %>%
+    map(str_c, collapse = ", ") %>%
+    simplify() %>%
+    as_tibble() %>%
+    rownames_to_column("Comorbidity") %>%
+    rename(`ICD-9-CM` = value) %>%
+    dmap_at("Comorbidity", str_replace_all, pattern = comorb) %>%
+    arrange(Comorbidity)
+
+knitr::kable(icd9, caption = "ICD-9-CM Codes Used in Author-Defined Comorbidity Set")
+```
+
+```{r}
+icd10 <- comorbidity_map_icd10_ek %>%
+    # map(icd_condense, warn = FALSE) %>%
+    map(sort) %>%
+    map(icd_short_to_decimal) %>%
+    map(str_c, collapse = ", ") %>%
+    simplify() %>%
+    as_tibble() %>%
+    rownames_to_column("Comorbidity") %>%
+    rename(`ICD-10-CM` = value) %>%
+    dmap_at("Comorbidity", str_replace_all, pattern = comorb) %>%
+    arrange(Comorbidity)
+
+knitr::kable(icd10, caption = "ICD-10-CM Codes Used in Author-Defined Comorbidity Set")
+```
+
+
 # Statistical Methods
 
-Data processing, risk score calculations, and statistical analysis were performed using `r R.Version()$version.string` (@R-base). The `icd` package (@R-icd) was used to cross patient diagnosis codes with comorbidity set diagnosis codes.
+Data processing, risk score calculations, and statistical analysis were performed using `r R.Version()$version.string` (@R-base). The `icd` package (@R-icd) was used to cross-reference patient diagnosis codes with comorbidity set diagnosis codes.
 
 # Supplemental Results
 
