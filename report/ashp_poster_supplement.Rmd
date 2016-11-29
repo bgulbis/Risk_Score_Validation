@@ -1,0 +1,38 @@
+---
+title: "Validation of ICD-9-CM/ICD-10-CM Codes for Automated Electronic Scoring of APACHE II, APACHE III, and SAPS II"
+subtitle: "Supplemental Material"
+author: "Eric Kao, Brian Gulbis"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output:
+  tufte::tufte_html: default
+---
+
+```{r setup, include=FALSE}
+library(tufte)
+# invalidate cache when the tufte version changes
+knitr::opts_chunk$set(tidy = FALSE, cache.extra = packageVersion('tufte'))
+options(htmltools.dir.version = FALSE)
+# bibliography: skeleton.bib
+# link-citations: yes
+
+library(tidyverse)
+library(stringr)
+library(forcats)
+library(tableone)
+library(broom)
+
+dirr::get_rds("../data/final")
+```
+
+# Patient Selection
+
+There were `r format(exclude$screen, big.mark = ",")` patients identified who met inclusion criteria. Patients were then excluded for the following reasons:
+
+* Pregnant: `r format(exclude$pregnant, big.mark = ",")`
+* Prisoner: `r format(exclude$prisoners, big.mark = ",")`
+* ICU stay < 12 hours: `r format(exclude$icu_short, big.mark = ",")`
+* Diagnosis coding contained both ICD-9-CM and ICD-10-CM: `r format(exclude$mult_icd_types, big.mark = ",")`
+* Missing data needed to calculate risk scores: `r format(exclude$labs_missing, big.mark = ",")`
+* Re-encounters (only included each patient once) : `r format(exclude$reencounter, big.mark = ",")`
+
+This left a total of `r format(flatten_int(exclude)[1] - sum(flatten_int(exclude)[-1]), big.mark = ",")` eligible patients remaining. From these, a random sample of 200 patients were selected for inclusion in the study. 
