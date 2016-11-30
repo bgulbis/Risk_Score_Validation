@@ -39,7 +39,7 @@ This left a total of `r format(flatten_int(exclude)[1] - sum(flatten_int(exclude
 
 # Comorbidity Definitions
 
-The following tables contain the list of ICD-9-CM and ICD-10-CM codes which were included in the author-defined comorbidity set.^[All child-codes of the codes listed were also included (i.e., 196 includes 196.0, 196.1, etc.)] 
+The following tables contain the list of ICD-9-CM and ICD-10-CM codes which were included in the author-defined comorbidity set.^[Any child-codes for the codes listed were also included (i.e., 196 includes 196.0, 196.1, etc.)] 
 
 
 ```{r, message=FALSE, warning=FALSE}
@@ -52,7 +52,7 @@ icd9 <- comorbidity_map_icd9_ek %>%
     as_tibble() %>%
     rownames_to_column("comorbidity")
 
-defs <- read_csv("../data/external/comorbidity_definitions.csv")
+defs <- read_csv("comorbidity_definitions.csv")
 
 df <- defs %>%
     filter(score == "apache2") %>%
@@ -80,6 +80,46 @@ df <- defs %>%
     dmap(~ coalesce(.x, ""))
 
 knitr::kable(df, caption = "ICD-10-CM Codes Used in Author-Defined Comorbidity Set for APACHE II")
+```
+
+```{r}
+df <- defs %>%
+    filter(score == "apache3") %>%
+    left_join(icd9, by = c("icd" = "comorbidity")) %>%
+    select(Comorbidity = comorbidity, Criteria = criteria, `ICD-9-CM Code` = value) %>%
+    dmap(~ coalesce(.x, ""))
+
+knitr::kable(df, caption = "ICD-9-CM Codes Used in Author-Defined Comorbidity Set for APACHE III")
+```
+
+```{r}
+df <- defs %>%
+    filter(score == "apache3") %>%
+    left_join(icd10, by = c("icd" = "comorbidity")) %>%
+    select(Comorbidity = comorbidity, Criteria = criteria, `ICD-10-CM Code` = value) %>%
+    dmap(~ coalesce(.x, ""))
+
+knitr::kable(df, caption = "ICD-10-CM Codes Used in Author-Defined Comorbidity Set for APACHE III")
+```
+
+```{r}
+df <- defs %>%
+    filter(score == "saps2") %>%
+    left_join(icd9, by = c("icd" = "comorbidity")) %>%
+    select(Comorbidity = comorbidity, Criteria = criteria, `ICD-9-CM Code` = value) %>%
+    dmap(~ coalesce(.x, ""))
+
+knitr::kable(df, caption = "ICD-9-CM Codes Used in Author-Defined Comorbidity Set for SAPS II")
+```
+
+```{r}
+df <- defs %>%
+    filter(score == "saps2") %>%
+    left_join(icd10, by = c("icd" = "comorbidity")) %>%
+    select(Comorbidity = comorbidity, Criteria = criteria, `ICD-10-CM Code` = value) %>%
+    dmap(~ coalesce(.x, ""))
+
+knitr::kable(df, caption = "ICD-10-CM Codes Used in Author-Defined Comorbidity Set for SAPS II")
 ```
 
 

@@ -1,0 +1,53 @@
+score,group,comorbidity,criteria,icd
+apache2,Liver,,,
+apache2,,Biopsy proven cirrhosis and documented portal hypertension,,cirrhosis
+apache2,, ,Plus,portal_htn
+apache2,,Past upper GI bleed attributed to portal hypertension,,upper_gi_bleed
+apache2,, ,Plus,portal_htn
+apache2,,"Prior hepatic failure, encephalopathy, or coma",,hepatic_failure
+apache2,, ,Or,encephalopathy_coma
+apache2,Cardiovascular,,,
+apache2,,Heart failure,,chf
+apache2,Respiratory,,,
+apache2,,"Chronic restrictive, obstructive, or vascular disease ",,pulmonary
+apache2,,,Or,pvd
+apache2,,Chronic hypoxia,,hypoxia
+apache2,,Chronic hypercapnia,,hypercapnia
+apache2,,Secondary polycythemia,,polycythemia
+apache2,,Severe pulmonary hypertension,,pulm_htn
+apache2,,Respirator dependence,,resp_depend
+apache2,Renal,,,
+apache2,,Receiving chronic dialysis,,chronic_hd
+apache2,Immuno-compromised,,,
+apache2,,Immuno-suppression therapy,,immunosuppress
+apache2,,Chemotherapy,,chemo
+apache2,,Radiation,,radiation
+apache2,,Long-term or high-dose steroids,,steroids
+apache2,,Leukemia,,leukemia
+apache2,,Lymphoma,,lymphoma
+apache2,,AIDS,,hiv
+apache2,,,Plus,kaposi
+apache2,,,Or,pneumocytosis
+apache2,,,Or,toxoplasmosis
+apache2,,,Or,tuberculosis
+apache3,,AIDS,,hiv
+apache3,,,Plus,kaposi
+apache3,,,Or,pneumocytosis
+apache3,,,Or,toxoplasmosis
+apache3,,,Or,tuberculosis
+apache3,,Hepatic failure,,hepatic_failure
+apache3,,Lymphoma,,lymphoma
+apache3,,Metastatic cancer,,cancer_mets
+apache3,,Leukemia or multiple myeloma,,leukemia
+apache3,,,Or,mult_myeloma
+apache3,,Immuno-suppression therapy,,immunosuppress
+apache3,,Cirrhosis,,cirrhosis
+saps2,,AIDS,,hiv
+saps2,,,Plus,kaposi
+saps2,,,Or,pneumocytosis
+saps2,,,Or,toxoplasmosis
+saps2,,,Or,tuberculosis
+saps2,,Metastatic cancer,,cancer_mets
+saps2,,Hematologic malignancy,,leukemia
+saps2,,,Or,lymphoma
+saps2,,,Or,mult_myeloma
