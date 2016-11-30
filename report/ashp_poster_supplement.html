@@ -12,7 +12,7 @@
 
 <meta name="author" content="Eric Kao, Brian Gulbis" />
 
-<meta name="date" content="2016-11-29" />
+<meta name="date" content="2016-11-30" />
 
 <title>Validation of ICD-9-CM/ICD-10-CM Codes for Automated Electronic Scoring of APACHE II, APACHE III, and SAPS II</title>
 
@@ -43,7 +43,7 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <h1 class="title toc-ignore">Validation of ICD-9-CM/ICD-10-CM Codes for Automated Electronic Scoring of APACHE II, APACHE III, and SAPS II</h1>
 <h3 class="subtitle"><em>Supplemental Material</em></h3>
 <h4 class="author"><em>Eric Kao, Brian Gulbis</em></h4>
-<h4 class="date"><em>November 29, 2016</em></h4>
+<h4 class="date"><em>November 30, 2016</em></h4>
 
 
 
@@ -727,9 +727,247 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <div id="statistical-methods" class="section level1">
 <h1>Statistical Methods</h1>
 <p>Data processing, risk score calculations, and statistical analysis were performed using R version 3.3.2 (2016-10-31) (<span class="citation">R Core Team (<label for="tufte-mn-1" class="margin-toggle">&#8853;</label><input type="checkbox" id="tufte-mn-1" class="margin-toggle">2016<span class="marginnote">R Core Team. 2016. <em>R: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/" class="uri">https://www.R-project.org/</a>.</span>)</span>). The <code>icd</code> package (<span class="citation">Wasey (<label for="tufte-mn-2" class="margin-toggle">&#8853;</label><input type="checkbox" id="tufte-mn-2" class="margin-toggle">2016<span class="marginnote">Wasey, Jack O. 2016. <em>Icd: Tools for Working with Icd-9 and Icd-10 Codes, and Finding Comorbidities</em>. <a href="https://CRAN.R-project.org/package=icd" class="uri">https://CRAN.R-project.org/package=icd</a>.</span>)</span>) was used to cross-reference patient diagnosis codes with comorbidity set diagnosis codes.</p>
+<p>Continuous data were analyzed using a paired t-test and Wilcoxon signed rank test. The p-value was then adjusted using the Benjamini and Hochberg method to adjust for performing multiple comparisons.</p>
+<p>A univarite linear regression model was fit using the risk score from each comorbidity set to predict the risk score for the manual review set.</p>
 </div>
 <div id="supplemental-results" class="section level1">
 <h1>Supplemental Results</h1>
+<p><!--
+<caption>--><span class="marginnote shownote">Summary of APACHE II Score for Each Comorbidity Set</span><!--</caption>--></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Tool</th>
+<th align="right">Mean</th>
+<th align="right">SD</th>
+<th align="right">P-value*</th>
+<th align="left">95% CI*</th>
+<th align="right">Median</th>
+<th align="left">IQR</th>
+<th align="right">P-value**</th>
+<th align="left">95% CI**</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">AHRQ</td>
+<td align="right">20.20</td>
+<td align="right">6.858</td>
+<td align="right">0.131</td>
+<td align="left">0.014 - 0.646</td>
+<td align="right">20</td>
+<td align="left">15 - 24</td>
+<td align="right">0.168</td>
+<td align="left">0 - 2</td>
+</tr>
+<tr class="even">
+<td align="left">AHRQ+DRG</td>
+<td align="right">19.79</td>
+<td align="right">6.832</td>
+<td align="right">0.619</td>
+<td align="left">-0.397 - 0.237</td>
+<td align="right">19</td>
+<td align="left">15 - 24</td>
+<td align="right">0.518</td>
+<td align="left">-1.5 - 0</td>
+</tr>
+<tr class="odd">
+<td align="left">Authors</td>
+<td align="right">20.05</td>
+<td align="right">6.910</td>
+<td align="right">0.425</td>
+<td align="left">-0.138 - 0.498</td>
+<td align="right">20</td>
+<td align="left">15 - 24</td>
+<td align="right">0.504</td>
+<td align="left">0 - 2</td>
+</tr>
+<tr class="even">
+<td align="left">Authors+DRG</td>
+<td align="right">19.65</td>
+<td align="right">6.867</td>
+<td align="right">0.341</td>
+<td align="left">-0.535 - 0.095</td>
+<td align="right">19</td>
+<td align="left">15 - 24</td>
+<td align="right">0.271</td>
+<td align="left">-1.5 - 0</td>
+</tr>
+<tr class="odd">
+<td align="left">Elixhauser</td>
+<td align="right">20.18</td>
+<td align="right">6.927</td>
+<td align="right">0.131</td>
+<td align="left">0.001 - 0.619</td>
+<td align="right">20</td>
+<td align="left">15 - 24</td>
+<td align="right">0.168</td>
+<td align="left">0 - 2</td>
+</tr>
+<tr class="even">
+<td align="left">Elixhauser+DRG</td>
+<td align="right">19.77</td>
+<td align="right">6.900</td>
+<td align="right">0.619</td>
+<td align="left">-0.409 - 0.209</td>
+<td align="right">19</td>
+<td align="left">15 - 24</td>
+<td align="right">0.518</td>
+<td align="left">-1.5 - 0</td>
+</tr>
+<tr class="odd">
+<td align="left">Manual</td>
+<td align="right">19.87</td>
+<td align="right">7.021</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+<td align="right">19</td>
+<td align="left">15 - 24.25</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">Quan</td>
+<td align="right">20.18</td>
+<td align="right">6.927</td>
+<td align="right">0.131</td>
+<td align="left">0.001 - 0.619</td>
+<td align="right">20</td>
+<td align="left">15 - 24</td>
+<td align="right">0.168</td>
+<td align="left">0 - 2</td>
+</tr>
+<tr class="odd">
+<td align="left">Quan+DRG</td>
+<td align="right">19.78</td>
+<td align="right">6.892</td>
+<td align="right">0.619</td>
+<td align="left">-0.399 - 0.219</td>
+<td align="right">19</td>
+<td align="left">15 - 24</td>
+<td align="right">0.518</td>
+<td align="left">-1.5 - 0</td>
+</tr>
+</tbody>
+</table>
+<p><!--
+<caption>--><span class="marginnote shownote">Summary of APACHE III Score for Each Comorbidity Set</span><!--</caption>--></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Tool</th>
+<th align="right">Mean</th>
+<th align="right">SD</th>
+<th align="right">P-value*</th>
+<th align="left">95% CI*</th>
+<th align="right">Median</th>
+<th align="left">IQR</th>
+<th align="right">P-value**</th>
+<th align="left">95% CI**</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">AHRQ</td>
+<td align="right">85.715</td>
+<td align="right">29.300</td>
+<td align="right">0.007</td>
+<td align="left">0.302 - 1.518</td>
+<td align="right">82.0</td>
+<td align="left">65.8 - 103.2</td>
+<td align="right">0.012</td>
+<td align="left">3 - 13</td>
+</tr>
+<tr class="even">
+<td align="left">AHRQ+DRG</td>
+<td align="right">85.555</td>
+<td align="right">29.259</td>
+<td align="right">0.012</td>
+<td align="left">0.169 - 1.331</td>
+<td align="right">82.0</td>
+<td align="left">65 - 103.2</td>
+<td align="right">0.018</td>
+<td align="left">1.5 - 11.5</td>
+</tr>
+<tr class="odd">
+<td align="left">Authors</td>
+<td align="right">85.715</td>
+<td align="right">29.300</td>
+<td align="right">0.007</td>
+<td align="left">0.302 - 1.518</td>
+<td align="right">82.0</td>
+<td align="left">65.8 - 103.2</td>
+<td align="right">0.012</td>
+<td align="left">3 - 13</td>
+</tr>
+<tr class="even">
+<td align="left">Authors+DRG</td>
+<td align="right">85.555</td>
+<td align="right">29.259</td>
+<td align="right">0.012</td>
+<td align="left">0.169 - 1.331</td>
+<td align="right">82.0</td>
+<td align="left">65 - 103.2</td>
+<td align="right">0.018</td>
+<td align="left">1.5 - 11.5</td>
+</tr>
+<tr class="odd">
+<td align="left">Elixhauser</td>
+<td align="right">85.715</td>
+<td align="right">29.300</td>
+<td align="right">0.007</td>
+<td align="left">0.302 - 1.518</td>
+<td align="right">82.0</td>
+<td align="left">65.8 - 103.2</td>
+<td align="right">0.012</td>
+<td align="left">3 - 13</td>
+</tr>
+<tr class="even">
+<td align="left">Elixhauser+DRG</td>
+<td align="right">85.555</td>
+<td align="right">29.259</td>
+<td align="right">0.012</td>
+<td align="left">0.169 - 1.331</td>
+<td align="right">82.0</td>
+<td align="left">65 - 103.2</td>
+<td align="right">0.018</td>
+<td align="left">1.5 - 11.5</td>
+</tr>
+<tr class="odd">
+<td align="left">Manual</td>
+<td align="right">84.805</td>
+<td align="right">28.998</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+<td align="right">81.5</td>
+<td align="left">63.8 - 103</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">Quan</td>
+<td align="right">85.715</td>
+<td align="right">29.300</td>
+<td align="right">0.007</td>
+<td align="left">0.302 - 1.518</td>
+<td align="right">82.0</td>
+<td align="left">65.8 - 103.2</td>
+<td align="right">0.012</td>
+<td align="left">3 - 13</td>
+</tr>
+<tr class="odd">
+<td align="left">Quan+DRG</td>
+<td align="right">85.555</td>
+<td align="right">29.259</td>
+<td align="right">0.012</td>
+<td align="left">0.169 - 1.331</td>
+<td align="right">82.0</td>
+<td align="left">65 - 103.2</td>
+<td align="right">0.018</td>
+<td align="left">1.5 - 11.5</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="references" class="section level1">
 <h1>References</h1>
