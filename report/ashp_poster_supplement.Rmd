@@ -145,6 +145,10 @@ all_scores <- map(scores, ~mutate(get(.x), score = .x)) %>%
     arrange(pie.id, score) %>%
     dmap_at("score", str_replace_all, pattern = "score_apache2_", replacement = "") 
 
+apache2_df <- all_scores %>%
+    spread(score, apache2) %>%
+    gather(score, apache2, -pie.id, -manual)
+
 man <- filter(all_scores, score == "manual")$apache2
 
 score_type <- list("ahrq" = "AHRQ",
@@ -192,6 +196,10 @@ all_scores <- map(scores, ~mutate(get(.x), score = .x)) %>%
     arrange(pie.id, score) %>%
     dmap_at("score", str_replace_all, pattern = "score_apache3_", replacement = "") 
 
+apache3_df <- all_scores %>%
+    spread(score, apache3) %>%
+    gather(score, apache3, -pie.id, -manual)
+
 man <- filter(all_scores, score == "manual")$apache3
 
 t <- all_scores[, -1] %>%
@@ -232,6 +240,10 @@ all_scores <- map(scores, ~mutate(get(.x), score = .x)) %>%
     map_df(~semi_join(.x, manual_patients, by = "pie.id")) %>%
     arrange(pie.id, score) %>%
     dmap_at("score", str_replace_all, pattern = "score_saps2_", replacement = "") 
+
+saps2_df <- all_scores %>%
+    spread(score, saps2) %>%
+    gather(score, saps2, -pie.id, -manual)
 
 man <- filter(all_scores, score == "manual")$saps2
 
@@ -417,3 +429,61 @@ df <- apache2_diff %>%
 knitr::kable(df, digits = 3, align = "lccc", caption = "Proportion of Patients with Differing Comorbidities")
 ```
 
+## Linear Regression Models
+
+```{r}
+lm <- apache2_df %>%
+    group_by(score) %>%
+    do(fit = lm(manual ~ apache2, data = .)) %>%
+    dmap_at("score", str_replace_all, pattern = score_type) %>%
+    rename(Tool = score)
+
+knitr::kable(glance(lm, fit), digits = 3, caption = "Linear Regression Models for APACHE II")
+```
+
+```{r, fig.cap = "Fitted Values vs. Residuals for APACHE II Linear Regression Models"}
+augment(lm, fit) %>%
+    ggplot(aes(x = .fitted, y = .resid)) + 
+    geom_point() +
+    xlab("Fitted Values") +
+    ylab("Residuals") +
+    facet_wrap(~ Tool)
+```
+
+```{r}
+lm <- apache3_df %>%
+    group_by(score) %>%
+    do(fit = lm(manual ~ apache3, data = .)) %>%
+    dmap_at("score", str_replace_all, pattern = score_type) %>%
+    rename(Tool = score)
+
+knitr::kable(glance(lm, fit), digits = 3, caption = "Linear Regression Models for APACHE III")
+```
+
+```{r, fig.cap = "Fitted Values vs. Residuals for APACHE III Linear Regression Models"}
+augment(lm, fit) %>%
+    ggplot(aes(x = .fitted, y = .resid)) + 
+    geom_point() +
+    xlab("Fitted Values") +
+    ylab("Residuals") +
+    facet_wrap(~ Tool)
+```
+
+```{r}
+lm <- saps2_df %>%
+    group_by(score) %>%
+    do(fit = lm(manual ~ saps2, data = .)) %>%
+    dmap_at("score", str_replace_all, pattern = score_type) %>%
+    rename(Tool = score)
+
+knitr::kable(glance(lm, fit), digits = 3, caption = "Linear Regression Models for SAPS II")
+```
+
+```{r, fig.cap = "Fitted Values vs. Residuals for SAPS II Linear Regression Models"}
+augment(lm, fit) %>%
+    ggplot(aes(x = .fitted, y = .resid)) + 
+    geom_point() +
+    xlab("Fitted Values") +
+    ylab("Residuals") +
+    facet_wrap(~ Tool)
+```
