@@ -100,6 +100,13 @@ ggplot(all_scores, aes(x = score, y = apache2)) +
     # geom_jitter(color = "light blue", alpha = 0.6)
 ```
 
+```{r}
+ggplot(all_scores, aes(x = apache2)) +
+    geom_histogram(binwidth = 0.5) +
+    facet_wrap(~ score)
+```
+
+
 ```{r, fig.height=6, fig.width=6}
 df <- all_scores %>%
     spread(score, apache2) %>%
@@ -144,6 +151,15 @@ mw <- all_scores[, -1] %>%
 knitr::kable(mw, digits = 4)
 ```
 
+```{r}
+options(scipen = 999)
+mw_pair <- all_scores %>%
+    dmap_at("score", factor) %>%
+    dmap_at("score", ~fct_relevel(.x, c("manual", "ek", "ek_drg"))) %>%
+    do(tidy(pairwise.wilcox.test(.$apache2, .$score, p.adj = "BH", paired = TRUE, exact = FALSE)))
+```
+
+
 #### Linear Regression Model
 
 ```{r}
@@ -158,8 +174,20 @@ knitr::kable(glance(lm, fit), digits = 4)
 augment(lm, fit) %>%
     ggplot(aes(x = .fitted, y = .resid)) + 
     geom_point() +
+    # geom_smooth(se = FALSE) +
     facet_wrap(~ score)
 ```
+
+```{r}
+mod_df <- df %>%
+    filter(score == "ek_drg")
+
+mod <- lm(manual ~ apache2, data = mod_df)
+
+par(mfrow = c(2, 2))
+plot(mod)
+```
+
 
 
 * Compare differences in score from comorbidity sets vs. manual
