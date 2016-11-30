@@ -43,34 +43,6 @@ The following tables contain the list of ICD-9-CM and ICD-10-CM codes which were
 
 
 ```{r, message=FALSE, warning=FALSE}
-comorb <- list(cancer_mets = "Cancer, metastatic)",
-               chemo = "Chemotherapy",
-               chf = "Heart failure (NYHA stage IV)",
-               chronic_hd = "Receiving chronic dialysis",
-               cirrhosis = "Cirrhosis",
-               encephalopathy_coma = "Hepatic encephalopathy or coma",
-               hepatic_failure = "Hepatic failure",
-               hiv = "AIDS: HIV with AIDS-defining illness",
-               hypercapnia = "Hypercapnia",
-               hypoxia = "Chronic hypoxia",
-               immunosuppress = "Received therapy that causes immunosuppression",
-               kaposi = "AIDS illness: Kaposi's sarcoma",
-               leukemia = "Hematoligic malignancy (leukemia)",
-               lymphoma = "Hematoligic malignancy (lymphoma)",
-               mult_myeloma = "Hematoligic malignancy (multiple myeloma)",
-               pneumocytosis = "AIDS illness: Pneumocytosis",
-               polycythemia = "Secondary polycythemia",
-               portal_htn = "Portal hypertenstion",
-               pulmonary = "Chronic restrictive, obstructive, or vascular disease",
-               pulm_htn = "Severe pulmonary hypertension",
-               pvd = "Chronic restrictive, obstructive, or vascular disease",
-               radiation = "Radiation",
-               resp_depend = "Respiratory dependency",
-               steroids = "Long-term or high-dose steroids",
-               toxoplasmosis = "AIDS illness: Toxoplasmosis",
-               tuberculosis = "AIDS illness: Tuberculosis",
-               upper_gi_bleed = "Upper GI bleed, due to portal hypertension")
-
 icd9 <- comorbidity_map_icd9_ek %>%
     map(sort) %>%
     map(icd_condense, warn = FALSE) %>%
@@ -78,12 +50,17 @@ icd9 <- comorbidity_map_icd9_ek %>%
     map(str_c, collapse = ", ") %>%
     simplify() %>%
     as_tibble() %>%
-    rownames_to_column("Comorbidity") %>%
-    rename(`ICD-9-CM` = value) %>%
-    dmap_at("Comorbidity", str_replace_all, pattern = comorb) %>%
-    arrange(Comorbidity)
+    rownames_to_column("comorbidity")
 
-knitr::kable(icd9, caption = "ICD-9-CM Codes Used in Author-Defined Comorbidity Set")
+defs <- read_csv("../data/external/comorbidity_definitions.csv")
+
+df <- defs %>%
+    filter(score == "apache2") %>%
+    left_join(icd9, by = c("icd" = "comorbidity")) %>%
+    select(Group = group, Comorbidity = comorbidity, Criteria = criteria, `ICD-9-CM Code` = value) %>%
+    dmap(~ coalesce(.x, ""))
+
+knitr::kable(df, caption = "ICD-9-CM Codes Used in Author-Defined Comorbidity Set for APACHE II")
 ```
 
 ```{r}
@@ -94,12 +71,15 @@ icd10 <- comorbidity_map_icd10_ek %>%
     map(str_c, collapse = ", ") %>%
     simplify() %>%
     as_tibble() %>%
-    rownames_to_column("Comorbidity") %>%
-    rename(`ICD-10-CM` = value) %>%
-    dmap_at("Comorbidity", str_replace_all, pattern = comorb) %>%
-    arrange(Comorbidity)
+    rownames_to_column("comorbidity") 
 
-knitr::kable(icd10, caption = "ICD-10-CM Codes Used in Author-Defined Comorbidity Set")
+df <- defs %>%
+    filter(score == "apache2") %>%
+    left_join(icd10, by = c("icd" = "comorbidity")) %>%
+    select(Group = group, Comorbidity = comorbidity, Criteria = criteria, `ICD-10-CM Code` = value) %>%
+    dmap(~ coalesce(.x, ""))
+
+knitr::kable(df, caption = "ICD-10-CM Codes Used in Author-Defined Comorbidity Set for APACHE II")
 ```
 
 
